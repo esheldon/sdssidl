@@ -1,3 +1,10 @@
 SDSSIDL is a set of general IDL utilities plotting, data analysis, and database access.  The distribution includes C/C++ extensions for postgres database interface, efficient file input/output, efficient ra/dec searching using HTM.
 
 There are many routines for working with Sloan Digital Sky Survey Data, especially the 'flat files' and characterization of the survey area.
+
+{{{
+pro crap, stuff, things
+  x=3
+  y=7*x
+end
+}}}
