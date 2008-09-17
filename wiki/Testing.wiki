@@ -2,3 +2,5 @@
 def mysquare(value):
     return value**2
 }}}
+
+Link to the [myfuncpy my function]
