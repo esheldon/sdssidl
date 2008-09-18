@@ -1,5 +1,5 @@
 {{{
-pro mcmc::_step, seed, pars, like, step_func, like_func, newpars, newlike, log=log
+pro step, seed, pars, like, step_func, like_func, newpars, newlike, log=log
 
   if (not keyword_set(like)) then like= call_function(like_func,pars)
 
