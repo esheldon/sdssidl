@@ -1,6 +1,25 @@
 {{{
-def mysquare(value):
-    return value**2
+pro mcmc::_step, seed, pars, like, step_func, like_func, newpars, newlike, log=log
+
+  if (not keyword_set(like)) then like= call_function(like_func,pars)
+
+  newpars= call_function(step_func,seed,pars)
+  newlike= call_function(like_func,newpars)
+
+  if keyword_set(log) then likeratio= newlike-like $
+  else likeratio= newlike/like
+
+  randomnumber= randomu(seed)
+
+  if keyword_set(log) then randomnumber= alog(randomnumber)
+  if NOT ((newlike GT like) OR $
+          (randomnumber LT likeratio)) then begin
+      newpars= pars
+      newlike= like
+  endif
+
+  return
+end
 }}}
 
 Link to the [myfuncpy my function]
