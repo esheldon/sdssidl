@@ -1,0 +1,2 @@
+# Config for OSF
+LDFLAGS = -shared 

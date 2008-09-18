@@ -1,0 +1,45 @@
+#!/bin/sh
+
+osname=`uname`
+
+echo "Configuring for OS: \"${osname}\""
+
+case $osname in
+    "Linux")
+        OS_CFLAGS="-Wall -fPIC"
+        SDSS_CFLAGS="-DLINKAGE -DCHECK_LEAKS -DSTAND_ALONE -DSDSS_LITTLE_ENDIAN"
+        OS_LDFLAGS="-shared"
+        OS_ARFLAGS="-rvcs"
+        # postgresql flags.  Standard should work on linux?
+        PG_CFLAGS=""
+        PG_LDFLAGS=""
+        # gsl stuff
+        GSL_CFLAGS=""
+        GSL_LDFLAGS=""
+    ;;
+    "Darwin")
+        # Have only checked on intel
+        OS_CFLAGS="-Wall -dynamic"
+        SDSS_CFLAGS="-DLINKAGE -DCHECK_LEAKS -DSTAND_ALONE -DSDSS_LITTLE_ENDIAN"
+        OS_LDFLAGS="-bundle -L/usr/lib -lc -flat_namespace -undefined suppress"
+        OS_ARFLAGS="-rvcs"
+        # postgresql flags.  Currently only support fink install
+        PG_CFLAGS="-I/sw/include/postgresql"
+        PG_LDFLAGS="-L/sw/lib"
+        # gsl stuff
+        GSL_CFLAGS="-I/sw/include"
+        GSL_LDFLAGS="-L/sw/lib"
+        ;;
+    *) 
+        echo "Unsupported OS: ${osname}"
+        exit 45;;
+esac
+
+echo "OS_CFLAGS=${OS_CFLAGS}" > make.conf
+echo "SDSS_CFLAGS=${SDSS_CFLAGS}" >> make.conf
+echo "OS_LDFLAGS=${OS_LDFLAGS}" >> make.conf
+echo "OS_ARFLAGS=${OS_ARFLAGS}" >> make.conf
+echo "PG_CFLAGS=${PG_CFLAGS}" >> make.conf
+echo "PG_LDFLAGS=${PG_LDFLAGS}" >> make.conf
+echo "GSL_CFLAGS=${GSL_CFLAGS}" >> make.conf
+echo "GSL_LDFLAGS=${GSL_LDFLAGS}" >> make.conf

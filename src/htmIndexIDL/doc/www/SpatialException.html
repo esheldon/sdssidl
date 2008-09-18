@@ -1,0 +1,149 @@
+<html><head><TITLE>SpatialException</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  SpatialException  </H2><BLOCKQUOTE>
+HTM SpatialIndex Exception base class
+This is the base class for all Science Archive exceptions
+</BLOCKQUOTE>
+<hr>
+ <h2> Inheritance:</h2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=155>
+<param name=classes value="CSpatialException,MSpatialException.html,CSpatialUnimplemented,MSpatialUnimplemented.html,CSpatialInterfaceError,MSpatialInterfaceError.html,CSpatialFailure,MSpatialFailure.html,CSpatialBoundsError,MSpatialBoundsError.html">
+<param name=before value="M,M|_,MR_,MR_,Mr_">
+<param name=after value="M,M,M,M,M">
+<param name=indent value="0,0,0,0,0">
+<param name=arrowdir value="down">
+</APPLET>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Fields</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.12.9"> <IMG BORDER=0 SRC=icon1.gif></A> static  char* </TD><TD><B>defaultstr</B> []<br>
+<I> default error string</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.12.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialException</B> ( const char *<!2><A HREF="SpatialException.html#DOC.12.6">what</A> = 0, int defIndex = 1 ) throw()<br>
+<I>Default and explicit constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.2"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialException</B> ( const char *context, const char *because, int defIndex = 1) throw()<br>
+<I>Standard constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.3"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialException</B> ( const <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>& ) throw()<br>
+<I> Copy constructor.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.4"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>& </TD><TD><B>operator=</B> ( const <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>& ) throw()<br>
+<I> Assignment operator.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.5"> <IMG BORDER=0 SRC=icon1.gif></A> virtual </TD><TD><B>~SpatialException</B> () throw()<br>
+<I> Destructor.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.6"> <IMG BORDER=0 SRC=icon1.gif></A> virtual  const  char* </TD><TD><B>what</B> () const  throw()<br>
+<I> Returns the message as set during construction.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.7"> <IMG BORDER=0 SRC=icon1.gif></A> int </TD><TD><B>slen</B> (const char *) const <br>
+<I> return string length also for null strings</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.12.8"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>clear</B> ()<br>
+<I> deallocate string</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Protected Fields</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.12.10"> <IMG BORDER=0 SRC=icon1.gif></A> char* </TD><TD><B>str_</B> <br>
+<I> error string to assemble</I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+HTM SpatialIndex Exception base class
+This is the base class for all Science Archive exceptions.  It may
+be used as a generic exception, but programmers are encouraged to
+use the more specific derived classes.  Note that all Spatial
+exceptions are also Standard Library exceptions by
+inheritance.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="SpatialException">
+<A NAME ="DOC.12.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialException( const char *<!2><A HREF="SpatialException.html#DOC.12.6">what</A> = 0, int defIndex = 1 ) throw()</B></TT>
+<DD>Default and explicit constructor.  
+The default constructor
+supplies a generic message indicating the exception type.  The
+explicit constructor sets the message to a copy of the provided
+string.  This behavior is shared by all derived classes.
+<DL></DL><P>
+<A NAME="SpatialException">
+<A NAME ="DOC.12.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialException( const char *context, const char *because, int defIndex = 1) throw()</B></TT>
+<DD>Standard constructor.  
+The message is assembled from copies of
+the two component strings.  The first indicates where in the
+program the exception was thrown, and the second indicates why.
+The null pointer is used to select standard components according
+to the type of the exception.  This behavior is shared by all
+derived classes.
+<DL></DL><P>
+<A NAME="SpatialException">
+<A NAME ="DOC.12.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialException( const <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>& ) throw()</B></TT>
+<DD> Copy constructor.
+<DL></DL><P>
+<A NAME="operator=">
+<A NAME ="DOC.12.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>&  operator=( const <!2><A HREF="SpatialException.html#DOC.12.1">SpatialException</A>& ) throw()</B></TT>
+<DD> Assignment operator.
+<DL></DL><P>
+<A NAME="~SpatialException">
+<A NAME ="DOC.12.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> virtual  ~SpatialException() throw()</B></TT>
+<DD> Destructor.
+<DL></DL><P>
+<A NAME="what">
+<A NAME ="DOC.12.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> virtual  const  char*  what() const  throw()</B></TT>
+<DD> Returns the message as set during construction.
+<DL></DL><P>
+<A NAME="slen">
+<A NAME ="DOC.12.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> int  slen(const char *) const </B></TT>
+<DD> return string length also for null strings
+<DL></DL><P>
+<A NAME="clear">
+<A NAME ="DOC.12.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  clear()</B></TT>
+<DD> deallocate string
+<DL></DL><P>
+<A NAME="defaultstr">
+<A NAME ="DOC.12.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  char*  defaultstr[]</B></TT>
+<DD> default error string
+<DL></DL><P>
+<A NAME="str_">
+<A NAME ="DOC.12.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char*  str_</B></TT>
+<DD> error string to assemble
+<DL></DL><P></DL>
+<hr>
+<DL><DT><B>Direct child classes:
+</B><DD><A HREF="SpatialUnimplemented.html"> SpatialUnimplemented </A><br>
+<A HREF="SpatialInterfaceError.html"> SpatialInterfaceError </A><br>
+<A HREF="SpatialFailure.html"> SpatialFailure </A><br>
+<A HREF="SpatialBoundsError.html"> SpatialBoundsError </A><br>
+</DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

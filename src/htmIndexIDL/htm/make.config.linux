@@ -1,0 +1,2 @@
+# Config for Linux
+LDFLAGS = -shared -export-dynamic
