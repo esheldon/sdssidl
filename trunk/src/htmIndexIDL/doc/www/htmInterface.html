@@ -1,0 +1,295 @@
+<html><head><TITLE>htmInterface</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  htmInterface  </H2><BLOCKQUOTE>
+
+htmInterface class
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.10.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>htmInterface</B> (size_t depth = 5, size_t saveDepth = 2)<br>
+<I>Constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.12"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>~htmInterface</B> ()<br>
+<I>Destructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.13"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="SpatialIndex.html">SpatialIndex</A>& </TD><TD><B>index</B> () const <br>
+<I>Access the index associated with the interface </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.2"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>lookupID</B> (float64 ra, float64 dec) const <br>
+<I>Lookup a node ID from ra,dec</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.3"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>lookupID</B> (float64 x, float64 y, float64 z) const <br>
+<I>Lookup a node ID from x,y,z</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.14"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>lookupID</B> (char *) const <br>
+<I>Lookup the ID from the Name string</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.4"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>lookupIDCmd</B> (char *)<br>
+<I>Lookup a node ID from a string command</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.15"> <IMG BORDER=0 SRC=icon1.gif></A> const  char* </TD><TD><B>lookupName</B> (float64 ra, float64 dec)<br>
+<I>Lookup a node name from ra,dec
+Given a certain RA,DEC and index depth return its HTM NodeName</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.5"> <IMG BORDER=0 SRC=icon1.gif></A> const  char* </TD><TD><B>lookupName</B> (float64 x, float64 y, float64 z)<br>
+<I>Lookup a node name from x,y,z</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.16"> <IMG BORDER=0 SRC=icon1.gif></A> const  char* </TD><TD><B>lookupName</B> (uint64 ID)<br>
+<I>Lookup a node name from a node ID</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.6"> <IMG BORDER=0 SRC=icon1.gif></A> const  char* </TD><TD><B>lookupNameCmd</B> (char *)<br>
+<I>Lookup a node name using a string command</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.7"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>circleRegion</B> ( float64 ra, float64 dec, float64 rad )<br>
+<I>Request all triangles in a circular region</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.8"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>circleRegion</B> ( float64 x, float64 y, float64 z, float64 rad )<br>
+<I>Request all triangles in a circular region</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.9"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>circleRegionCmd</B> ( char *str )<br>
+<I>Request all triangles in a circular region</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.17"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>convexHull</B> ( <!1><A HREF="ValVec.html">ValVec</A><float64> ra, <!1><A HREF="ValVec.html">ValVec</A><float64> dec )<br>
+<I>Request all triangles in the convex hull of a given set of 
+points</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.18"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>convexHull</B> ( <!1><A HREF="ValVec.html">ValVec</A><float64> x, <!1><A HREF="ValVec.html">ValVec</A><float64> y, <!1><A HREF="ValVec.html">ValVec</A><float64> z )<br>
+<I>Request all triangles in the convex hull of a given set of 
+points</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.10"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>convexHullCmd</B> ( char *str )<br>
+<I>Request all triangles in the convex hull of a given set of 
+points</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.19"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>domain</B> ( <!1><A HREF="SpatialDomain.html">SpatialDomain</A> & )<br>
+<I>Give the ranges for an intersection with a proper domain</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.11"> <IMG BORDER=0 SRC=icon1.gif></A> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> & </TD><TD><B>domainCmd</B> ( char *str )<br>
+<I>String interface for domain intersection</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.20"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>changeDepth</B> (size_t depth, size_t saveDepth = 2)<br>
+<I>Change the current index depth </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.21"> <IMG BORDER=0 SRC=icon1.gif></A> static  bool </TD><TD><B>isInteger</B> (const <!1><A HREF="VarStr.html">VarStr</A> &)<br>
+<I>Check whether a varstring is an integer </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.22"> <IMG BORDER=0 SRC=icon1.gif></A> static  bool </TD><TD><B>isFloat</B> (const <!1><A HREF="VarStr.html">VarStr</A> &)<br>
+<I>Check whether a varstring is a float </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.23"> <IMG BORDER=0 SRC=icon1.gif></A> static  bool </TD><TD><B>inRange</B> ( const <!1><A HREF="ValVec.html">ValVec</A><<!1><A HREF="htmRange.html">htmRange</A>> &, int64 )<br>
+<I>Check whether a range contains a certain id </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.10.24"> <IMG BORDER=0 SRC=icon1.gif></A> static  void </TD><TD><B>printRange</B> ( const <!1><A HREF="ValVec.html">ValVec</A><<!1><A HREF="htmRange.html">htmRange</A>> & )<br>
+<I>Print the ranges to cout </I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+
+htmInterface class.
+The SpatialInterface class contains all methods to interface the
+HTM index with external applications.
+
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="htmInterface">
+<A NAME ="DOC.10.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  htmInterface(size_t depth = 5, size_t saveDepth = 2)</B></TT>
+<DD>Constructor. The depth is optional, defaulting to level 5. It
+can be changed with the changeDepth() memberfunction or it can
+be specified with one of the string command interfaces. The
+saveDepth parameter can be specified to keep the given amount of
+levels in memory. This can also be altered by changeDepth. 
+<DL></DL><P>
+<A NAME="~htmInterface">
+<A NAME ="DOC.10.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ~htmInterface()</B></TT>
+<DD>Destructor
+<DL></DL><P>
+<A NAME="index">
+<A NAME ="DOC.10.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="SpatialIndex.html">SpatialIndex</A>&  index() const </B></TT>
+<DD>Access the index associated with the interface 
+<DL></DL><P>
+<A NAME="lookupID">
+<A NAME ="DOC.10.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  lookupID(float64 ra, float64 dec) const </B></TT>
+<DD>Lookup a node ID from ra,dec.
+Given a certain RA,DEC and index depth return its HTM ID.
+<DL></DL><P>
+<A NAME="lookupID">
+<A NAME ="DOC.10.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  lookupID(float64 x, float64 y, float64 z) const </B></TT>
+<DD>Lookup a node ID from x,y,z.
+Given a certain cartesian vector x,y,z and index depth return its HTM ID.
+<DL></DL><P>
+<A NAME="lookupID">
+<A NAME ="DOC.10.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  lookupID(char *) const </B></TT>
+<DD>Lookup the ID from the Name string
+<DL></DL><P>
+<A NAME="lookupIDCmd">
+<A NAME ="DOC.10.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  lookupIDCmd(char *)</B></TT>
+<DD>Lookup a node ID from a string command.
+The string in the input may have one of the following forms:
+<ul>
+<li> "J2000 depth ra dec"
+<li> "CARTESIAN depth x y z"
+<li> "NAME name"
+</ul>
+The string will be evaluated depending on how many items it has.
+SpatialInterfaceError is thrown if the string is unexpected.
+<DL></DL><P>
+<A NAME="lookupName">
+<A NAME ="DOC.10.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  char*  lookupName(float64 ra, float64 dec)</B></TT>
+<DD>Lookup a node name from ra,dec
+Given a certain RA,DEC and index depth return its HTM NodeName
+<DL></DL><P>
+<A NAME="lookupName">
+<A NAME ="DOC.10.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  char*  lookupName(float64 x, float64 y, float64 z)</B></TT>
+<DD>Lookup a node name from x,y,z.
+Given a certain cartesian vector x,y,z and index depth return its 
+HTM NodeName.
+<DL></DL><P>
+<A NAME="lookupName">
+<A NAME ="DOC.10.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  char*  lookupName(uint64 ID)</B></TT>
+<DD>Lookup a node name from a node ID
+<DL></DL><P>
+<A NAME="lookupNameCmd">
+<A NAME ="DOC.10.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  char*  lookupNameCmd(char *)</B></TT>
+<DD>Lookup a node name using a string command.
+The string in the input may have one of the following forms:
+<ul>
+<li> "J2000 depth ra dec"
+<li> "CARTESIAN depth x y z"
+<li> "ID id"
+</ul>
+The string will be evaluated depending on how many items it has.
+SpatialInterfaceError is thrown if the string is unexpected.
+<DL></DL><P>
+<A NAME="circleRegion">
+<A NAME ="DOC.10.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  circleRegion( float64 ra, float64 dec, float64 rad )</B></TT>
+<DD>Request all triangles in a circular region.
+Given are the center coordinate and radius in arcminutes.
+<DL></DL><P>
+<A NAME="circleRegion">
+<A NAME ="DOC.10.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  circleRegion( float64 x, float64 y, float64 z, float64 rad )</B></TT>
+<DD>Request all triangles in a circular region.
+Given are the center coordinate and radius in arcminutes.
+<DL></DL><P>
+<A NAME="circleRegionCmd">
+<A NAME ="DOC.10.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  circleRegionCmd( char *str )</B></TT>
+<DD>Request all triangles in a circular region.
+Given are the center coordinate and radius in arcminutes.
+Same as previous two functions but from a string.
+<DL></DL><P>
+<A NAME="convexHull">
+<A NAME ="DOC.10.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  convexHull( <!1><A HREF="ValVec.html">ValVec</A><float64> ra, <!1><A HREF="ValVec.html">ValVec</A><float64> dec )</B></TT>
+<DD>Request all triangles in the convex hull of a given set of 
+points
+<DL></DL><P>
+<A NAME="convexHull">
+<A NAME ="DOC.10.18">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  convexHull( <!1><A HREF="ValVec.html">ValVec</A><float64> x, <!1><A HREF="ValVec.html">ValVec</A><float64> y, <!1><A HREF="ValVec.html">ValVec</A><float64> z )</B></TT>
+<DD>Request all triangles in the convex hull of a given set of 
+points
+<DL></DL><P>
+<A NAME="convexHullCmd">
+<A NAME ="DOC.10.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  convexHullCmd( char *str )</B></TT>
+<DD>Request all triangles in the convex hull of a given set of 
+points.
+The points are given in the string in the following form:
+<pre>
+" J2000 depth ra dec ra dec ra dec "  
+</pre>
+or
+<pre>
+" CARTESIAN depth x y z x y z x y z "
+</pre>
+There may be as many points ra, dec or x,y,z as you want.
+<DL></DL><P>
+<A NAME="domain">
+<A NAME ="DOC.10.19">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  domain( <!1><A HREF="SpatialDomain.html">SpatialDomain</A> & )</B></TT>
+<DD>Give the ranges for an intersection with a proper domain
+<DL></DL><P>
+<A NAME="domainCmd">
+<A NAME ="DOC.10.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  <!1><A HREF="ValVec.html">ValVec</A> <<!1><A HREF="htmRange.html">htmRange</A>> &  domainCmd( char *str )</B></TT>
+<DD>String interface for domain intersection.
+The domain should be given in the following form:
+<pre>
+DOMAIN depth
+nConvexes
+nConstraints in convex 1
+x y z d
+x y z d
+.
+.
+x y z d
+nConstraints in convex 2
+x y z d
+x y z d
+.
+.
+x y z d
+.
+.
+.
+nConstrinats in convex n
+x y z d
+x y z d
+.
+.
+x y z d
+<pre>
+
+<p>
+The numbers need to be separated by whitespace (newlines are allowed).
+Throws SpatialInterfaceError on syntax errors.
+<DL></DL><P>
+<A NAME="changeDepth">
+<A NAME ="DOC.10.20">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  changeDepth(size_t depth, size_t saveDepth = 2)</B></TT>
+<DD>Change the current index depth 
+<DL></DL><P>
+<A NAME="isInteger">
+<A NAME ="DOC.10.21">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  bool  isInteger(const <!1><A HREF="VarStr.html">VarStr</A> &)</B></TT>
+<DD>Check whether a varstring is an integer 
+<DL></DL><P>
+<A NAME="isFloat">
+<A NAME ="DOC.10.22">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  bool  isFloat(const <!1><A HREF="VarStr.html">VarStr</A> &)</B></TT>
+<DD>Check whether a varstring is a float 
+<DL></DL><P>
+<A NAME="inRange">
+<A NAME ="DOC.10.23">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  bool  inRange( const <!1><A HREF="ValVec.html">ValVec</A><<!1><A HREF="htmRange.html">htmRange</A>> &, int64 )</B></TT>
+<DD>Check whether a range contains a certain id 
+<DL></DL><P>
+<A NAME="printRange">
+<A NAME ="DOC.10.24">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  void  printRange( const <!1><A HREF="ValVec.html">ValVec</A><<!1><A HREF="htmRange.html">htmRange</A>> & )</B></TT>
+<DD>Print the ranges to cout 
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>
