@@ -1,5 +1,0 @@
-﻿{{{
-def myfunc(x):
-	y=x+25
-    return x+y
-}}}
