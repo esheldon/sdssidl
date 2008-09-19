@@ -1,0 +1,1159 @@
+;+
+; NAME:
+;  POSTGRES   (IDL Class file)
+;
+;
+; PURPOSE:
+;  An IDL class file wrapping the pgsql_query() function, which provides
+;  an interface to the postgres database.
+;
+; CALLING SEQUENCE:
+;  pg = obj_new('postgres', connect_info=)
+;
+; OPTIONAL INPUTS:
+;  connect_info: This is stored at initialization so can be used later
+;    without sending. Useful if not using the database listed in the
+;    PGDATABASE environment variable for example.
+;
+; METHODS:
+;  All the functionality comes from the pgsql_query() function.  This
+;  class provides some wrapper methods for complex but often-used queries.
+;  Use:
+;          methods,'postgres' 
+;
+;  to list the methods and 
+;          doc_method,'postgres::methodname' 
+;
+;  to see the full documentation for each. Use 
+;          doc_method,'postgres',/class  (or doc_library,'postgres__define')
+;  to see this doc.
+; 
+;
+;  The most useful methods:
+;    ::query()
+;       Send a query and return the results.
+;
+;    ::struct2table: Stuff a structure into a postgres table, creating a
+;       new table if necessary.
+;
+;    ::tables()
+;       Return a list of tables in the database.
+;    ::table_exists() 
+;       Return 1 if the table exists, 0 if not.
+;    ::describe
+;       Print a description of a table or, if no arguments, short descriptions 
+;       of all tables.
+;    ::table_indexes 
+;       Print index information for a table.
+;
+;    ::status_val()
+;       Return the query status value given the name
+;    ::status_name()
+;       Return status name given the value
+;
+;    ::tablerows()
+;       Postgres does not store the number of rows for a table, it counts them
+;       each time you run select count(*) from table....  If this info has been
+;       stored in a table called tablename_meta it is retrieved, otherwise an
+;       error is given and execution is stopped.
+;
+; RESTRICTIONS:
+;
+;
+;
+; MODIFICATION HISTORY:
+;   Created: Mid-2005, Erin Sheldon, Uchicago
+;-
+;
+;
+;
+;  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License
+;    along with this program; if not, write to the Free Software
+;    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+;
+;
+
+function postgres::init, connect_info=connect_info
+
+  funcnames  = routine_info(/system,/functions)
+
+  w = where(funcNames eq 'PGSQL_QUERY',nw)
+  if nw eq 0 then begin
+      message,'The postgres library PGSQL_QUERY() is not available',/inf
+      message,'See the SDSSIDL README file for help on compilation',/inf
+      return,0
+  endif
+
+
+  self->set_parameters, $
+    connect_info=connect_info, query_status=-1, nrows=0
+  return,1
+end 
+
+pro postgres::set_parameters, connect_info=connect_info, query_status=query_status, nrows=nrows
+
+  if n_elements(connect_info) ne 0 then begin 
+      self.connect_info = connect_info 
+  endif 
+  if n_elements(query_status) ne 0 then begin 
+      self.query_status = query_status
+  endif 
+  if n_elements(nrows) ne 0 then begin 
+      self.nrows = nrows
+  endif 
+
+end 
+
+;docstart::postgres::query
+;
+; NAME:
+;  postgres::query()
+;
+; PURPOSE:
+;  Simple wrapper for pgsql_query().  Useful if the user has inherited the
+;  class and wants to store certain things internally, such as status,
+;  nrows. Also, can store connect_info at initialization of this class so you
+;  don't have to send it each time.  This is useful if not connecting to
+;  alternative databases from PGDATABASE, or as another user.  
+;
+;  Finally, better to use this than the pgsql_query() function directly in 
+;  your code because of a bug in IDL that it gives a compile error if that
+;  C function has not been linked, which can be confusing.
+;
+; CALLING SEQUENCE:
+;
+;  res = pg->query(query, nrows=, connect_info=, file=, /append, /nointerrupt,
+;                  /verbose, status=)
+;
+; INPUTS:
+;  The query in string form.
+; 
+; OPTIONAL INPUTS:
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;       http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;  file=: File into which the result will be written.
+;  /append: Append the file.
+;  /nointerrupt: Normally pgsql_query() runs a busy loop waiting for results.
+;      This loop checks if control-c has been sent and if so, stops the
+;      query and returns no data.  If /nointerrupt is sent then no such busy
+;      loop is run.  This saves CPU if, for example, little results are being
+;      returned from a long query.  Also good for batch mode when an interrupt
+;      cannot be sent anyway.  The query cannot be killed however without
+;      help from the administrator.
+;  /verbose: pgsql_query() will print some informationl messges.
+;
+; OPTIONAL OUTPUTS:
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: Mid-2005  Erin Sheldon Uchicago
+;
+;docend::postgres::query
+
+function postgres::query, query, nrows=nrows, connect_info=connect_info, file=file, append=append, nointerrupt=nointerrupt, verbose=verbose, status=status
+  
+  self->reset
+
+  nq = n_elements(query)
+  if nq eq 0 then begin 
+      print,'-Syntax: res=pg->query(query_string, nrows=, connect_info=, file=, /append, /nointerrupt, /verbose, status=)'
+      print
+      message,'halting'
+  endif 
+
+  if n_elements(connect_info) eq 0 then begin 
+      connect_info = self.connect_info
+  endif 
+
+  ;; Now send the query. IDL has a bug that it gives a compile
+  ;; error if the pgsql_query() function was not linked (that
+  ;; doesn't happen for procedures).  So we use the CALL_FUNCTION
+  ;; procedure to avoid this bug.
+
+  struct = CALL_FUNCTION('pgsql_query', $
+                         query, $
+                         nrows=nrows, $
+                         connect_info=connect_info, $
+                         file=file, append=append, $
+                         nointerrupt=nointerrupt, $
+                         verbose=verbose, status=status)
+  
+  self->set_parameters, query_status=status, nrows=nrows
+
+  return,struct
+end 
+
+pro postgres::query, query, result=result, nrows=nrows, connect_info=connect_info, file=file, append=append, nointerrupt=nointerrupt, verbose=verbose, status=status
+
+  on_error, 2
+  nq = n_elements(query)
+  if nq eq 0 then begin 
+      print,'-Syntax: pg->query, query_string, result=, nrows=, connect_info=, file=, /append, /nointerrupt, /verbose, status='
+      print
+      print,'This is the procedural version of the query() method'
+      print,'  useful if no results are returned.  If you expect results,'
+      print,'  you should use the functional form res=pg->query() for '
+      print,'  readability'
+      print
+      message,'Halting'
+  endif 
+
+  result = self->query(query, $
+                       nrows=nrows, $
+                       connect_info=connect_info, $
+                       file=file, $
+                       append=append, $
+                       nointerrupt=nointerrupt, $
+                       verbose=verbose, status=status)
+end 
+
+;docstart::postgres::status_name
+;
+; NAME:
+;  postgres::status_name()
+;
+; PURPOSE:
+;  Return the status name associated with the value.
+;
+; CALLING SEQUENCE:
+;  print, pg->status_name(status)
+;
+; INPUTS:
+;  The status returned from pgsql_query()
+;
+; MODIFICATION HISTORY:
+;  Created: Mid-2005  Erin Sheldon Uchicago
+;
+;docend::postgres::status_name
+
+function postgres::status_name, status_val
+  case status_val of
+      0: return,'success'
+      1: return,'connect_failure'
+      2: return,'no_result'
+      3: return,'write_failure'
+      4: return,'fatal_error'
+      else: message,'unknown status value: '+ntostr(status_val)
+  endcase 
+end 
+
+;docstart::postgres::status_val
+;
+; NAME:
+;  postgres::status_val()
+;
+; PURPOSE:
+;  Return the status val associated with the name.
+;
+; CALLING SEQUENCE:
+;  if status ne pg->status_val(status_name) then .....
+;
+; INPUTS:
+;  The name of the status. One of:
+;    success, connect_failure, no_result, write_failure, fatal_error
+;  
+; OUTPUTS:
+;      'success': return,0
+;      'connect_failure': return,1
+;      'no_result': return,2
+;      'write_failure':return,3
+;      'fatal_error': return,4
+;
+; MODIFICATION HISTORY:
+;  Created: Mid-2005  Erin Sheldon Uchicago
+;
+;docend::postgres::status_val
+
+function postgres::status_val, status_name
+
+  case strlowcase(status_name) of
+      'success': return,0
+      'connect_failure': return,1
+      'no_result': return,2
+      'write_failure':return,3
+      'fatal_error': return,4
+      else: message,'unknown status name: ',status_name
+  endcase 
+
+end 
+
+function postgres::connect_info
+  return,self.connect_info
+end 
+
+function postgres::query_status
+  return,self.query_status
+end 
+
+function postgres::nrows
+  return,self.nrows
+end 
+
+;docstart::postgres::tables
+;
+; NAME:
+;  postgres::tables(/all)
+;
+; PURPOSE:
+;  Return a listing of the tables in the current database, or that sent
+;  by connect_info.  By default returns the "public" tables.  If /all is 
+;  sent then all are returned.
+;
+; CALLING SEQUENCE:
+;  tablenames = pg->tables(connect_info=, /all, /struct, status=)
+;
+; INPUTS:
+;  tablename:  The name of the table.
+;
+; OPTIONAL INPUTS:
+;  /all: Return a list of all tables, not just public.
+;  /struct: Instead of returning only the names, return a structure with
+;    lots of info.
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;   http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;
+; OUTPUTS:
+;  The listing of tables in string array.
+;
+; OPTIONAL OUTPUTS:
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: 2006-05-19  Erin Sheldon NYU
+;
+;docend::postgres::tables
+
+function postgres::tables, struct=struct, connect_info=connect_info, all=all, status=status
+
+  query = "select * from pg_tables"
+  if not keyword_set(all) then begin 
+      query = query + " where schemaname = 'public'"
+  endif 
+
+  res = self->query(query, connect_info=connect_info, status=status)
+  if status eq self->status_val('success') then begin 
+      if keyword_set(struct) then begin 
+          return, res
+      endif else begin 
+          return, res.tablename
+      endelse 
+  endif else if status eq self->status_val('no_result') then begin 
+      if not keyword_set(all) then begin 
+          message,'No public tables',/inf
+      endif else begin 
+          message,'No tables returned',/inf
+      endelse 
+      return, -1
+  endif else begin 
+      message,'Failed to query database for table names',/inf
+      return, -1
+  endelse 
+end 
+
+
+
+
+;docstart::postgres::table_exists
+;
+; NAME:
+;  postgres::table_exists()
+;
+; PURPOSE:
+;  Check if the table exists in the current database, or
+;    the one specified by connect_info
+;
+; CALLING SEQUENCE:
+;  if pg->table_exists(tablename, connect_info=, status=st) then .....
+;
+; INPUTS:
+;  tablename:  The name of the table.
+;
+; OPTIONAL INPUTS:
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;   http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;
+; OPTIONAL OUTPUTS:
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: 2006-05-19  Erin Sheldon NYU
+;
+;docend::postgres::table_exists
+
+
+function postgres::table_exists, tablename, connect_info=connect_info, status=status
+
+  status = 1
+  ntab = n_elements(tablename)
+  if ntab eq 0 then begin 
+      print,'-Syntax: if pg->table_exists(tablename,connect_info=, status=) then ..'
+      print
+      message,'Halting'
+  endif 
+
+  tablenames = self->tables(connect_info=connect_info, status=status)
+  if status ne self->status_val('success') then begin 
+      return, 0
+  endif  
+
+  match, strlowcase(tablenames), strlowcase(tablename), mall, min
+  if mall[0] eq -1 then return,0 else return,1
+
+end 
+
+
+
+;docstart::postgres::table_indexes
+;
+; NAME:
+;  postgres::table_indexes
+;
+; PURPOSE:
+;  Print out index info for a table.
+;
+; CALLING SEQUENCE:
+;  if pg->table_indexes, tablename, struct=, connect_info=, status=
+;
+; INPUTS:
+;  tablename:  The name of the table.
+;
+; OPTIONAL INPUTS:
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;   http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;
+; OPTIONAL OUTPUTS:
+;  struct=: The structure for the index descriptions.
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: 2006-05-19  Erin Sheldon NYU
+;
+;docend::postgres::table_indexes
+
+pro postgres::table_indexes, tablename, struct=struct, connect_info=connect_info, status=status
+
+  tname = strlowcase( strtrim(string( tablename[0] ), 2) )
+  if not self->table_exists(tablename) then begin 
+      message,'No table called '+tname,/inf
+      return
+  endif 
+
+  ;; Get the oid for this table
+  query = $
+    "SELECT " +$
+    "  c.oid, "+$
+    "  n.nspname, "+$
+    "  c.relname "+$
+    "FROM "+$
+    "  pg_catalog.pg_class c "+$
+    "LEFT JOIN "+$
+    "  pg_catalog.pg_namespace n ON n.oid = c.relnamespace "+$
+    "WHERE "+$
+    "  pg_catalog.pg_table_is_visible(c.oid) AND c.relname ~ '^"+tname+"$' "+$
+    "ORDER BY 2, 3"
+
+  
+  oid_struct = self->query(query, connect_info=connect_info, status=status)
+  if status ne self->status_val('success') then begin 
+;      message,"could not retrieve oid for table '"+tname+"'",/inf
+      return
+  endif 
+  if self->nrows() ne 1 then begin 
+      message,'More than one row returned.  That should not happen'
+  endif 
+  oidstr = ntostr( oid_struct.oid )
+
+
+  ;; Now that we have the oid, we can get the index list
+  query = $
+    "SELECT "                                 +$
+    "  c2.relname as index, "                 +$
+    "  i.indisprimary as primary, "           +$
+    "  i.indisunique as unique, "             +$
+    "  i.indisclustered as clustered, "       +$
+    "  pg_catalog.pg_get_indexdef(i.indexrelid, 0, true) as indexdef "+$
+    "FROM "                                   +$
+    "  pg_catalog.pg_class c, "               +$
+    "  pg_catalog.pg_class c2, "              +$
+    "  pg_catalog.pg_index i "                +$
+    "WHERE "                                  +$
+    "  c.oid = '"+oidstr+"' AND "             +$
+    "  c.oid = i.indrelid AND "               +$
+    "  i.indexrelid = c2.oid "                +$
+    "ORDER BY "+$
+    "  i.indisprimary DESC, i.indisunique DESC, c2.relname"
+
+  struct = self->query(query, connect_info=connect_info, status=status)
+  if status ne self->status_val('success') then begin 
+;      message,"could not retrieve indexes for table '"+tname+"'",/inf
+      return
+  endif 
+
+  ;; print the output
+
+  nindex = n_elements(struct)
+  idesc = strarr(nindex)
+
+
+  for i=0l, nindex-1 do begin 
+      def = struct[i].indexdef
+
+      if struct[i].primary then begin 
+          idesc[i] = 'PRIMARY KEY, '
+      endif else if stregex(def, 'UNIQUE', /bool) then begin 
+          idesc[i] = 'UNIQUE KEY, '
+      endif 
+
+      iuse = stregex(def, 'USING')
+      if iuse ne -1 then begin 
+          idesc[i] = idesc[i] + strmid(def, iuse+6)
+      endif 
+
+  endfor 
+
+  maxrel = max( strlen( struct.index ) ) 
+  maxdef = max( strlen( idesc ) ) 
+
+  
+  padding = 3
+  width = maxrel+maxdef+2*padding
+
+  divider = mkstr(width+2, val='-')
+
+  relformat = 'A'+ntostr(maxrel+padding)
+  defformat = 'A'+ntostr(maxdef+padding)
+  format = '('+relformat+','+defformat+')'
+  
+  print,"Indexes for '"+tname+"'"
+  print
+  print, 'index', 'description', format=format
+  print,divider
+
+  for i=0l, nindex-1 do begin 
+      print,$
+        struct[i].index, idesc[i], $
+        format=format
+  endfor 
+
+end 
+
+
+;docstart::postgres::describe
+;
+; NAME:
+;  postgres::describe
+;
+; PURPOSE:
+;  Print a description either the tables in the database or, if a tablename
+;  is sent, a description ofthe table layout. In that case it runs
+;       select * from tablename limit 1
+;  and then help, result, /struct on the result.  The structure can be
+;  returned via the keyword.
+;
+; CALLING SEQUENCE:
+;  if pg->describe, [tablename, struct=, /all, connect_info=, status=]
+;
+; INPUTS:
+;  If no inputs, a short description of all public tables is displayed.
+;  If /all, the other tables are also described.
+;
+;  tablename:  The name of the table.
+;
+; OPTIONAL INPUTS:
+;  /all: Return a list of all tables, not just public.
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;   http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;
+; OPTIONAL OUTPUTS:
+;  struct=: The structure containing the description.
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: 2006-05-19  Erin Sheldon NYU
+;
+;docend::postgres::describe_table
+
+pro postgres::describe, tablename, struct=struct, all=all, connect_info=connect_info, status=status
+
+
+  if n_elements(tablename) ne 0 then begin 
+      tname = strtrim(string(tablename[0]), 2)
+      query = "select * from "+tname+" limit 1"
+
+      struct = self->query(query, connect_info=connect_info, status=status)
+      if status eq self->status_val('success') then begin 
+          help,struct,/str
+          self->table_indexes, tname
+      endif  
+  endif else begin 
+      struct = self->tables(all=all, /struct, status=status)
+      if status eq self->status_val('success') then begin 
+          print_struct, struct
+      endif  
+  endelse 
+
+end 
+
+
+
+
+;docstart::postgres::tablerows
+;
+; NAME:
+;  postgres::tablerows()
+;
+; PURPOSE:
+;  If the metatable exists for the input tablename, return the number
+;  of listed rows.
+;
+; CALLING SEQUENCE:
+;  nrows = pg->tablerows(tablename, connect_info=, status=st) 
+;
+; INPUTS:
+;  tablename:  The name of the table.
+;
+; OPTIONAL INPUTS:
+;  connect_info:  List of connection options separated by semicolon.
+;        e.g. "user=somename;dbname=somename"
+;   http://www.postgresql.org/docs/8.0/interactive/libpq.html#LIBPQ-CONNECT
+;
+; OPTIONAL OUTPUTS:
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; MODIFICATION HISTORY:
+;  Created: 2006-05-19  Erin Sheldon NYU
+;
+;docend::postgres::tablerows
+
+function postgres::tablerows, tablename, connect_info=connect_info, status=status
+
+  metatable = tablename + '_meta'
+  query = 'select * from '+metatable
+  res = self->query(query, connect_info=connect_info, status=status)
+  if status ne self->status_val('success') then begin 
+      return, -1
+  endif else begin 
+      if tag_exist(res, 'nrows') then begin 
+          tablerows = res.nrows
+          ntr = n_elements(tablerows) 
+          return, tablerows[ntr-1]
+      endif else begin 
+          message,'NROWS does not exist in table '+metatable,/inf
+          return, -1
+      endelse 
+  endelse 
+
+end 
+
+
+
+
+;docstart::postgres::postgres_type
+;
+; NAME:
+;  postgres::postgres_type()
+;
+;
+; PURPOSE:
+;  Method of the postgres class to convert an idl type description to a
+;  postgres type description.  The idl type description is that returned
+;  from the size(var, /tname) call.
+;
+; CALLING SEQUENCE:
+;  pgtype = pg->postgres_type(idltype)
+;
+; INPUTS:
+;  struct: An IDL type description.
+;
+; KEYWORD PARAMETERS:
+;  length: For strings, use this as the lenght of a VARCHAR definition.
+;    default is to use the more flexible, but less efficient, TEXT 
+;    format.
+;
+; OUTPUTS:
+;  A string containing the postgres type name.
+;
+; RESTRICTIONS:
+;  Currently COMPLEX, STRUCTURE, and POINTER are not supported.
+;
+; EXAMPLE:
+;  IDL> tn = size(var, /tname)
+;  IDL> pg = obj_new('posgres')
+;  IDL> pgtype = pg->postgres_type(tn)
+;
+; MODIFICATION HISTORY:
+;  Created: Some time mid 2005, Erin Sheldon, UChicago
+;
+;docend::postgres::postgres_type
+
+
+function postgres::postgres_type, tname, length=length
+
+  if n_params() lt 1 then begin 
+      print,'-Syntax: pgtyep = obj->postgres_type(idl_type_name, length=)'
+      return,''
+  endif 
+
+  ;; Because there are no unsigned types in postgres, we must
+  ;; convert uint to long, ulong to long64, etc
+  ;; There may be issues with the ULONG64 since it is not supported
+  ;; by postgres
+  case strupcase(tname) of 
+      'BYTE':    return,'SMALLINT'
+      'INT':     return,'SMALLINT'
+      'UINT':    return,'INT'
+      'LONG':    return,'INT'
+      'ULONG':   return,'BIGINT'
+      'LONG64':  return,'BIGINT'
+      'ULONG64': return,'BIGINT'
+      'FLOAT':   return,'REAL'
+      'DOUBLE':  return,'DOUBLE PRECISION'
+      'STRING': BEGIN 
+          if n_elements(length) eq 0 then begin 
+              return,'TEXT'
+          endif else begin
+              return,'VARCHAR('+strtrim( long(length[0]) ,2)+')'
+          endelse 
+      end 
+  endcase 
+
+end 
+
+;docstart::postgres::struct2coldefs
+;
+; NAME:
+;  postgres::struct2coldefs()
+;
+;
+; PURPOSE:
+;  Method of the postgres class to convert a structure into a list SQL type
+;  definitions for each tag.
+;
+; CALLING SEQUENCE:
+;  tdef=pg->struct2coldefs(struct, /varchar, tags=, /verbose)
+;
+;
+; INPUTS:
+;  struct: A structure.
+;
+; KEYWORD PARAMETERS:
+;  /varchar: Use VARCHAR for strings rather than TEXT.  More efficient, but
+;    if the max lenght is determined from the input structure so one must
+;    be careful that the lenght is representative of all data to be put
+;    in the table.
+;  tags=: A list of tags from the structure. Default is to use all.
+;  /verbose: Print out the tag definitions.
+;
+; OUTPUTS:
+;  A string array containing the column definitions.
+;
+; EXAMPLE:
+;  IDL> struct = mrdfits('some_fits_file.fits', 1)
+;  IDL> pg = obj_new('posgres')
+;  IDL> cdef = pg->struct2coldefs(struct)
+;
+; MODIFICATION HISTORY:
+;  Created: Some time mid 2005, Erin Sheldon, UChicago
+;
+;docend::postgres::struct2coldefs
+
+function postgres::struct2coldefs, struct, varchar=varchar, tags=tags, verbose=verbose
+
+  if n_params() lt 1 then begin 
+      print,'-Syntax: coldefs = obj->struct2coldefs(struct, /varchar, tags=, /verbose)'
+      return,''
+  endif 
+
+  ;; generate entries in a pgsql create table statement from the input
+  ;; structure. 
+
+  tags = strlowcase( tag_names(struct) )
+  ntags = n_elements(tags)
+
+  for i=0l, ntags-1 do begin 
+
+      tmpvar = struct[0].(i)
+      nelem = n_elements(tmpvar)
+
+      tn = size(tmpvar,/tname)
+
+      if tn eq 'STRING' and keyword_set(varchar) then begin 
+          len = max( strlen( struct.(i) ) )
+          pgsql_type = self->postgres_type(tn, length=len)
+      endif else begin          
+          pgsql_type = self->postgres_type(tn)
+      endelse 
+
+      if nelem gt 1 then pgsql_type = pgsql_type + '['+ntostr(nelem)+']'
+          
+      coldef = tags[i] + ' '+pgsql_type
+      if tn ne 'STRING' then coldef = coldef + ' NOT NULL'
+
+      if keyword_set(verbose) then begin 
+          print,tags[i],' '+tn
+          print,' |--> '+coldef
+      endif 
+
+      add_arrval, coldef, coldefs
+
+  endfor 
+
+  return,coldefs
+
+end 
+
+
+;docstart::postgres::struct2tabledef
+;
+; NAME:
+;  postgres::struct2tabledef()
+;
+;
+; PURPOSE:
+;  Method of the postgres class to convert a structure into an SQL
+;  CREATE TABLE statement.  Allows defining of the primary key.
+;
+; CALLING SEQUENCE:
+;  tdef=pg->struct2tabledef(struct, tablename, primary_key=, /varchar, file=)
+;
+;
+; INPUTS:
+;  struct: A structure.
+;  tablename:  The name of the table into which the data will be stuffed.
+;
+;
+; KEYWORD PARAMETERS:
+;  primary_key: The tag to be used as the primary key.
+;  /varchar: Use VARCHAR for strings rather than TEXT.  More efficient, but
+;    if the max lenght is determined from the input structure so one must
+;    be careful that the lenght is representative of all data to be put
+;    in the table.
+;  file: A file to write the create table statement to.
+;
+; OUTPUTS:
+;  A string containing the CREATE TABLE statement.
+;
+; EXAMPLE:
+;  IDL> struct = mrdfits('some_fits_file.fits', 1)
+;  IDL> pg = obj_new('posgres')
+;  IDL> tdef = pg->struct2tabledef(struct, 'newtable', primary_key='index')
+;
+; MODIFICATION HISTORY:
+;  Created: Some time mid 2005, Erin Sheldon, UChicago
+;
+;docend::postgres::struct2tabledef
+
+function postgres::struct2tabledef, struct, tablename, varchar=varchar, file=file, primary_key=primary_key
+
+  on_error, 2
+  if n_elements(struct) eq 0 or n_elements(tablename) eq 0 then begin 
+      print,'-Syntax: pg->struct2tabledef, struct, tablename, /varchar, file=, primary_key='
+      print
+      message,'Halting'
+  endif 
+
+  if n_elements(file) eq 0 then begin 
+      lun = -1
+  endif else begin 
+      openw,lun,file,/get_lun
+  endelse 
+
+  coldefs = self->struct2coldefs(struct, varchar=varchar)
+
+  tags = tag_names(struct)
+  
+
+  ;; add the primary key
+  if n_elements(primary_key) eq 1 and $
+    size(primary_key, /tname) eq 'STRING' then begin 
+      
+      if tag_exist(struct, primary_key) then begin 
+          coldefs = [coldefs, 'PRIMARY KEY ('+primary_key+')']
+      ENDIF ELSE BEGIN    
+          message,'tag '+primary_key+' does not exist',/inf
+          print,tag_names(struct)
+      ENDELSE 
+  ENDIF 
+
+  tabledef = $
+    'CREATE TABLE '+tablename + ' '+$
+    '('+strjoin(coldefs,', ')+')'
+  
+
+  ncoldefs = n_elements(coldefs)
+  printf,lun,'CREATE TABLE '+tablename
+  printf,lun,'('
+  FOR i=0L, ncoldefs-2 DO BEGIN 
+      printf,lun,coldefs[i]+', '
+  ENDFOR 
+  printf,lun,coldefs[i]
+  printf,lun,');'
+
+  IF n_elements(file) NE 0 THEN free_lun,lun
+
+  return, tabledef
+
+
+END 
+
+
+;docstart::postgres::struct2table
+;
+; NAME:
+;  postgres::struct2table  
+;
+;
+; PURPOSE:
+;  Method of the postgres class to write a structure into a postgres
+;  database.
+;
+; CALLING SEQUENCE:
+;  pg->struct2table, struct, tablename, primary_key=, connect_info=,
+;                    tmpdir=, status=
+;
+;
+; INPUTS:
+;  struct: A structure.  May be an array.
+;  tablename:  The name of the table into which the data will be stuffed.
+;
+;
+; KEYWORD PARAMETERS:
+;  primary_key: The tag to be used as the primary key.  Only used if the
+;       table is created.
+;  connect_info: Infor used for connecting. This is the standard string
+;       sent to postgres clients: e.g. 
+;                  "user=username;password=pass;host=hostname;"
+;       If not sent, this info is gotten from the environment variables.
+;       and ~/.pgpass file.
+;  tmpdir: Directory to write the temporary postgres input file.
+;
+;
+; OPTIONAL OUTPUTS:
+;  status: The status of the query.  See the ::status_val() method for
+;    the meaning of this output.
+;
+; SIDE EFFECTS:
+;  Data is stuffed into the table. The table if non-existent will be
+;  created if the permissions are sufficient.
+;
+;
+; RESTRICTIONS:
+;  The user must have the postgres password info in their ~/.pgpass file.
+;  This is becuase the COPY command may only be run as the postgres
+;  user.
+;
+; EXAMPLE:
+;  IDL> struct = mrdfits('some_fits_file.fits', 1)
+;  IDL> pg = obj_new('posgres')
+;  IDL> pg->struct2table, struct, 'newtable'
+;
+; MODIFICATION HISTORY:
+;  Created: Some time mid 2005, Erin Sheldon, UChicago
+;
+;docend::postgres::struct2table
+
+PRO postgres::struct2table, struct, tablename, primary_key=primary_key, varchar=varchar, status=status, tmpdir=tmpdir, connect_info=connect_info, createonly=createonly
+
+  status = 1
+  on_error, 2
+  IF n_elements(struct) EQ 0 OR n_elements(tablename) EQ 0 THEN BEGIN 
+      print,'-Syntax: pg->struct2table, struct, tablename, primary_key=, '+$
+        '/varchar, tmpdir=, connect_info=, createonly=creatonly, status='
+      print
+      message,'Halting'
+  ENDIF 
+
+  ;; If the table already exists, no need to create a table 
+  ;; definition.
+
+  texist = self->table_exists(tablename)
+  IF texist AND keyword_set(createonly) THEN BEGIN 
+      message,'/createonly set but table already exists',/inf
+      message,'Nothing done',/inf
+      status = 0
+      return
+  ENDIF 
+
+  IF NOT texist THEN BEGIN 
+
+      message,'Creating table definition',/inf
+      ;; WE will generate the table
+      tabledef = self->struct2tabledef(struct, tablename, $
+                                       primary_key=primary_key, $
+                                       varchar=varchar)
+
+      ;; Create the table
+      message,'Creating table',/inf
+      res = self->query(tabledef, status=qstatus, connect_info=connect_info)
+      
+      IF qstatus NE self->status_val('no_result') THEN BEGIN 
+          message,'Could not create table',/inf
+          return
+      ENDIF 
+
+      IF keyword_set(createonly) THEN BEGIN 
+          status=0
+          return
+      ENDIF 
+
+  ENDIF 
+
+  ;; Now write the input file.  Ascii for now
+  IF n_elements(tmpdir) EQ 0 THEN tmpdir = '~'
+  tmpdir = expand_tilde(tmpdir)
+
+  file = tmpfile(prefix=tablename+'-stuff-')+'.pgsql'
+  file = concat_dir(tmpdir, file)
+  
+  message,'Writing input file: '+file,/inf
+  self->input_write, struct, file, status=wstatus
+  IF wstatus NE 0 THEN BEGIN 
+      message,'Could not write postgres input file'
+      return
+  ENDIF 
+
+  IF NOT fexist(file) THEN BEGIN 
+      message,'Cannot find the file in /tmp'
+  ENDIF 
+
+  ;; Stuff the table.  Must do this as postgres; this is
+  ;; a security hole if no password protection is set up
+  ;; for the postgres account.
+
+
+  query = "COPY "+tablename+" FROM '"+file+"'"
+  message,query,/inf
+  out = self->query(query, connect_info='user=postgres', $
+                    status = stuff_status)
+  IF stuff_status NE self->status_val('no_result') THEN BEGIN 
+      message,'Failed to stuff file',/inf
+  ENDIF ELSE BEGIN 
+      file_delete, file
+      status = 0
+  ENDELSE 
+
+
+
+  return
+
+END 
+
+
+
+
+
+
+PRO postgres::create_index, table, columns, connect_info=connect_info
+
+  on_error, 2
+  IF n_params() LT 2 THEN BEGIN 
+      print,'-Syntax: pg->create_index, table, columns, connect_info='
+      print
+      message,'Halting'
+  ENDIF 
+
+  ;; Only trick here is dealing with arrays
+  ncols = n_elements(columns)
+  cstr = strarr(ncols)
+  inames = strarr(ncols)
+  FOR i=0L, ncols-1 DO BEGIN 
+
+      IF strmatch(columns[i], '*\[*') THEN BEGIN 
+
+          ;; remove the braces for index name
+          tiname = repstr(columns[i], '[', '_')
+          tiname = repstr(tiname, ']', '')
+
+          inames[i] = tiname
+          cstr[i] = '(('+columns[i]+'))'
+      ENDIF ELSE BEGIN 
+          inames[i] = columns[i]
+          cstr[i] = '('+columns[i]+')'
+      ENDELSE 
+
+  ENDFOR 
+
+  create_index_arr = $
+    'CREATE INDEX '+table+'_'+inames+'_index ON '+table+' '+cstr
+
+  FOR i=0L, ncols-1 DO BEGIN 
+      query = create_index_arr[i]
+      print,query
+      self->query, query, connect_info=connect_info, status=status
+      IF status NE self->postgres::status_val('no_result') THEN BEGIN 
+          message,'Error creating index'
+      ENDIF 
+  ENDFOR 
+
+
+END 
+
+
+
+
+
+;; Write a structure as a postgres input file
+PRO postgres::input_write, struct, file, status=status
+
+  status = 1
+  IF n_params() LT 2 THEN BEGIN 
+      print,'-Syntax: pg->input_write, struct, file, status='
+      return
+  ENDIF 
+  ascii_write, struct, file, /bracket_arrays, status=status
+END 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set status to unknown, nrows to zero
+;; The connect information is left untouched
+;  I never use this.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PRO postgres::reset
+
+  ;; Don't change the connect info: 
+  self.query_status = -1
+  self.nrows = 0
+
+END 
+
+FUNCTION postgres::cleanup
+  return,1
+END 
+
+
+
+PRO postgres__define
+
+  struct = {$
+             postgres, $
+             connect_info: '', $
+             query_status: -1, $
+             nrows: 0ULL $
+            }
+
+END 
