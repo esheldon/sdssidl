@@ -129,3 +129,4 @@ run_status_file     /net/cheops1/data0/run_status/sdss_run_status.fit
 # Directory holding small files for efficient ra/dec searching
 radec_search_dir    /net/cheops1/data0/Radec/
 
+test
