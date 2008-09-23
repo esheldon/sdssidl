@@ -9,4 +9,4 @@
     * [src src] -- 
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//AUTHORS AUTHORS]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//CHANGEStxt CHANGES.txt]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//CHANGES.txt CHANGES.txt]
