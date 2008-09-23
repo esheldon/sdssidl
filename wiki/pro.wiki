@@ -1,34 +1,18 @@
 
 
-* [proastro Astro] 
-
-* [proclassgal Galaxy Classification Code] 
-
-* [profileio File i/o] 
-
-* [profiles Files] 
-
-* [profits Fits tools] 
-
-* [prohtm HTM] 
-
-* [proidlstruct_files IDL structure i/o] 
-
-* [proplotting Plotting Routines] 
-
-* [propostgres Postgres] 
-
-* [proprobgal Star-Galaxy Separation] 
-
-* [prosdss General SDSS Library] 
-
-* [prosdsspix SDSSPix Routines] 
-
-* [prospherical_polygons Spherical Polygon Routines] 
-
-* [prostatistics Statistics] 
-
-* [prostruct IDL Structures] 
-
-* [proutil Utilities] 
-
+    * [proastro Astro] 
+    * [proclassgal Galaxy Classification Code] 
+    * [profileio File i/o] 
+    * [profiles Files] 
+    * [profits Fits tools] 
+    * [prohtm HTM] 
+    * [proidlstruct_files IDL structure i/o] 
+    * [proplotting Plotting Routines] 
+    * [propostgres Postgres] 
+    * [proprobgal Star-Galaxy Separation] 
+    * [prosdss General SDSS Library] 
+    * [prosdsspix SDSSPix Routines] 
+    * [prospherical_polygons Spherical Polygon Routines] 
+    * [prostatistics Statistics] 
+    * [prostruct IDL Structures] 
+    * [proutil Utilities] 
