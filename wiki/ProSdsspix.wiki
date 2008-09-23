@@ -1,0 +1,7 @@
+#summary IDL Wrappers for modified versions of Ryan Scranton's SDSSPix C routines
+
+=== Sub Directories ===
+=== Files ===
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/sdsspix/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/sdsspix/apply_pixel_mask.pro apply_pixel_mask.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/sdsspix/pixel_maskflags_select.pro pixel_maskflags_select.pro]

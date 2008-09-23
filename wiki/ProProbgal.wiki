@@ -1,0 +1,12 @@
+#summary Bayesian Star-Galaxy Separation Routines
+
+=== Sub Directories ===
+=== Files ===
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_combine_gri.pro bayes_combine_gri.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_eval_poly2d.pro bayes_eval_poly2d.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_pars.pro bayes_pars.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_prob.pro bayes_prob.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_prob_nc.pro bayes_prob_nc.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/bayes_set_common.pro bayes_set_common.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/probgal/compute_bayes_prob.pro compute_bayes_prob.pro]
