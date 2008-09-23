@@ -1,10 +1,10 @@
 
 
-* [config.wiki config] 
-* [data.wiki data] 
-* [obsolete.wiki obsolete] 
-* [pro.wiki pro] 
-* [setup.wiki setup] 
-* [src.wiki src] 
-[AUTHORS.wiki AUTHORS]
-[CHANGEStxt.wiki CHANGES.txt]
+* [config config] 
+* [data data] 
+* [obsolete obsolete] 
+* [pro pro] 
+* [setup setup] 
+* [src src] 
+[AUTHORS AUTHORS]
+[CHANGEStxt CHANGES.txt]
