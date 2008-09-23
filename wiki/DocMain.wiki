@@ -8,5 +8,5 @@
     * [setup setup] -- 
     * [src src] -- 
 === Files ===
-    * [AUTHORS AUTHORS]
-    * [CHANGEStxt CHANGES.txt]
+    * http://code.google.com/p/sdssidl/source/browse/tags/v1.4//AUTHORS
+    * http://code.google.com/p/sdssidl/source/browse/tags/v1.4//CHANGEStxt
