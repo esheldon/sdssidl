@@ -1,7 +1,7 @@
 Generic Plotting Routines
 
 === Sub Directories ===
-    * [proplottingobsolete obsolete] 
+    * [proplottingobsolete obsolete] -- 
 === Files ===
     * [proplottingDESCRIPTION DESCRIPTION]
     * [proplottingadd_labelspro add_labels.pro]
