@@ -8,5 +8,5 @@
     * [setup setup] 
     * [src src] 
 === Files ===
-[AUTHORS AUTHORS]
-[CHANGEStxt CHANGES.txt]
+    * [AUTHORS AUTHORS]
+    * [CHANGEStxt CHANGES.txt]
