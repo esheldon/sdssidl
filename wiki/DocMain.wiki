@@ -1,12 +1,12 @@
 
 
 === Sub Directories ===
-    * [config config] -- 
-    * [data data] -- 
-    * [obsolete obsolete] -- 
-    * [pro pro] -- 
-    * [setup setup] -- 
-    * [src src] -- 
+    * [config config]
+    * [data data]
+    * [obsolete obsolete]
+    * [pro pro]
+    * [setup setup]
+    * [src src]
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//AUTHORS AUTHORS]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//CHANGES.txt CHANGES.txt]

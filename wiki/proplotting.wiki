@@ -1,7 +1,7 @@
 Generic Plotting Routines
 
 === Sub Directories ===
-    * [proplottingobsolete obsolete] -- 
+    * [proplottingobsolete obsolete]
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//pro/plotting/DESCRIPTION DESCRIPTION]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4//pro/plotting/add_labels.pro add_labels.pro]
