@@ -1,4 +1,4 @@
-#Generic Plotting Routines
+#summary Generic Plotting Routines
 
 === Sub Directories ===
     * [proplottingobsolete obsolete]
