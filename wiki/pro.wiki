@@ -2,35 +2,19 @@
 
 === Sub Directories ===
     * [proastro astro] -- Astronomy routines
-
     * [proclassgal classgal] -- Judith Racusin's code for classifying galaxies based on color and morphology
-
     * [profileio fileio] -- File input/output
-
     * [profiles files] -- Programs for file naming, testing and searching.
-
     * [profits fits] -- Modified versions of idlastron library tools
-
     * [prohtm htm] -- Tools wrapping the C functions htm_index, htmMatchC, htm_intersect.
-
     * [proidlstruct_files idlstruct_files] -- Tools for reading/writing idl structures
-
     * [proplotting plotting] -- Generic Plotting Routines
-
     * [propostgres postgres] -- A class wrapping the pgsql_query() C function.
-
     * [proprobgal probgal] -- Bayesian Star-Galaxy Separation Routines
-
     * [prosdss sdss] -- General tools for SDSS data analysis
-
     * [prosdsspix sdsspix] -- IDL Wrappers for modified versions of Ryan Scranton's SDSSPix C routines
-
     * [prospherical_polygons spherical_polygons] -- IDL Wrappers for Modified versions of Andreas Berlind's spherical polygon code
-
     * [prostatistics statistics] -- Generic Statistics Routines
-
     * [prostruct struct] -- Tools for manipulating IDL structures
-
     * [proutil util] -- Utilities for general data manipulation
-
 === Files ===
