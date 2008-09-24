@@ -9,3 +9,4 @@
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/DESCRIPTION DESCRIPTION]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/configure configure]

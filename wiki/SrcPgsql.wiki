@@ -4,6 +4,7 @@
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/DESCRIPTION DESCRIPTION]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/configure configure]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/pgsql_query.c pgsql_query.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/pgsql_query.h pgsql_query.h]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/pgsql/pgsql_query_util.c pgsql_query_util.c]

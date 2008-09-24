@@ -4,4 +4,5 @@
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/total_int/DESCRIPTION DESCRIPTION]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/total_int/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/total_int/configure configure]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/total_int/total_int.c total_int.c]
