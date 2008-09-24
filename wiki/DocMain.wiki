@@ -10,4 +10,7 @@
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/AUTHORS AUTHORS]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/CHANGES.txt CHANGES.txt]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/CHANGES.txt~ CHANGES.txt~]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/README.txt README.txt]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/gpl.txt gpl.txt]

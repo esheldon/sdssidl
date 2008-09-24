@@ -2,8 +2,12 @@
 
 === Sub Directories ===
 === Files ===
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/.Makefile.osx.swp .Makefile.osx.swp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/BitList.cpp BitList.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/BitList.h BitList.h]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/Makefile.linux Makefile.linux]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/Makefile.osf Makefile.osf]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/Makefile.osx Makefile.osx]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/SpatialConstraint.cpp SpatialConstraint.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/SpatialConstraint.h SpatialConstraint.h]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/htm/SpatialConvex.cpp SpatialConvex.cpp]

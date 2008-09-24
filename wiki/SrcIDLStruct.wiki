@@ -4,5 +4,7 @@
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/IDLStruct.cpp IDLStruct.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/IDLStruct.hpp IDLStruct.hpp]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/testidlstruct.cpp testidlstruct.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/IDLStruct/testidlstruct.pro testidlstruct.pro]
