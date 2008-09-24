@@ -1,7 +1,9 @@
-#summary 
+#summary C extension wrapping Andreas Berlind's spherical polygon search code.
 
 === Sub Directories ===
 === Files ===
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sphpoly_masks/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sphpoly_masks/DESCRIPTION~ DESCRIPTION~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sphpoly_masks/Makefile Makefile]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sphpoly_masks/mask.c mask.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sphpoly_masks/mask.h mask.h]

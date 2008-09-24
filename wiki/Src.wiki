@@ -2,15 +2,15 @@
 
 === Sub Directories ===
     * [SrcDLM DLM]
-    * [SrcIDLStruct IDLStruct]
+    * [SrcIDLStruct IDLStruct] -- A C++ class that wrapps an IDL structure and gives an interface to the elements and tags.
     * [SrcAtlas atlas] -- Wrappers for Robert Lupton's atlas reader code.
     * [SrcFileio fileio] -- C++ extensions for efficient reading and writing of binary and ascii files.
-    * [SrcGauleg gauleg]
-    * [SrcHtmIndexIDL htmIndexIDL]
-    * [SrcPgsql pgsql]
-    * [SrcSdsspixIDL sdsspixIDL]
-    * [SrcSphpoly_masks sphpoly_masks]
-    * [SrcTotal_int total_int]
+    * [SrcGauleg gauleg] -- C extension for calculating gauss-legendre integration weights and abscissa.
+    * [SrcHtmIndexIDL htmIndexIDL] -- C++ extension for performing hierarchical trianglar mesh indicex calculation, searches, and matches. These are wrappers around the basic library of Peter Kunszt.
+    * [SrcPgsql pgsql] -- C extension for interfacing with a postgres database. Returns the results in an IDL structure.
+    * [SrcSdsspixIDL sdsspixIDL] -- C extension wrapping Ryan Scranton's sdsspix routines.
+    * [SrcSphpoly_masks sphpoly_masks] -- C extension wrapping Andreas Berlind's spherical polygon search code.
+    * [SrcTotal_int total_int] -- C extension to total an array as integers. Like built in total(), but works on integers without converting to float. IDL versions greater than 6 also support total(x, /int)
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/DESCRIPTION DESCRIPTION]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/DESCRIPTION~ DESCRIPTION~]
