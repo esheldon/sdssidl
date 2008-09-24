@@ -1,4 +1,4 @@
-v1.4.0
+v1.4.0 2008-09-20
 ---------------------------------------
 Completely revamped the configure system.  Now creates a single file
 src/make.conf with the CFLAGS and LDFLAGS needed for the OS.  This is included
