@@ -19,4 +19,3 @@
     * [ProUtil util] -- Utilities for general data manipulation
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/DESCRIPTION~ DESCRIPTION~]

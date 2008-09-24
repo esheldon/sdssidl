@@ -4,5 +4,4 @@
     * [SrcAtlasSrc src]
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/DESCRIPTION~ DESCRIPTION~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/Makefile Makefile]

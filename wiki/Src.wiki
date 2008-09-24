@@ -13,5 +13,4 @@
     * [SrcTotal_int total_int] -- C extension to total an array as integers. Like built in total(), but works on integers without converting to float. IDL versions greater than 6 also support total(x, /int)
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/DESCRIPTION~ DESCRIPTION~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/Makefile Makefile]
