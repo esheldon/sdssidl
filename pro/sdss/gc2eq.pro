@@ -27,6 +27,14 @@
 ;-                                       
 pro gc2eq, mu, nu, node, inc, ra, dec
 
+    if n_params() lt 6 then begin 
+        on_error, 2
+        print,'-Syntax: gc2eq, mu, nu, node, inc, ra, dec'
+        print,' mu, nu, node, inc in degrees'
+        print
+        message,'Halting'
+    endif 
+
     sdssidl_setup
     !sdss->gc2eq, mu, nu, node, inc, ra, dec
 

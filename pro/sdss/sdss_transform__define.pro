@@ -94,7 +94,7 @@ end
 
 pro sdss_transform::eq2gc, ra_in, dec_in, node_in, inc_in, mu, nu
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 6 then begin 
         on_error, 2
         print,'-Syntax: eq2gc, ra, dec, node, inc, mu, nu'
         print,' ra, dec, node, inc in degrees'
@@ -156,7 +156,7 @@ end
 
 pro sdss_transform::gc2eq, mu_in, nu_in, node_in, inc_in, ra, dec
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 6 then begin 
         on_error, 2
         print,'-Syntax: gc2eq, mu, nu, node, inc, ra, dec'
         print,' mu, nu, node, inc in degrees'
@@ -215,7 +215,7 @@ end
 
 pro sdss_transform::gc2csurvey, mu, nu, node, inc, clambda, ceta
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 6 then begin 
         on_error, 2
         print,'-Syntax: gc2csurvey, mu, nu, node, inc, clambda, ceta'
         print,' mu, nu, node, inc in degrees'
@@ -256,7 +256,7 @@ end
 
 pro sdss_transform::csurvey2gc, clambda, ceta, node, inc, mu, nu
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 6 then begin 
         on_error, 2
         print,'-Syntax: csurvey2gc, clambda, ceta, node, inc, mu, nu'
         print,' all in degrees'
@@ -340,7 +340,7 @@ end
 
 pro sdss_transform::eq2csurvey, ra_in, dec_in, clambda, ceta
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 4 then begin 
         on_error, 2
         print,'-Syntax: ist->eq2csurvey, ra, dec, clambda, ceta'
         print,' ra, dec in degrees'
@@ -423,7 +423,7 @@ end
 
 pro sdss_transform::csurvey2eq, clambda, ceta, ra, dec
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 4 then begin 
         on_error, 2
         print,'-Syntax: csurvey2eq, clambda, ceta, ra, dec'
         print,' clambda, ceta in degrees'
@@ -466,7 +466,7 @@ end
 
 pro sdss_transform::eq2survey, ra_in, dec_in, lambda, eta
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 4 then begin 
         on_error, 2
         print,'-Syntax: eq2survey, ra, dec, lambda, eta'
         print,' ra, dec in degrees'
@@ -547,7 +547,7 @@ end
 
 pro sdss_transform::survey2eq, lambda_in, eta_in, ra, dec
 
-    if n_params() lt 2 then begin 
+    if n_params() lt 4 then begin 
         on_error, 2
         print,'-Syntax: survey2eq, lambda, eta, ra, dec'
         print,' lambda, eta in degrees'
@@ -621,7 +621,7 @@ end
 
 pro sdss_transform::munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinear, status=status
 
-  if n_params() lt 4 then begin 
+  if n_params() lt 6 then begin 
       on_error, 2
       print,'-Syntax: munu2rowcol, trans, field, mu, nu, row, col, ri=, /nonlinear, status='
       print
@@ -767,7 +767,7 @@ end
 
 pro sdss_transform::rowcol2munu, trans, field, row, col, mu, nu, ri=ri,status=status
 
-    if n_params() lt 4 then begin 
+    if n_params() lt 6 then begin 
         on_error, 2
         print,'-Syntax: rowcol2munu, trans, field, row, col, mu, nu, ri=, status='
         print

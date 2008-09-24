@@ -64,6 +64,13 @@
 
 pro rowcol2eq, trans, node, inc, field, row, col, ra, dec, status=status
 
+    if n_params() lt 8 then begin
+        on_error, 2
+        print,'-Syntax: st->rowcol2eq, trans, node, inc, field, row, col, ra, dec, status='
+        print
+        message,'Halting'
+    endif
+
     sdssidl_setup
     !sdss->rowcol2eq, trans, node, inc, field, row, col, ra, dec, status=status
 

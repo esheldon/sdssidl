@@ -48,6 +48,14 @@
 
 PRO eq2gc, ra, dec, node, inc, mu, nu
 
+    if n_params() lt 6 then begin 
+        on_error, 2
+        print,'-Syntax: eq2gc, ra, dec, node, inc, mu, nu'
+        print,' ra, dec, node, inc in degrees'
+        print
+        message,'Halting'
+    endif 
+
     sdssidl_setup
     !sdss->eq2gc, ra, dec, node, inc, mu, nu
 
