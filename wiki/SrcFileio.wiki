@@ -1,9 +1,11 @@
-#summary 
+#summary C++ extensions for efficient reading and writing of binary and ascii files.
 
 === Sub Directories ===
     * [SrcFileioDoc doc]
     * [SrcFileioOld old]
 === Files ===
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/fileio/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/fileio/DESCRIPTION~ DESCRIPTION~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/fileio/FileObj.cpp FileObj.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/fileio/FileObj.hpp FileObj.hpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/fileio/Makefile Makefile]

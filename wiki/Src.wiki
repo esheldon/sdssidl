@@ -3,8 +3,8 @@
 === Sub Directories ===
     * [SrcDLM DLM]
     * [SrcIDLStruct IDLStruct]
-    * [SrcAtlas atlas]
-    * [SrcFileio fileio]
+    * [SrcAtlas atlas] -- Wrappers for Robert Lupton's atlas reader code.
+    * [SrcFileio fileio] -- C++ extensions for efficient reading and writing of binary and ascii files.
     * [SrcGauleg gauleg]
     * [SrcHtmIndexIDL htmIndexIDL]
     * [SrcPgsql pgsql]
