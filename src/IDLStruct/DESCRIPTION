@@ -1,0 +1,2 @@
+title		IDLStruct
+description	A C++ class that wrapps an IDL structure and gives an interface to the elements and tags.
