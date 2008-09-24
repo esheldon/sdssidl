@@ -52,6 +52,14 @@
 
 pro csurvey2eq, clambda, ceta, ra, dec
 
+    if n_params() lt 4 then begin 
+        on_error, 2
+        print,'-Syntax: csurvey2eq, clambda, ceta, ra, dec'
+        print,' clambda, ceta in degrees'
+        print
+        message,'Halting'
+    endif
+
     sdssidl_setup
     !sdss->csurvey2eq, clambda, ceta, ra, dec
 

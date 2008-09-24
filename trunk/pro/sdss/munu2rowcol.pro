@@ -57,6 +57,13 @@
 
 pro munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinear, status=status
 
+	if n_params() lt 6 then begin 
+		on_error, 2
+		print,'-Syntax: munu2rowcol, trans, field, mu, nu, row, col, ri=, /nonlinear, status='
+		print
+		message,'Halting'
+	endif 
+
     sdssidl_setup
     !sdss->munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinear, status=status
 

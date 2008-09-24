@@ -54,6 +54,14 @@
 
 pro survey2eq, lambda, eta, ra, dec
 
+    if n_params() lt 4 then begin 
+        on_error, 2
+        print,'-Syntax: survey2eq, lambda, eta, ra, dec'
+        print,' lambda, eta in degrees'
+        print
+        message,'Halting'
+    endif 
+
     sdssidl_setup
     !sdss->survey2eq, lambda, eta, ra, dec
 

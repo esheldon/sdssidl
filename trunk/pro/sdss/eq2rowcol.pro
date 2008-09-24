@@ -68,6 +68,13 @@
 
 pro eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=ri, nonlinear=nonlinear, status=status
 
+  if n_params() lt 8 then begin 
+      on_error, 2
+      print,'-Syntax: st->eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=, /nonlinear, status='
+      print
+      message,'Halting'
+  ENDIF 
+
     sdssidl_setup
     !sdss->eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=ri, nonlinear=nonlinear, status=status
 

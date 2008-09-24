@@ -55,6 +55,13 @@
 
 pro rowcol2munu, trans, field, row, col, mu, nu, ri=ri, status=status
 
+    if n_params() lt 6 then begin 
+        on_error, 2
+        print,'-Syntax: rowcol2munu, trans, field, row, col, mu, nu, ri=, status='
+        print
+        message,'Halting'
+    endif 
+
     sdssidl_setup
     !sdss->rowcol2munu, trans, field, row, col, mu, nu, ri=ri, status=status
 
