@@ -5,7 +5,6 @@
     * [SrcSdsspixIDLIdlOld old]
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/idl/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/idl/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/idl/applyPixelMaskIDL.c applyPixelMaskIDL.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/idl/applyPixelMaskUtil.c applyPixelMaskUtil.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/sdsspixIDL/idl/apply_maskIDL.c apply_maskIDL.c]

@@ -3,7 +3,6 @@
 === Sub Directories ===
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/src/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/src/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/src/atlasImages.c atlasImages.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/src/dataIo.c dataIo.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/src/dervish.c dervish.c]

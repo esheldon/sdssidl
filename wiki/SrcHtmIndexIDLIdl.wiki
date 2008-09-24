@@ -3,7 +3,6 @@
 === Sub Directories ===
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/idl/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/idl/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/idl/htmIndexIDL.cpp htmIndexIDL.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/idl/htmIntersectIDL.cpp htmIntersectIDL.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/idl/htmIntersectRadec.cpp htmIntersectRadec.cpp]

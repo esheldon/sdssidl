@@ -3,6 +3,5 @@
 === Sub Directories ===
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/gauleg/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/gauleg/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/gauleg/gauleg.c gauleg.c]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/gauleg/gauleg.h gauleg.h]

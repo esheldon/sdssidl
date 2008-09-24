@@ -4,13 +4,12 @@
     * [Config config]
     * [Data data]
     * [Obsolete obsolete]
-    * [Pro pro]
+    * [Pro pro] -- IDL program files
     * [Setup setup]
-    * [Src src]
+    * [Src src] -- C/C++ extensions to IDL
 === Files ===
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/AUTHORS AUTHORS]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/CHANGES.txt CHANGES.txt]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/CHANGES.txt~ CHANGES.txt~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/Makefile Makefile]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/README.txt README.txt]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/gpl.txt gpl.txt]

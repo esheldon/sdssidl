@@ -6,7 +6,6 @@
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/Makefile Makefile]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/Makefile.linux Makefile.linux]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/Makefile.osf Makefile.osf]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/Makefile~ Makefile~]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/SpatialConstraint.cpp SpatialConstraint.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/SpatialConvex.cpp SpatialConvex.cpp]
     * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/htmIndexIDL/src/SpatialDomain.cpp SpatialDomain.cpp]
