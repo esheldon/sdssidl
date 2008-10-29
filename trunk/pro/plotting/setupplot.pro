@@ -11,17 +11,25 @@
 ;    the defaults to suit them. Note pslayout contains tags for setting
 ;    up X and Z buffer as well as PS
 ;
-;    Also runs simpctable, to create a set of colors, and defsymbols
-;    to define the system variables !tsym for true-type font symbols
-;    and !vsym for vector drawn font symbols, and !csym for use with
-;    either true-type or vector drawn fonts.  Note, this is obsoleted
+;    Also runs simpctable if load_simpctable=1 (default), to create a set of 
+;	 colors, and defsymbols to define the system variables !tsym for true-type 
+;	 font symbols and !vsym for vector drawn font symbols, and !csym for use 
+;	 with either true-type or vector drawn fonts.  Note, this is obsoleted
 ;    by the textoidl() program which allows one to type tex symbols.
 ;
+;	 The simpctable method is also being deprecated, as the c2i function is
+;	 a better method, allowing the user to indicate a color name which it
+;	 converts to the appropriate color index.
+;
 ; CALLING SEQUENCE:
-;    setupplot [, type, /help, /test, true=true, /invbw, tmpdir=]
+;    setupplot [, type, /help, /test, true=true, /invbw, 
+;		load_simpctable=, tmpdir=]
 ;
 ; OPTIONAL INPUTS:
 ;    type: if given, the type is set using set_plot, type
+;	 load_simpctable=: 1 for true, 0 for false.  Currently on by default but
+;		this will change as the c2i(color_name) method is better.  See c2i.pro
+;		for details.
 ;    tmpdir=: Temporary directory used by setfont for setting the vector
 ;       font. Default is /tmp
 ; KEYWORD PARAMETERS:
