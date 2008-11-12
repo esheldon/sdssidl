@@ -56,8 +56,9 @@ pro eq2csurvey, ra, dec, clambda, ceta
         on_error, 2
         print,'-Syntax: eq2csurvey, ra, dec, clambda, ceta'
         print,' ra, dec in degrees'
-        print
-        message,'Halting'
+        return
+;        print
+;        message,'Halting'
     endif 
  
     sdssidl_setup
