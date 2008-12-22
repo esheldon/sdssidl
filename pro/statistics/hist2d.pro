@@ -85,7 +85,7 @@ IF arg_present(xbins) OR arg_present(ybins) THEN BEGIN
         ENDIF 
     ENDFOR 
 
-    FOR i=0L, nxbins-1 DO BEGIN 
+    FOR i=0L, nybins-1 DO BEGIN 
         IF yrev[i] NE yrev[i+1] THEN BEGIN 
             w2=yrev[ yrev[i]:yrev[i+1]-1  ]
             nw2 = n_elements(w2)
