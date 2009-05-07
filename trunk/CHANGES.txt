@@ -45,7 +45,8 @@ minor changes:
     pro/files/path_join.pro: More flexible behavior.
     pro/util/match_multi.pro: Check number of matches > 0 before creating 
         output array.
-
+    pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
+        input arrays.
 
 
 v1.3.0 2007-10-09
