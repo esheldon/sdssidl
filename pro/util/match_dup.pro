@@ -50,6 +50,9 @@
 ;	
 ; REVISION HISTORY:
 ;    29-May-2002: Erin Scott Sheldon UofMich in IDL v5.2
+;    07-May-2009: Amy E. Kimball UWash.
+;                 Fixed a bug where code crashed if no overlap in the range of
+;                 arr1 and arr2 (and sort=0).
 ;- 
 ;
 ;
@@ -118,6 +121,14 @@ pro match_dup, arr1, arr2, match1, match2, numlist1=numlist1, h1=h1, reverse_ind
 
       max = min( [max(arr1, min=min1), max(arr2, min=min2)] )
       min = max( [min1, min2] )
+      if min gt max then begin
+        ;; no possible overlap between the two arrays
+        match1 = -1
+        match2 = -1
+        numlist1=0L
+        numlist2=0L
+        return
+      endif
       h1=histogram(arr1, reverse_indices=reverse_indices1, $
                    min=min, max=max $
                   )
