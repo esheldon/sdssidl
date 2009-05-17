@@ -47,6 +47,8 @@ minor changes:
         output array.
     pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
         input arrays.
+    pro/astro/spheredist.pro: Bug fix; output fixzed so values are between 0
+    and 2!pi.
 
 
 v1.3.0 2007-10-09
