@@ -90,7 +90,7 @@ function spheredist, ra1, dec1, ra2, dec2, units=units, theta=theta
         endif else begin 
             theta = atan( sin(radiff), $
                 (sindec1*cosradiff - cosdec1*sindec2/cosdec2) ) + !dpi
-            if theta eq 2.*!dpi then theta=0
+            theta = theta mod (2.*!dpi)
             if units eq 2 or units eq 4 then theta=theta*d2r
         endelse
     endif 
