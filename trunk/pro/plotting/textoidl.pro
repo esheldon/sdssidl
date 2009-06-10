@@ -278,7 +278,7 @@ FUNCTION textoidl_table, POSTSCRIPT=ps, VECTOR=vec,  HELP=Help
 ;  Set IDL font sequence for roman fonts.
     RomanFont = strarr(3)
     RomanFont(VECFONT) = '!3'
-    RomanFont(PSFONT) = '!M'
+    RomanFont(PSFONT) = '!3'
 
 ;lowercase Greek -- 
 ;    Note there is some trickery involved in getting \varphi
@@ -402,7 +402,6 @@ FUNCTION textoidl_table, POSTSCRIPT=ps, VECTOR=vec,  HELP=Help
       RomanFont(FontSelection) $
       + Roman(FontSelection,*) $
       + PreviousFont(FontSelection)
-
 
 
     TranslationTable = [[LowercaseGreek],[UppercaseGreek],[Symbols],[Roman]]
