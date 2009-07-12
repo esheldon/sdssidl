@@ -9,7 +9,6 @@
 ;  IDL DLM, and uses the DLM htm_index when these are not sent.
 ;  This is very efficient for large search angles and large lists.
 ;  May seem slow otherwise due to overhead creating htm indices.
-;  Currently returns all matches within the search radius.
 ;
 ;
 ; CATEGORY:
