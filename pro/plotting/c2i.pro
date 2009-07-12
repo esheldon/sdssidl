@@ -31,8 +31,9 @@
 ;       grey0 grey1 ... grey100
 ;
 ;   On a true-color display, many more colors are defined: all the colors that
-;   are in the rgb.txt file on unix systems. You can send the keyword 
-;	/showcolors the command showrgb, which shows the color names. 
+;   are in the rgb.txt file on unix systems (see the showrgb program). 
+;   You can send the keyword /showcolors the command showrgb, which shows
+;   the color names. 
 ;
 ;   On an 8-bit display or device (such as postscript) a new color table is
 ;   loaded. 33 colors above are defined plus greys grey00 to grey100.  
