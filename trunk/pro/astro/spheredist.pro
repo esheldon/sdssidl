@@ -36,9 +36,10 @@ function spheredist, ra1, dec1, ra2, dec2, units=units, theta=theta
     nr1=n_elements(ra1) & nd1=n_elements(dec1) 
     nr2=n_elements(ra2) & nd2=n_elements(dec2)
     npar = N_params()
-    if (nr1 eq 0) or (nd1 eq 0) or (nr2 eq 0) or (nd2 eq 0) then begin
-      print,'-Syntax: dis = spheredist(ra1,dec1,ra2,dec2,units=,theta=)'
-      return,-1
+	if (nr1 eq 0) or (nd1 eq 0) or (nr2 eq 0) or (nd2 eq 0) then begin
+		print,'-Syntax: dis = spheredist(ra1,dec1,ra2,dec2,units=,theta=)'
+		on_error, 2
+		message,'Halting'
     endif
 
     common spheredist_cblock, d2r, r2d
@@ -49,8 +50,8 @@ function spheredist, ra1, dec1, ra2, dec2, units=units, theta=theta
 
     if n_elements(units) eq 0 then units = 1
 
-    if (nr1 ne nd1) then message,'length of ra1 must length of dec1'
-    if (nr2 ne nd2) then message,'length of ra2 must length of dec2'
+	if (nr1 ne nd1) then message,'length of ra1 must length of dec1'
+	if (nr2 ne nd2) then message,'length of ra2 must length of dec2'
 
     ; Deal with input units
     if units eq 1 or units eq 2 then begin
