@@ -1,6 +1,8 @@
 pro ploth,x,y,hist,xrange=xrange,yrange=yrange,_extra=ex,$
-nxbins=nxbins,nybins=nybins,range=range,$
-log=log,sqrt=sqrt,median=median,smooth=smooth,g_smooth=g_smooth,silent=silent
+	nxbins=nxbins,nybins=nybins,range=range,$
+	log=log,sqrt=sqrt,median=median,smooth=smooth,g_smooth=g_smooth,$
+	silent=silent, $
+	asinh=asinh
 ;+
 ; NAME:		
 ;		ploth
@@ -34,7 +36,8 @@ log=log,sqrt=sqrt,median=median,smooth=smooth,g_smooth=g_smooth,silent=silent
 ;		default is to go around the mean by three sigma
 ;		uses sigma clipping algorithm
 ;
-;	log, sqrt : use log or square root scaling
+;	/log, /sqrt : use log or square root scaling
+;   /asinh: Use asinh scaling
 ;
 ;	median : do a median filter smoothing on a square this size
 ;		should be an odd integer
@@ -149,8 +152,13 @@ if keyword_set(sqrt) then begin
 	;square root scale
 endif
 
-
-tvim2,map,xrange=hist.xrange,yrange=hist.yrange,range=range,_extra=ex
+if keyword_set(asinh) then begin
+    tvasinh,map,xrange=hist.xrange,yrange=hist.yrange,$
+      sky=0.0, $
+      _extra=ex
+endif else begin
+	tvim2,map,xrange=hist.xrange,yrange=hist.yrange,range=range,_extra=ex
+endelse
 
 return
 end
