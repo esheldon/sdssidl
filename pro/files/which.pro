@@ -10,26 +10,28 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
 ;	when there are duplicates.  This is similar to the unix
 ;	'which' command.
 ;
+;	If no files are found, search for intrinsic procedures/functions
+;	with the input name and explain if found.
+;
 ; CALLING SEQUENCE:
-;    WHICH, [ proc_name ]          ;Find PROC_NAME in !PATH and display
+;    WHICH, [ proc_name, files=, /dlm, /show, /help, /silent ]
 ;
 ; OPTIONAL INPUT:
 ;	proc_name - Character string giving the name of the IDL procedure or 
 ;		function.  Do not give an extension.   If omitted, 
 ;		the program will prompt for PROC_NAME.
-;       /show: if set, will show the user the first file found
+;		/dlm: Search !DLM_PATH for dynamically loaded modules instead
+;			of !PATH for .pro files
+;       /show: if set, will display the first file found
 ;       /help: print syntax
 ;
-; OUTPUTS:
+; OPTIONAL OUTPUT KEYWORDS:
 ;	files: An array containing the filenames
-;
-; SIDE EFFECTS
-;	None.
 ;
 ; PROCEDURE:
 ;	The system variable !PATH is parsed into individual libraries or 
 ;	directories.   Each library or directory is then searched for the
-;	procedure name.  
+;	procedure name.  If /dlm is set, search !DLM_PATH for .dlm files
 ;
 ; EXAMPLE:
 ;	Find out where the procedure CURVEFIT lives.
@@ -45,6 +47,10 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
 ;       03-DEC-2000 Added files and show keywords. Erin Sheldon
 ;       21-JUN-2004 Use FILE_WHICH procedure for IDL > 5.3  for significant
 ;             speed increase. Fixed intrinsic procedure searching. E.S.
+;		??-??-2006 Look also for dynamically loaded modules if /dlm is set
+;	27-May-2009: Due to bug in idl 7.0 file_which, moved over to using 
+;		straight file_search.  This now makes the dividing line 5.5 between
+;		the two methods.  Erin Sheldon, BNL
 ;-
 
   if keyword_set(help) then begin
@@ -52,7 +58,7 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
       return
   endif 
 
-  on_error,2                    ;return to caller on error
+  ;on_error,2                    ;return to caller on error
 
   common which_block, funcnames, pronames
 
@@ -118,13 +124,13 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
           endelse
       endif else begin          ;Directory
 
-          IF IDLversion LT 5.4 THEN BEGIN 
+          IF IDLversion LT 5.5 THEN BEGIN 
               ;; Old way
 ;              a = findfile(dir + dirsep + name+'.pro',COUNT=i)
-              a = findfile(dir + dirsep + name+ext,COUNT=i)
+              a = findfile(dir + dirsep + proc_name+ext,COUNT=i)
               if (I ge 1) then begin ;Found by FINDFILE?
 ;                  filename = dir+dirsep+name+'.pro'
-                  filename = dir+dirsep+name+ext
+                  filename = dir+dirsep+proc_name+ext
                   add_arrval, filename, files
                   
                   IF NOT keyword_set(silent) THEN BEGIN 
@@ -135,17 +141,19 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
               endif
           endif else BEGIN 
               ;; New way: E.S.S.
-;              fileName = FILE_WHICH(dir, proc_name+'.pro')
-              fileName = FILE_WHICH(dir, proc_name+ext)
-              if filename ne '' then begin 
+			  filename = filepath(root=dir, proc_name+ext)
+			  lfiles = file_search(dir, proc_name+ext)
+			  ;if file_test(filename) then begin
+			  if lfiles[0] ne '' then begin
 
                   if not keyword_set(silent) then begin 
                       if (found eq 0) then print,'Found in: ',dir
                       if (found eq 1) then print,'Also in: ',dir
 
-;                      lfiles = file_search(dir, proc_name+'.pro')
-                      lfiles = file_search(dir, proc_name+ext)
-                      for ifl = 0L, n_elements(lfiles)-1 do print,'   '+lfiles[ifl]
+                      ;lfiles = file_search(dir, proc_name+ext)
+                      for ifl = 0L, n_elements(lfiles)-1 do begin
+						  print,'   '+lfiles[ifl]
+					  endfor
 
                   endif 
                   found=1
