@@ -76,6 +76,7 @@ pro _pplot_doplot, x, y, $
                    errstyle=est, $
                    errthick=eth, $
                    errcolor = ecol, $
+				   color=color, $
                    nohat=hat, $
                    hatlength=hln, $
                    $
@@ -84,7 +85,8 @@ pro _pplot_doplot, x, y, $
                    noclip = noclip, $
                    $
                    overplot=overplot, $
-                  _EXTRA = _extra, ANONYMOUS_ = DUMMY_, COLOR=color
+				   ANONYMOUS_ = DUMMY_, $
+                  _EXTRA = _extra
 
 
   on_error, 2
@@ -199,7 +201,8 @@ pro _pplot_doplot, x, y, $
   endif else begin 
       plot, x, y, device=device, $
         xrange = xrange, yrange = yrange, xlog = xlog, ylog = ylog, $
-        _extra = _extra, noclip = noclip, nsum= 1, color=color
+        _extra = _extra, noclip = noclip, nsum= 1, $
+		color=color
   endelse 
 
 ;	Plot the error bars.   Compute the hat length in device coordinates
@@ -332,7 +335,7 @@ function _pplot_aspect_position, aspect, center=center
 
 end 
 
-pro _pplot_convert_colors, color_in, errcolor_in, color, errcolor
+pro _pplot_convert_colors, color_in, errcolor_in, bg_in, color, errcolor, bg
     if n_elements(color_in) ne 0 then begin
         if size(color_in,/tname) eq 'STRING' then begin
             color=c2i(color_in) 
@@ -347,6 +350,13 @@ pro _pplot_convert_colors, color_in, errcolor_in, color, errcolor
             errcolor=errcolor_in 
         endelse
     endif
+    if n_elements(bg_in) ne 0 then begin
+        if size(bg_in,/tname) eq 'STRING' then begin
+            bg=c2i(bg_in) 
+        endif else begin
+            bg=bg_in 
+        endelse
+    endif
 end
 
 ; Main procedure.
@@ -354,6 +364,7 @@ pro pplot, x, y, xerror=xerror, yerror=yerror, aspect=aspect, center=center, $
            errthick=eth, $
            color=color_in, $
            errcolor = ecol_in, $
+		   background = background_in, $
            nohat=hat, $
            hatlength=hln, $
            errstyle=est, $
@@ -381,7 +392,7 @@ pro pplot, x, y, xerror=xerror, yerror=yerror, aspect=aspect, center=center, $
   endif 
 
   ; Color input.  We support strings for colors through c2i.pro
-  _pplot_convert_colors, color_in, ecol_in, color, ecol  
+  _pplot_convert_colors, color_in, ecol_in, background_in, color, ecol, bg
 
   nxerror = n_elements(xerror)
   nyerror = n_elements(nyerror)
@@ -415,6 +426,7 @@ pro pplot, x, y, xerror=xerror, yerror=yerror, aspect=aspect, center=center, $
     errthick=eth, $
     color=color, $
     errcolor = ecol, $
+	background=bg, $
     nohat=hat, $
     hatlength=hln, $
     errstyle=est, $
