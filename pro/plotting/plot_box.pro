@@ -33,6 +33,7 @@
 
 PRO plot_box, minx, maxx, miny, maxy, $
               polyfill=polyfill, $
+			  color=color_in, $
               _extra=extra
 
   IF n_params() LT 4 THEN BEGIN
@@ -41,19 +42,28 @@ PRO plot_box, minx, maxx, miny, maxy, $
       return
   ENDIF 
 
+  if size(color_in, /tname) eq 'STRING' then begin
+	  ; just in case we don't have c2i() this will still
+	  ; compile
+	  comm = 'color = c2i(color_in)'
+	  res=execute(comm)
+  endif else begin
+	  color = color_in
+  endelse
+
   IF keyword_set(polyfill) THEN BEGIN 
 
       polyfill, $
         [minx, maxx, maxx, minx], $
         [miny, miny, maxy, maxy], line_fill=line_fill, $
-        _extra=extra
+        color=color, _extra=extra
 
   ENDIF ELSE BEGIN 
 
-      oplot,[minx,minx],[miny,maxy], _extra=extra
-      oplot,[minx,maxx],[maxy,maxy], _extra=extra
-      oplot,[maxx,maxx],[maxy,miny], _extra=extra
-      oplot,[maxx,minx],[miny,miny], _extra=extra
+      oplot,[minx,minx],[miny,maxy], _extra=extra, color=color
+      oplot,[minx,maxx],[maxy,maxy], _extra=extra, color=color
+      oplot,[maxx,maxx],[maxy,miny], _extra=extra, color=color
+      oplot,[maxx,minx],[miny,miny], _extra=extra, color=color
 
   ENDELSE 
 
