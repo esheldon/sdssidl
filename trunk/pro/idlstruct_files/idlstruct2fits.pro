@@ -76,7 +76,7 @@ PRO idlstruct2fits_tofits, idlstruct_files, fits_files, status=status
 
 END 
 
-PRO idlstruct2fits_toidlstruct, fits_files, idlstruct_files, status=status
+PRO idlstruct2fits_toidlstruct, fits_files, idlstruct_files, ascii=ascii, csv=csv, status=status
 
   nst = n_elements(fits_files)
   FOR i=0L, nst-1 DO BEGIN 
@@ -96,7 +96,7 @@ PRO idlstruct2fits_toidlstruct, fits_files, idlstruct_files, status=status
       IF status EQ 0 THEN BEGIN 
           print
           print,'Writing to idlstruct file: ',idlstruct_files[i]
-          write_idlstruct, t, idlstruct_files[i]
+          write_idlstruct, t, idlstruct_files[i], ascii=ascii, csv=csv
       ENDIF ELSE BEGIN 
           print,'Unable to read fits file'
       ENDELSE 
@@ -107,13 +107,13 @@ END
 
 
 
-PRO idlstruct2fits, infiles, outfiles, reverse=reverse, status=status
+PRO idlstruct2fits, infiles, outfiles, reverse=reverse, ascii=ascii, csv=csv, status=status
 
   status = 1
   IF n_params() LT 2 THEN BEGIN 
       print,'-Syntax: idlstruct2fits, idlstruct_files, fits_files, status='
       print,'      -- OR --'
-      print,'-Syntax: idlstruct2fits, fits_files, idlstruct_files, /reverse, status='
+      print,'-Syntax: idlstruct2fits, fits_files, idlstruct_files, /reverse, /ascii, /csv, status='
       print
       print,' Use /reverse to convert fits to idlstruct'
       return
@@ -133,7 +133,8 @@ PRO idlstruct2fits, infiles, outfiles, reverse=reverse, status=status
   ENDIF ELSE BEGIN 
       fits_files = infiles
       idlstruct_files = outfiles
-      idlstruct2fits_toidlstruct, fits_files, idlstruct_files, status=status
+      idlstruct2fits_toidlstruct, fits_files, idlstruct_files, $
+		  ascii=ascii, csv=csv, status=status
   ENDELSE 
 
 END 
