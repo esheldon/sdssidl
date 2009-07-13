@@ -362,7 +362,7 @@ function sdss_files::rundir, run, rerun=rerun, min=min, corrected=corrected, exi
             return,badval
         endif 
 
-        rundir = concat_dir(data_dir, strtrim(string(userun),2))
+        ;rundir = concat_dir(data_dir, rstr)
     endif else begin 
         data_dir = sdssidl_config('shapecorr_dir', exists=dexists)
         if not dexists then begin 
@@ -371,12 +371,20 @@ function sdss_files::rundir, run, rerun=rerun, min=min, corrected=corrected, exi
             return,badval
         ENDIF 
 
-        rundir = concat_dir(data_dir, 'corr'+strtrim(string(userun),2))
+        ;rundir = concat_dir(data_dir, 'corr'+rstr)
+		rstr = 'corr'+rstr
 
     ENDELSE 
 
+	if sdssidl_config('rerun_first') eq 1 then begin
+		elements = [data_dir, rrstr, rstr]
+	endif else begin
+		elements = [data_dir, rstr, rrstr]
+	endelse
     ;; Now get the rerun directory
-    rundir = concat_dir(rundir, rrstr+'/')
+    ;rundir = concat_dir(rundir, rrstr+'/')
+
+	rundir = path_join(elements)
 
     if arg_present(exists) then begin
         exists=fexist(rundir)

@@ -8,7 +8,7 @@
 ;    print a time interval in a nice format if days,hours,minuties,seconds.   
 ;	
 ; CALLING SEQUENCE: 
-;    ptime, t [, num, tstr=, command=, savetime=]
+;    ptime, t [, num, tstr=, command=, /savetime]
 ;      
 ;                 
 ; INPUTS: 
@@ -73,7 +73,7 @@ pro ptime, ttime, num, tstr=tstr, savetime=savetime, command=command
     endif else begin  
 
         if n_params() eq 0 then begin 
-            print,'-Syntax: ptime, t [, num, command=, tstr=, savetime=]'
+            print,'-Syntax: ptime, t [, num, command=, tstr=, /savetime]'
             print,''
             print,'Use doc_library,"ptime"  for more help.'  
             return
