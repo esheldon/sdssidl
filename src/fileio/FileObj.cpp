@@ -1250,7 +1250,7 @@ int FileObj::GetInputRows()
 
     // We get here if rows keyword not present or n_elements() is zero
     if (mVerbose) printf("Extracting all rows\n");
-    mNumRowsToGet = mNumRowsInFile;
+    mNumRowsToGet = mNumRowsInFile-mSkipLines;
     mRowsToGet.resize(mNumRowsInFile);
     for (IDL_MEMINT i=0;i<mNumRowsInFile;i++)
         mRowsToGet[i] = i;

@@ -1,3 +1,12 @@
+v1.5.0
+---------------------------------------
+bug fixes:
+	skiplines works properly now for ascii_read() C++ DLM.
+    pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
+        input arrays.
+    pro/astro/spheredist.pro: Bug fix; output fixzed so values are between 0
+    and 2!pi.
+
 v1.4.0 2008-09-20
 ---------------------------------------
 Completely revamped the configure system.  Now creates a single file
@@ -45,10 +54,6 @@ minor changes:
     pro/files/path_join.pro: More flexible behavior.
     pro/util/match_multi.pro: Check number of matches > 0 before creating 
         output array.
-    pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
-        input arrays.
-    pro/astro/spheredist.pro: Bug fix; output fixzed so values are between 0
-    and 2!pi.
 
 
 v1.3.0 2007-10-09
