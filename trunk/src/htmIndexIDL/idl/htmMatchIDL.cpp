@@ -18,7 +18,7 @@
 #include "SpatialInterface.h"
 #include "SpatialDomain.h"
 #include "VarStr.h"
-#include "fstream.h"
+//#include "fstream.h"
 #include <time.h>
 #include "export.h"
 
@@ -42,11 +42,9 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
 
   // These will point at the input data
   double *ra1, *dec1, *ra2, *dec2, *angleinput;
-  IDL_LONG *htmid2, *htmrev2, minLeafId, maxLeafId;
-  FILE *fptr;
+  IDL_LONG *htmrev2, minLeafId, maxLeafId;
+  FILE *fptr=NULL;
 
-  // not using this currently (also,should be uint64?)
-  //IDL_LONG *htmid2;
 
   // Will be copies of inputs
   IDL_MEMINT n1, n2, nangle;
@@ -139,7 +137,7 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
     htmInterface htm(depth,savedepth);  // generate htm interface
     const SpatialIndex &index = htm.index();
 
-    double angle, d;
+    double angle=0, d=0;
 
     vector <int32> m1;
     vector <int32> m2;  
@@ -184,13 +182,13 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
       idList.resize(nFound);
       
       // ----------- FULL NODES -------------
-      for(int i = 0; i < flist.length(); i++)
+      for(size_t i = 0; i < flist.length(); i++)
 	{  
 	  idList[idCount] = (uint32 )flist(i);
 	  idCount++;
 	}
       // ----------- Partial Nodes ----------
-      for(int i = 0; i < plist.length(); i++)
+      for(size_t i = 0; i < plist.length(); i++)
 	{  
 	  idList[idCount] = (uint32 )plist(i);
 	  idCount++;
@@ -301,7 +299,7 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
 	      (double *) IDL_MakeTempArray(IDL_TYP_DOUBLE, 1, dim, 
 					   IDL_ARR_INI_NOP, &d12tmp);
 	    
-	    for (int32 i=0;i<m1.size();i++) {
+	    for (size_t i=0;i<m1.size();i++) {
 	      match1[i] = m1[i];
 	      match2[i] = m2[i];
 	      dis12[i] = d12[i];
@@ -346,7 +344,7 @@ htmMatchGetData(IDL_VPTR ra1Vptr, IDL_VPTR dec1Vptr,
 		IDL_MEMINT *depth, IDL_MEMINT *maxmatch)
 {
 
-  IDL_MEMINT tmp_n1, tmp_n2, tmp_nid, tmp_nrev;
+  IDL_MEMINT tmp_n1, tmp_n2, tmp_nrev;
 
   // Extract pointers to ra/dec data
   if (!getDblPtr(ra1Vptr, ra1, n1))
@@ -463,7 +461,7 @@ gcirc(double ra1, double dec1,
 
 
 void
-htmMatchErrOut(char *message)
+htmMatchErrOut(const char *message)
 {
 
   IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, message);
@@ -547,7 +545,8 @@ int IDL_Load_(void)
      5th parameter will say if it accepts keywords and some other flags 
      For more info see page 325 of external dev. guide */
   static IDL_SYSFUN_DEF2 func_addr[] = {
-    { (IDL_SYSRTN_GENERIC) htmmatchc, "HTMMATCHC", 0, IDL_MAXPARAMS, 
+    { (IDL_SYSRTN_GENERIC) htmmatchc, 
+		static_cast<char *>("HTMMATCHC"), 0, IDL_MAXPARAMS, 
       IDL_SYSFUN_DEF_F_KEYWORDS, 0},
   };
 

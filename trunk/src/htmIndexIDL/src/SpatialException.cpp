@@ -30,7 +30,7 @@
 #include <SpatialException.h>
 
 /* --- SpatialException methods ------------------------------------------------- */
-char *
+const char *
 SpatialException::defaultstr[] = {
   "SDSS Science Archive",
   "generic exception",			// These specialized exceptions are

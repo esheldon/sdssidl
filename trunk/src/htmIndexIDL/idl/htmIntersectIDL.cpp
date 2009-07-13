@@ -41,7 +41,7 @@
 #include "SpatialInterface.h"
 #include "SpatialDomain.h"
 #include "VarStr.h"
-#include "fstream.h"
+#include <fstream>
 #include <time.h>
 #include <stdlib.h>
 #include "export.h"
@@ -66,14 +66,14 @@ htmIntersect(int argc, IDL_VPTR *argv, char *argk) {
   // holds cos(angle)
   double dist;
 
-  IDL_MEMINT numRA, numDEC;
+  //IDL_MEMINT numRA, numDEC;
 
   // This is the return value.  index points to the data region 
   IDL_VPTR idlistVptr;
   uint64 *idlist;
 
   int savedepth=2;	// depth and stored depth
-  size_t i,j;
+  size_t i;
 
   ///////////////////////////////////////////////////////////
   // Process the keywords 
@@ -131,7 +131,7 @@ htmIntersect(int argc, IDL_VPTR *argv, char *argk) {
     //////////////////////////////
 
     ValVec<uint64> plist, flist;	// List results
-    const ValVec<htmRange> *rlist;
+    //const ValVec<htmRange> *rlist;
         
     domain.intersect(&index,plist,flist);	  // intersect with list
       

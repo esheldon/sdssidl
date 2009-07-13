@@ -75,17 +75,17 @@ public:
   SpatialConvex & operator [](size_t i);
 
   /// read from stream
-  void read(istream&);
+  void read(std::istream&);
 
   /// set ra,dec,d from user
   void setRaDecD(float64 ra, float64 dec, float64 d);
 
   /// write to stream
-  void write(ostream&) const;
+  void write(std::ostream&) const;
 
   const SpatialIndex * index; 		/// A pointer to the index
 
-  static void ignoreCrLf(istream &);
+  static void ignoreCrLf(std::istream &);
 protected:
   ValVec<SpatialConvex> convexes_;      /// The vector of convexes
 

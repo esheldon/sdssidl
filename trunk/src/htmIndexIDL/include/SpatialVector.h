@@ -25,7 +25,7 @@
 //#
 #include <math.h>
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include "SpatialGeneral.h"
 
 //########################################################################
@@ -101,10 +101,10 @@ public:
   void show() const;
 
   /// Read vector from a stream
-  void read(istream &);
+  void read(std::istream &);
 
   /// Write vector to a stream
-  void write(ostream &) const;
+  void write(std::ostream &) const;
 
   /// Comparison
   int operator ==(const SpatialVector & ) const;

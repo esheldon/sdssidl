@@ -48,7 +48,7 @@ float64 SpatialVector::z() const {
 // read from istream
 //
 inline
-istream& operator >>( istream& in, SpatialVector & v) {
+std::istream& operator >>( std::istream& in, SpatialVector & v) {
   v.read(in);
   return(in);
 }
@@ -57,7 +57,7 @@ istream& operator >>( istream& in, SpatialVector & v) {
 // write to ostream
 //
 inline
-ostream& operator <<( ostream& out, const SpatialVector & v) {
+std::ostream& operator <<( std::ostream& out, const SpatialVector & v) {
   v.write(out);
   return(out);
 }

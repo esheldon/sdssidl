@@ -26,7 +26,8 @@
 //#
 
 #include <VarVec.h>
-#include <iostream.h>
+//#include <iostream.h>
+#include <iostream>
 
 //##########################################################################
 //#
@@ -107,10 +108,10 @@ public:
   bool overlaps(const BitList & BL) const;
 
   /// compress output
-  void compress(ostream &) const;
+  void compress(std::ostream &) const;
 
   /// decompress input
-  void decompress(istream &);
+  void decompress(std::istream &);
 
 private:
   friend class BitListIterator;

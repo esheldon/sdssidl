@@ -314,7 +314,7 @@ SpatialConvex::simplify0() {
   // one where the convex lies on its left side.
   i = cornerConstr1(0);		// the i'th constraint and j'th constraint
   j = cornerConstr2(0);		// intersect at 0'th corner
-  size_t c1,c2,k1,k2;
+  size_t c1=0,c2=0,k1=0,k2=0;
   // Now find the other corner where the i'th and j'th constraints intersect.
   // Store the corner in vi1 and vi2, and the other constraint indices 
   // in c1,c2.
@@ -910,36 +910,40 @@ SpatialConvex::testTriangle(const SpatialVector & v0,
   if ( !testBoundingCircle(v0,v1,v2) ) return rEJECT;
 
   if ( sign_ == pOS || sign_ == mIXED || (sign_ == zERO && constraints_.length() <= 2)) {
-    // Does the smallest constraint intersect with the edges?
-    if ( testEdgeConstraint(v0,v1,v2,0) ) {
-      // Is there another positive constraint that does NOT intersect with
-      // the edges?
-      size_t cIndex;
-      if ( cIndex = testOtherPosNone(v0,v1,v2) ) {
-	// Does that constraint lie inside or outside of the triangle?
-	if ( testConstraintInside(v0,v1,v2, cIndex) )
-	  return pARTIAL;
-	// Does the triangle lie completely within that constr?
-	else if( constraints_.vector_[cIndex].contains(v0) )
-	    return pARTIAL;
-	else return rEJECT;
+	  // Does the smallest constraint intersect with the edges?
+	  if ( testEdgeConstraint(v0,v1,v2,0) ) {
+		  // Is there another positive constraint that does NOT intersect with
+		  // the edges?
+		  size_t cIndex;
+		  if ( cIndex = testOtherPosNone(v0,v1,v2) ) {
+			  // Does that constraint lie inside or outside of the triangle?
+			  if ( testConstraintInside(v0,v1,v2, cIndex) ) {
+				  return pARTIAL;
+			  }
+			  // Does the triangle lie completely within that constr?
+			  else if( constraints_.vector_[cIndex].contains(v0) ) {
+				  return pARTIAL;
+			  }
+			  else {
+				  return rEJECT;
+			  }
 
-      } else {
-	if(sign_ == pOS || sign_ == zERO) return pARTIAL;
-	else return dONTKNOW;
-      }	
-    } else {
-      if (sign_ == pOS || sign_ == zERO) {
-	// Does the smallest lie inside or outside the triangle?
-	if( testConstraintInside(v0,v1,v2, 0) ) 
-	    return pARTIAL;
-	else return rEJECT;
-      } else return  dONTKNOW;
-    }
+		  } else {
+			  if(sign_ == pOS || sign_ == zERO) return pARTIAL;
+			  else return dONTKNOW;
+		  }	
+	  } else {
+		  if (sign_ == pOS || sign_ == zERO) {
+			  // Does the smallest lie inside or outside the triangle?
+			  if( testConstraintInside(v0,v1,v2, 0) ) 
+				  return pARTIAL;
+			  else return rEJECT;
+		  } else return  dONTKNOW;
+	  }
   } else if (sign_ == zERO) {
-    if ( corners_.length() > 0 && testEdge0(v0,v1,v2) ) 
-      return pARTIAL;
-    else return rEJECT;
+	  if ( corners_.length() > 0 && testEdge0(v0,v1,v2) ) 
+		  return pARTIAL;
+	  else return rEJECT;
   }
   return pARTIAL;
 }
@@ -1106,7 +1110,7 @@ SpatialConvex::eSolve(const SpatialVector & v1,
 
   float64 q      = -0.5L * ( b + ( SGN(b) * sqrt(D) ) );
 
-  float64 root1, root2;
+  float64 root1=0, root2=0;
   int i = 0;
 
   if ( a > gEpsilon || a < -gEpsilon ) { root1 = q / a; i++; }
@@ -1228,11 +1232,11 @@ SpatialConvex::testVectorInside(const SpatialVector & v0,
 /////////////READ/////////////////////////////////////////
 //
 void
-SpatialConvex::read(istream &in) {
+SpatialConvex::read(std::istream &in) {
   size_t nconstr;
   SpatialConstraint constr;
   
-  in.setf(ios::skipws);
+  in.setf(std::ios::skipws);
   while(in.peek() == COMMENT)  // ignore comments
     in.ignore(10000,'\n');
   in >> nconstr ; in.ignore(); // ignore "\n"
@@ -1251,7 +1255,7 @@ SpatialConvex::read(istream &in) {
 /////////////READ/////////////////////////////////////////
 //
 void
-SpatialConvex::readRaDec(istream &in) {
+SpatialConvex::readRaDec(std::istream &in) {
   size_t nconstr;
   SpatialConstraint constr;
   
@@ -1279,7 +1283,7 @@ SpatialConvex::setRaDecD(float64 ra, float64 dec, float64 d) {
 /////////////WRITE////////////////////////////////////////
 //
 void
-SpatialConvex::write(ostream &out) const {
+SpatialConvex::write(std::ostream &out) const {
   out << "#CONVEX" << "\n";
   out << constraints_.length() << "\n";
   for (size_t i = 0; i < constraints_.length() ; i++)
@@ -1289,7 +1293,7 @@ SpatialConvex::write(ostream &out) const {
 /////////////>>///////////////////////////////////////////
 // read from istream
 //
-istream& operator >>( istream& in, SpatialConvex & c) {
+std::istream& operator >>( std::istream& in, SpatialConvex & c) {
   c.read(in);
   return(in);
 }
@@ -1297,7 +1301,7 @@ istream& operator >>( istream& in, SpatialConvex & c) {
 /////////////<<///////////////////////////////////////////
 // write to ostream
 //
-ostream& operator <<( ostream& out, const SpatialConvex & c) {
+std::ostream& operator <<( std::ostream& out, const SpatialConvex & c) {
   c.write(out);
   return(out);
 }

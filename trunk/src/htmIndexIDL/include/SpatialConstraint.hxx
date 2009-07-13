@@ -21,8 +21,8 @@
 //# provided or otherwise made available to any other person.
 //#
 //#
-extern istream& operator >>( istream&, SpatialConstraint &);
-extern ostream& operator <<( ostream&, const SpatialConstraint &);
+extern std::istream& operator >>( std::istream&, SpatialConstraint &);
+extern std::ostream& operator <<( std::ostream&, const SpatialConstraint &);
 
 // 
 inline

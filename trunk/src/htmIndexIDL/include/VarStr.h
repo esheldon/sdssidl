@@ -30,7 +30,7 @@
 
 #include <sys/types.h>
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 
 /** Dynamic string.
 
@@ -190,7 +190,7 @@ public:
       write function.
   */
 
-  void write( ostream& _out ) const;
+  void write( std::ostream& _out ) const;
 
   /** clear method */
 

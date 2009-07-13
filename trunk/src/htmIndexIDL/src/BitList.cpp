@@ -433,7 +433,7 @@ not (BitList & _res, const BitList & BL) {
 //
 
 void
-BitList::compress(ostream & out) const {
+BitList::compress(std::ostream & out) const {
 
   BitListIterator iter(*this);
   bool bit, obit, flag = false;
@@ -503,7 +503,7 @@ BitList::compress(ostream & out) const {
 // fills in the bits in the real BitList. See compress_ for details.
 //
 void
-BitList::decompress(istream & in) {
+BitList::decompress(std::istream & in) {
 
   char c1, c2;
   int count, idx=0;

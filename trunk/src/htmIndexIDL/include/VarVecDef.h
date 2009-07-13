@@ -34,7 +34,7 @@
 
 #include <VarVec.h>
 #include <stdlib.h>
-#include <new.h>
+#include <new>
 #include <string.h>
 
 // This file defines the templates declared in VarVec.h, and should
@@ -211,28 +211,31 @@ size_t	ValVec<T>::insert( size_t count, size_t offset )
 	 free( oldVec );
       }
    }
-   else if ( count )
-      if ( offset )
-	 try {
-	    // destroy obliterated portion of unoccupied region
-	    for ( i = 0; i < count; ++i ) vector_[length_+i].~T();
+   else if ( count ) {
+	   if ( offset ) {
+		   try {
+			   // destroy obliterated portion of unoccupied region
+			   for ( i = 0; i < count; ++i ) vector_[length_+i].~T();
 
-	    // bitwise move displaced portion of occupied region
-	    memmove(vector_+start+count, vector_+start, offset * sizeof(T));
+			   // bitwise move displaced portion of occupied region
+			   memmove(vector_+start+count, vector_+start, offset * sizeof(T));
 
-	    // construct vacated region with fill or default
-	    if ( pFill_ )
-	       for ( i = 0; i < count; ++i ) ::new(vector_+start+i) T(*pFill_);
-	    else
-	       for ( i = 0; i < count; ++i ) ::new(vector_+start+i) T;
-	 }
-	 catch (...) {
-	    vector_ = 0;
-	    length_ = capacity_ = 0;
-	    throw;
-	 }
-      else if ( pFill_ )
-	 for ( i = 0; i < count; ++i ) vector_[length_+i] = *pFill_;
+			   // construct vacated region with fill or default
+			   if ( pFill_ )
+				   for ( i = 0; i < count; ++i ) ::new(vector_+start+i) T(*pFill_);
+			   else
+				   for ( i = 0; i < count; ++i ) ::new(vector_+start+i) T;
+		   }
+		   catch (...) {
+			   vector_ = 0;
+			   length_ = capacity_ = 0;
+			   throw;
+		   }
+	   }
+	   else if ( pFill_ ) {
+		   for ( i = 0; i < count; ++i ) vector_[length_+i] = *pFill_;
+	   }
+   }
 
    return length_ = newLength;
 }
