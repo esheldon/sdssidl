@@ -69,20 +69,6 @@ PRO make_cmodel_counts,cat,cmodel,cmodelerr, defaults=defaults
 
   ncat = n_elements(cat)
 
-  make_flag_struct,fs
-  fs.binned1='Y'
-  det1=fltarr(ncat)
-  det2=det1
-  det3=det1
-  flag_select,cat,fs,1,index
-  det1(index)=1.0
-  flag_select,cat,fs,2,index
-  det2(index)=1.0
-  flag_select,cat,fs,3,index
-  det3(index)=1.0
-  detnum=det1+det2+det3
-  wnone=where(detnum EQ 0,anone)
-
   IF keyword_set(defaults) THEN BEGIN 
       ;; We wil only copy in those which pass these cuts
       wu = where(cat.counts_exp[0] GT 1 AND cat.counts_dev[0] GT 1, nwu)

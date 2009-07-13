@@ -30,7 +30,9 @@
 ;  doc_method, 'postgres::query
 ;
 ; MODIFICATION HISTORY:
-;  Created: 2006, Erin Sheldon, NYU
+;	Created: 2006, Erin Sheldon, NYU
+;	2009-01-22: Use file_which to get the file path instead of which. E.S.
+;	
 ;-
 ;
 ;
@@ -81,9 +83,10 @@ pro doc_method, method, class=class
   class_name = msp[0]
   method_name = msp[1]
 
-  which, class_name+'__define', file=file, /silent
-  if n_elements(file) eq 0 then begin 
-      message,'Class '+ntostr(class_name)+' not found'
+  file=file_which(class_name+'__define.pro')
+  if file eq '' then begin 
+      message,'Class '+string(class_name)+' not found',/inf
+	  return
   endif 
 
   ;; Now get everything between these

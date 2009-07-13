@@ -1,22 +1,24 @@
 ;+
 ;
 ; NAME:
-;    csurvey2gc
+;    gc2csurvey
 ;       
 ; PURPOSE:
-;    convert from corrected SDSS survey coordinates to SDSS great circle
+;    convert from SDSS great circle to corrected SDSS survey coordinates
 ;
 ; CALLING SEQUENCE:
-;    csurvey2eq, clambda, ceta, node, inc, mu, nu
+;    gc2csurvey, mu, nu, node, inc, clambda, ceta
+;
 ; INPUTS: 
-;   clambda, ceta: corrected survey coords. 
-;   node, inc: node and inclination of the stripe.
+;    mu, nu: great circle coords.
+;    node, inc: node and inclination of the stripe.
 ;       
 ; OUTPUTS: 
-;    mu, nu: great circle coords.
+;   clambda, ceta: survey coords. 
 ;
 ; REVISION HISTORY:
 ;    26-Sep2002  Erin Scott Sheldon UofChicago
+;
 ;
 ;-                                       
 ;
@@ -41,16 +43,16 @@
 ;                                       
 
 
-pro csurvey2gc, clambda, ceta, node, inc, mu, nu
+pro gc2csurvey, mu, nu, node, inc, clambda, ceta
 
     if n_params() lt 6 then begin 
         on_error, 2
-        print,'-Syntax: csurvey2gc, clambda, ceta, node, inc, mu, nu'
+        print,'-Syntax: gc2csurvey, mu, nu, node, inc, clambda, ceta'
         print,' all in degrees'
         message,'Halting'
     endif 
 
     sdssidl_setup
-    !sdss->csurvey2gc, clambda, ceta, node, inc, mu, nu
+    !sdss->gc2csurvey, mu, nu, node, inc, clambda, ceta
 
 end 

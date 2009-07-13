@@ -228,6 +228,28 @@ function sdss_flags::flagnames, flagtype, status=status
 
 end 
 
+function sdss_flags::flagname, flagtype, bit, status=status
+
+	status=1
+	if n_elements(flagtype) eq 0 or n_elements(bit) eq 0 then begin
+		on_error, 2
+        print,'-Syntax:  fn = sf->flagname(flagtype, bit, status=)'
+        print
+        message,'Halting'
+    endif
+
+	names = self->flagnames(flagtype, status=status)
+	if status ne 0 then return,''
+
+	maxbit = n_elements(names)-1
+	if bit lt 0 or bit gt maxbit then begin
+		message,'bit '+ntostr(bit)+' is out of range: 0 '+ntostr(maxbit)
+	endif
+
+	return, names[bit]
+   
+end
+
 ;docstart::sdss_flags::flagstruct
 ;
 ; NAME:
@@ -930,11 +952,11 @@ end
 ;
 ;docend::sdss_flags::plotflags
 
-pro sdss_flags::plotflags, flags, flagtype, xtitle=xtitle, ytitle=ytitle, _extra=_extra
+pro sdss_flags::plotflags, flags, flagtype, frac=frac, title=title, xtitle=xtitle, ytitle=ytitle, label_charsize=label_charsize, _extra=_extra
 
     if n_elements(flags) eq 0 or n_elements(flagtype) eq 0 then begin
         on_error, 2
-        print,'-Syntax: sf->plotflags, flags, flagtype, _extra=_extra'
+        print,'-Syntax: sf->plotflags, flags, flagtype, /frac, _extra=_extra'
         print
         message,'Halting'
     endif
@@ -944,26 +966,60 @@ pro sdss_flags::plotflags, flags, flagtype, xtitle=xtitle, ytitle=ytitle, _extra
     flagnames = self->flagnames(flagtype, status=status)    
     if status ne 0 then message,'Could not get flagnames for type: ',flagtype
 
-    if n_elements(xtitle) eq 0 then xtitle=flagtype+' flag bits'
-    if n_elements(ytitle) eq 0 then ytitle='Number'
+    if n_elements(title) eq 0 then title=flagtype+' flag bits'
+    if n_elements(ytitle) eq 0 then begin
+		if keyword_set(frac) then begin
+			ytitle='Fraction'
+		endif else begin
+			ytitle='Number'
+		endelse
+	endif
 
     nf = n_elements(flagnames)
+	flagbits = intarr(nf)
+	flaghist=lon64arr(nf)
     for i=0L, nf-1 do begin
         flagval = self->flag(flagtype, flagnames[i])
+
+		flagbit = fix( rnd(alog(flagval)/log2) )
+		flagbits[i] = flagbit
+
         w=where( (flags and flagval) ne 0, nw)
-        if nw ne 0 then begin
-            flagbit = fix( alog(flagval)/log2 )
-            add_arrval, flagbit, flagbits
-            add_arrval, nw, flaghist
-        endif
+		flaghist[i] = nw
     endfor
 
+
     if n_elements(flaghist) ne 0 then begin
-        pplot, flagbits, flaghist, psym=10, $
-            xtitle=xtitle, ytitle=ytitle, _extra=_extra
+		if keyword_set(frac) then flaghist=flaghist/float(n_elements(flags))
+
+        pplot, flagbits, flaghist, psym=10, position=[0.1,0.3,0.85,0.95],$
+            xtitle=xtitle, ytitle=ytitle, title=title, _extra=_extra, $
+			xminor=1, $
+			xrange=[0,31], $
+			xticks=32-1, xtickf='(a1)'
+
+
+		ypos = replicate(!y.window[0] - 0.02, 32)
+		xpos = !x.window[0] + (!x.window[1] - !x.window[0]) * findgen(32)/31
+
+		names=flagnames
+		names = ntostr(flagbits,f='(i02)')+' '+names
+		for i=0L, n_elements(names)-1 do begin
+			xyouts, xpos[i], ypos[i], names[i], alignment=0.0, $
+				orientation=-45, charsize=label_charsize, $
+				/normal
+		endfor
+
     endif else begin
         print,'No flags set'
     endelse
+end
+
+pro sdss_flags::_plot_label_setup, flagtype
+	self.sdss_flags_tempstring = flagtype
+end
+function sdss_flags::_plot_label, axis, index, value
+	return, self->flagname(self.sdss_flags_tempstring, value)
 end
 
 ;docstart::sdss_flags::printflags
@@ -1027,7 +1083,7 @@ pro sdss_flags__define
 
   struct = {$
              sdss_flags, $
-             sdss_flags_dummyvar: 0 $
+             sdss_flags_tempstring: '' $
            }
 
 end 

@@ -85,11 +85,11 @@ PRO bayes_combine_gri,cat,probflags,mag,see,c,ivarsum,mag_psf,gweight,iweight,$
   ivarsum=fltarr(n_cat)
   keep=intarr(n_cat)
 
-  make_flag_struct,fs
+  fs = {binned1:'Y'}
   fs.binned1='Y'
-  flag_select,cat,fs,1,indexg
-  flag_select,cat,fs,2,indexr
-  flag_select,cat,fs,3,indexi
+  indexg = sdss_flag_select(cat.flags[1], 'object1', fs)
+  indexr = sdss_flag_select(cat.flags[2], 'object1', fs)
+  indexi = sdss_flag_select(cat.flags[3], 'object1', fs)
 
   IF indexg[0] NE -1 THEN keep(indexg) = keep(indexg) + 1
   IF indexr[0] NE -1 THEN keep(indexr) = keep(indexr) + 1
@@ -148,21 +148,24 @@ PRO bayes_combine_gri,cat,probflags,mag,see,c,ivarsum,mag_psf,gweight,iweight,$
       ENDELSE
   ENDELSE
 
+  lowlim = 14.0
+  highlim = 24.0
+
   gmom=cat.m_rr_cc_psf(1)
   rmom=cat.m_rr_cc_psf(2)
   imom=cat.m_rr_cc_psf(3)
 
-  ggpsf=gpsf > 14.0 < 24.0
-  rrpsf=rpsf > 14.0 < 24.0
-  iipsf=ipsf > 14.0 < 24.0
+  ggpsf=gpsf > lowlim < highlim
+  rrpsf=rpsf > lowlim < highlim
+  iipsf=ipsf > lowlim < highlim
 
   ggpsferr=gpsferr > 0.0001 < 5.0
   rrpsferr=rpsferr > 0.0001 < 5.0
   iipsferr=ipsferr > 0.0001 < 5.0
 
-  ggexp=gexp > 14.0 < 24.0
-  rrexp=rexp > 14.0 < 24.0
-  iiexp=iexp > 14.0 < 24.0
+  ggexp=gexp > lowlim < highlim
+  rrexp=rexp > lowlim < highlim
+  iiexp=iexp > lowlim < highlim
 
   ggexperr=gexperr > 0.0001 < 5.0
   rrexperr=rexperr > 0.0001 < 5.0
