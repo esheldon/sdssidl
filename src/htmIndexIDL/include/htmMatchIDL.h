@@ -26,7 +26,7 @@ gcirc(double ra1, double dec1,
       double ra2, double dec2);
 
 void 
-htmMatchErrOut(char *message);
+htmMatchErrOut(const char *message);
 
 static void
 htmMatchSetStatus(int statusVal);
@@ -71,16 +71,16 @@ static IDL_KW_PAR kw_pars[] = {
      returning variables!
   */
 
-  {"DEPTH", IDL_TYP_INT, 1, IDL_KW_VIN, 
+  {static_cast<char *>("DEPTH"), IDL_TYP_INT, 1, IDL_KW_VIN, 
    (int *) IDL_KW_OFFSETOF(depth_there), (char *) IDL_KW_OFFSETOF(depth) },
 
-  {"FILE", IDL_TYP_STRING, 1, IDL_KW_VIN, 
+  {static_cast<char *>("FILE"), IDL_TYP_STRING, 1, IDL_KW_VIN, 
    (int *) IDL_KW_OFFSETOF(file_there), (char *) IDL_KW_OFFSETOF(file) },
 
-  {"MAXMATCH", IDL_TYP_MEMINT, 1, IDL_KW_VIN, 
+  {static_cast<char *>("MAXMATCH"), IDL_TYP_MEMINT, 1, IDL_KW_VIN, 
    (int *) IDL_KW_OFFSETOF(maxmatch_there), (char *) IDL_KW_OFFSETOF(maxmatch) },
 
-  {"STATUS", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 
+  {static_cast<char *>("STATUS"), IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 
    (int *) IDL_KW_OFFSETOF(status_there), (char *) IDL_KW_OFFSETOF(status) },
 
 

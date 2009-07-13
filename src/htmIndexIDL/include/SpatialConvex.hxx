@@ -21,8 +21,8 @@
 //# provided or otherwise made available to any other person.
 //#
 //#
-extern istream& operator >>( istream&, SpatialConvex &);
-extern ostream& operator <<( ostream&, const SpatialConvex &);
+extern std::istream& operator >>( std::istream&, SpatialConvex &);
+extern std::ostream& operator <<( std::ostream&, const SpatialConvex &);
 
 
 inline

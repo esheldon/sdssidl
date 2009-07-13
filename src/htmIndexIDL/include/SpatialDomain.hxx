@@ -38,7 +38,7 @@ SpatialDomain::numConvexes() {
 // read from istream
 //
 inline
-istream& operator >>( istream& in, SpatialDomain & c) {
+std::istream& operator >>( std::istream& in, SpatialDomain & c) {
   c.read(in);
   return(in);
 }
@@ -47,7 +47,7 @@ istream& operator >>( istream& in, SpatialDomain & c) {
 // write to ostream
 //
 inline
-ostream& operator <<( ostream& out, const SpatialDomain & c) {
+std::ostream& operator <<( std::ostream& out, const SpatialDomain & c) {
   c.write(out);
   return(out);
 }

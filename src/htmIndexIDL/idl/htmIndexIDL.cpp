@@ -78,7 +78,7 @@ htmIndex(int argc, IDL_VPTR *argv, char *argk) {
   htmInterface *htm;
 
   // for looping, etc.
-  size_t j;
+  IDL_MEMINT j;
 
   ///////////////////////////////////////////////////////////
   // Process the keywords 

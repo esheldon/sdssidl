@@ -245,11 +245,11 @@ bool htmInterface::inRange( const ValVec<htmRange> &range, int64 id) {
   size_t len = range.length() - 1;
 
   // completely outside range?
-  if(id < range(0).lo || id > range(len).hi)return false;
+  if(size_t(id) < range(0).lo || size_t(id) > range(len).hi)return false;
 
   // check each range
   for(size_t i = 0; i <= len; i++)
-    if(id <= range(i).hi && id >= range(i).lo) return true;
+    if(size_t(id) <= range(i).hi && size_t(id) >= range(i).lo) return true;
   return false;
 }
 

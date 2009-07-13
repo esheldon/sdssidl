@@ -29,7 +29,7 @@ static IDL_KW_PAR kw_pars[] = {
      returning variables!
   */
 
-  {"STATUS", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 
+  {static_cast<char *>("STATUS"), IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 
    (int *) IDL_KW_OFFSETOF(status_there), (char *) IDL_KW_OFFSETOF(status) },
 
 

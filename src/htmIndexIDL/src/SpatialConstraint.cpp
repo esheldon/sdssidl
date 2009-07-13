@@ -112,9 +112,9 @@ SpatialConstraint::invert() {
 /////////////READ/////////////////////////////////////////
 //
 void
-SpatialConstraint::read(istream &in) {
+SpatialConstraint::read(std::istream &in) {
 
-  in.setf(ios::skipws);
+  in.setf(std::ios::skipws);
   while(in.peek() == COMMENT)  // ignore comments
       in.ignore(10000,'\n');
   in >> a_ >> d_ ;
@@ -131,7 +131,7 @@ SpatialConstraint::read(istream &in) {
 /////////////READ/////////////////////////////////////////
 //
 void
-SpatialConstraint::readRaDec(istream &in) {
+SpatialConstraint::readRaDec(std::istream &in) {
 
   while(in.peek() == COMMENT)  // ignore comments
       in.ignore(10000,'\n');
@@ -163,7 +163,7 @@ SpatialConstraint::setRaDecD(float64 ra, float64 dec, float64 d) {
 /////////////WRITE////////////////////////////////////////
 //
 void
-SpatialConstraint::write(ostream &out) const {
+SpatialConstraint::write(std::ostream &out) const {
   size_t p = out.precision();
   out.precision(16);
   out << a_ << ' ' << d_ << "\n";
@@ -173,7 +173,7 @@ SpatialConstraint::write(ostream &out) const {
 /////////////>>///////////////////////////////////////////
 // read from istream
 //
-istream& operator >>( istream& in, SpatialConstraint & c) {
+std::istream& operator >>( std::istream& in, SpatialConstraint & c) {
   c.read(in);
   return(in);
 }
@@ -181,7 +181,7 @@ istream& operator >>( istream& in, SpatialConstraint & c) {
 /////////////<<///////////////////////////////////////////
 // write to ostream
 //
-ostream& operator <<( ostream& out, const SpatialConstraint & c) {
+std::ostream& operator <<( std::ostream& out, const SpatialConstraint & c) {
   c.write(out);
   return(out);
 }

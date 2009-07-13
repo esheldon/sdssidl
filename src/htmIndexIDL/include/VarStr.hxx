@@ -11,7 +11,7 @@
 //#
 /* --- VarStr methods ------------------------------------------------------ */
 #include <stdlib.h>
-#include <iostream.h>
+#include <iostream>
 inline
 char *	VarStr::data() const{
   return vector_;
@@ -26,7 +26,7 @@ bool 	VarStr::empty() const {
 // write to ostream
 //
 inline
-ostream& operator <<( ostream& out, const VarStr & s) {
+std::ostream& operator <<( std::ostream& out, const VarStr & s) {
   return(  out << s.data() );
 }
 
@@ -120,14 +120,14 @@ VarStr::append( unsigned char *pBuf, const int len )
 #if !defined(SXBIGENDIAN)
   //   swapEndian( pBuf, len, 1 );
 #endif
-   for( size_t i = 0; i < len; i++ )
+   for( size_t i = 0; i < size_t(len); i++ )
      (length_ < capacity_ ? vector_[length_++] : at(length_)) = pBuf[ i ];
    return length_;
 }
 
 
 inline void
-VarStr::write( ostream& _out ) const {
+VarStr::write( std::ostream& _out ) const {
   _out.write( vector_, length_ );
   _out.flush();
 }

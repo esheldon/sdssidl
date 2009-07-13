@@ -128,7 +128,7 @@ SpatialDomain::intersect(const SpatialIndex * idx,
 }
 
 void
-SpatialDomain::ignoreCrLf(istream &in) {
+SpatialDomain::ignoreCrLf(std::istream &in) {
   char c = in.peek();
   while (c == 10 || c == 13) {
     in.ignore();
@@ -138,7 +138,7 @@ SpatialDomain::ignoreCrLf(istream &in) {
 /////////////READ/////////////////////////////////////////
 //
 void
-SpatialDomain::read(istream &in) {
+SpatialDomain::read(std::istream &in) {
   size_t nconv;
   char comstr[20];
 
@@ -221,7 +221,7 @@ SpatialDomain::setRaDecD(float64 ra, float64 dec, float64 d) {
 /////////////Write////////////////////////////////////////
 //
 void
-SpatialDomain::write(ostream &out) const {
+SpatialDomain::write(std::ostream &out) const {
   out << "#DOMAIN" << "\n";
   out << convexes_.length() << "\n";
   for (size_t i = 0; i < convexes_.length() ; i++)

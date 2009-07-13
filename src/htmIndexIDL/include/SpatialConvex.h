@@ -116,16 +116,16 @@ public:
   SpatialConstraint & operator [](size_t i);
 
   /// read from stream
-  void read(istream&);
+  void read(std::istream&);
 
   /// read from stream
-  void readRaDec(istream&);
+  void readRaDec(std::istream&);
 
   /// set ra,dec,d from user
   void setRaDecD(float64 ra, float64 dec, float64 d);
 
   /// write to stream
-  void write(ostream&) const;
+  void write(std::ostream&) const;
 
 private:
 

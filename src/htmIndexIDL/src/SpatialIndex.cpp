@@ -110,7 +110,7 @@ SpatialIndex::SpatialIndex(size_t maxlevel, size_t buildlevel) :
 /////////////SHOWVERTICES/////////////////////////////////
 // showVertices: print every vertex to the output stream
 void
-SpatialIndex::showVertices(ostream & out) const
+SpatialIndex::showVertices(std::ostream & out) const
 {
   for(size_t i = 0; i < vertices_.length()-1; i++)
     out << vertices_.vector_[i] << "\n";

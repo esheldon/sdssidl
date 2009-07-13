@@ -146,16 +146,16 @@ public:
   float64 d() const ;
 
   /// read
-  void read(istream &in);
+  void read(std::istream &in);
 
   /// read
-  void readRaDec(istream &in);
+  void readRaDec(std::istream &in);
 
   /// set ra,dec,d  E.S.S.
   void setRaDecD(float64 ra, float64 dec, float64 d);
 
   /// write
-  void write(ostream &out) const;
+  void write(std::ostream &out) const;
 
 private:
   SpatialVector a_;			// normal vector

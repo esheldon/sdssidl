@@ -2,5 +2,5 @@
 # Directories of routines to be built
 #
 
-CODE_DIRS = atlas fileio gauleg htmIndexIDL sphpoly_masks total_int sdsspixIDL pgsql
+CODE_DIRS = IDLStruct atlas fileio gauleg htmIndexIDL sphpoly_masks total_int sdsspixIDL pgsql
 
