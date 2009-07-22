@@ -1316,6 +1316,8 @@ END
 ;       $Id: textoidl.pro,v 1.8 2004/07/19 16:48:04 schlegel Exp $
 ;       $Log: textoidl.pro,v $
 ;       
+;		Revision: Added \sun symbol.  Changed roman font to !3 which
+;		works better. 2009-07-22
 ;       Revision: Added \odot symbol. 2007-08-28, Erin Sheldon, NYU
 ;       Revision 1.8  2004/07/19 16:48:04  schlegel
 ;       Replace calls to the obsolete function RSTRPOS() with STRPOS(/REVERSE_SEARCH).
