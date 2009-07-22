@@ -2,5 +2,5 @@
 
 === Sub Directories ===
 === Files ===
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/fileio/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/fileio/read_struct.pro read_struct.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/fileio/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/fileio/read_struct.pro read_struct.pro]

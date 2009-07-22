@@ -8,9 +8,9 @@
     * [Setup setup]
     * [Src src] -- C/C++ extensions to IDL
 === Files ===
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/AUTHORS AUTHORS]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/CHANGES.txt CHANGES.txt]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/README.txt README.txt]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/configure configure]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/gpl.txt gpl.txt]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/AUTHORS AUTHORS]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/CHANGES.txt CHANGES.txt]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/README.txt README.txt]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/configure configure]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/gpl.txt gpl.txt]

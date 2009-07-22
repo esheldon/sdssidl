@@ -2,6 +2,6 @@
 
 === Sub Directories ===
 === Files ===
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/spherical_polygons/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/spherical_polygons/apply_sphpoly_mask.pro apply_sphpoly_mask.pro]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/spherical_polygons/sphpoly_completeness.pro sphpoly_completeness.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/spherical_polygons/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/spherical_polygons/apply_sphpoly_mask.pro apply_sphpoly_mask.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/spherical_polygons/sphpoly_completeness.pro sphpoly_completeness.pro]

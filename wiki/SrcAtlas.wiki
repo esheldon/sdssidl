@@ -3,6 +3,6 @@
 === Sub Directories ===
     * [SrcAtlasSrc src]
 === Files ===
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/Makefile Makefile]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/src/atlas/configure configure]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/src/atlas/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/src/atlas/Makefile Makefile]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/src/atlas/configure configure]

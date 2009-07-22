@@ -2,5 +2,5 @@
 
 === Sub Directories ===
 === Files ===
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/postgres/DESCRIPTION DESCRIPTION]
-    * [http://code.google.com/p/sdssidl/source/browse/tags/v1.4/pro/postgres/postgres__define.pro postgres__define.pro]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/postgres/DESCRIPTION DESCRIPTION]
+    * [http://code.google.com/p/sdssidl/source/browse/trunk/pro/postgres/postgres__define.pro postgres__define.pro]
