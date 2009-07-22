@@ -88,6 +88,7 @@ function mrdfits_multi, infiles, $
   delvarx,struct
 
   if n_elements(extension) eq 0 then extension=1
+  extstr='['+string(extension,f='(i0)')+']'
 
   ;; See which files actually exist
   nfiles = n_elements(infiles)
@@ -129,7 +130,7 @@ function mrdfits_multi, infiles, $
   numlist = lonarr(nfiles)
   for i=0l, nfiles-1 do begin 
 
-      hdr = headfits(files[i], ext=1)
+      hdr = headfits(files[i], ext=extension)
       numlist[i] = sxpar(hdr,'naxis2')
       ntotal = ntotal + numlist[i]
 
@@ -150,7 +151,7 @@ function mrdfits_multi, infiles, $
       for i=0l, nfiles-1 do begin 
           
           if numlist[i] ne 0 then begin 
-              print,'Reading File: '+ntostr(files[i])
+              print,'Reading File: ',files[i],extstr,form='(a,a,a)'
               t = mrdfits(files[i], extension, $
                           columns=columns, $
                           unsigned=unsigned, $
