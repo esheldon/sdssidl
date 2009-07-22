@@ -1,0 +1,110 @@
+The original documentation for HTM code is below
+
+I had to cut out the cout,cerr, etc commands for
+in order to link to IDL with linux. Also changed
+endl to "\n" in order to link to IDL in both linux and Alpha.
+
+For OSF had to remove some statements in these .h files:
+VarStr.hpp
+SpatialGeneral.h
+
+
+Added functionality to classes SpatialConstraint, 
+SpatialConvex, SpatialDomeain: allowed ra,dec,d
+to be set without opening a file.
+
+SpatialDomain domain;
+domain.setRaDecD(ra,dec,d);
+
+Wrote applications htmLookupRadec.cpp and htmIntersectRadec.cpp
+intended for linking.
+
+Erin Scott Sheldon
+17-DEC-2000
+
+===============================================================================
+
+HTM Index C++ Package README
+============================
+
+This is the distribution of the Hierarchical Triangular Mesh
+package, called SpatialIndex.
+
+0. Disclaimer
+-------------
+
+This is Version 2.5 of the software, and although it has been tested
+extensively we do not feel responsible for any data loss, damage, or
+any other uncomfortable circumstance that may be arising from its
+use. It is provided as is, it may not be sold or included in a
+commercial package.  The copyright notice at the beginning of each
+source file may not be removed.  If you plan to redistribute it
+further, please report or request eventual changes to the author.
+
+If you plan to use this software, please contact the author so that
+you can be included on the HTM email list. This way you'll get notified
+of bugfixes and availibility of new versions of the code.
+
+
+1. Installation
+---------------
+
+We provide makefiles for the platforms Linux, OSF, Solaris, IRIX.
+For Windows there is a Visual Studio Workspace file inculded.
+
+Unix:
+=====
+To make things work, do
+
+make PLATFORM
+make
+
+where PLATFORM is one of linux,osf,solaris,irix
+
+and you'll have a working library in lib/ and a couple of example
+apps in bin/.  All sources for the example executables are in app/ If
+you want to build on a platform other than the four above, please edit
+any of the Makefile.PLATFORM in src/ and app/, update it and save it
+as Makefile.  Be so kind to send me a copy of that so that I can add
+it to the distribution.
+
+
+Windows:
+========
+Load SpatialIndex.dsw in Visual Studio and build as usual.
+There is a project for the dll as well as for all examples.
+You might need to tweak some of the project settings..
+
+
+2. Documentation
+----------------
+
+See 
+
+http://www.sdss.jhu.edu/ 
+
+under HTM Index for generic documentation,
+
+and 
+
+doc/www/index.html 
+
+for the class documentation in this distribution.
+Also, look at the example files app/*.cpp, they have detailed descriptions.
+
+
+
+3. Contact
+----------
+
+Any issues, questions, wishes for further improvement, bugs
+can be sent to
+
+Peter Kunszt
+kunszt@pha.jhu.edu
+
+Johns Hopkins University
+Center for Astrophysical Sciences
+3701 San Martin Drive
+Baltimore MD 21218
+

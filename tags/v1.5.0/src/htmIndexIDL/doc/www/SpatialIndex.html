@@ -1,0 +1,279 @@
+<html><head><TITLE>SpatialIndex</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  SpatialIndex  </H2><BLOCKQUOTE>
+
+The Spatial Index is a quad tree of spherical triangles
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.7.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialIndex</B> (size_t maxlevel, size_t buildlevel =2)<br>
+<I>Constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.10"> <IMG BORDER=0 SRC=icon1.gif></A> static  uint64 </TD><TD><B>idByName</B> (const char *)<br>
+<I> NodeName conversion to integer ID</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.2"> <IMG BORDER=0 SRC=icon1.gif></A> static  char* </TD><TD><B>nameById</B> (uint64 ID, char * name = 0)<br>
+<I>int32 conversion to a string (name of database)</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.3"> <IMG BORDER=0 SRC=icon1.gif></A> uint32 </TD><TD><B>leafNumberById</B> (uint64 ID) const <br>
+<I>Return leaf number in bitlist for a certain ID</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.4"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>idByLeafNumber</B> (uint32 n) const <br>
+<I>Return leaf id for a certain bitlist index</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.5"> <IMG BORDER=0 SRC=icon1.gif></A> char* </TD><TD><B>nameByLeafNumber</B> (uint32 n, char * name = 0) const <br>
+<I>return name for a certain leaf index (to be used for name lookup
+from a bitlist)</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.6"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>idByPoint</B> (<!1><A HREF="SpatialVector.html">SpatialVector</A> & vector) const <br>
+<I>find a node by giving a vector</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.11"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>idByPoint</B> (const float64 & ra, const float64 & dec) const <br>
+<I> find a node by giving a ra,dec in degrees.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.7"> <IMG BORDER=0 SRC=icon1.gif></A> char* </TD><TD><B>nameByPoint</B> (<!1><A HREF="SpatialVector.html">SpatialVector</A> & vector, char* s=NULL) const <br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.13"> <IMG BORDER=0 SRC=icon1.gif></A> char* </TD><TD><B>nameByPoint</B> (const float64 & ra, const float64 & dec, char* s=NULL) const <br>
+<I> find a node by giving a ra,dec in degrees.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.14"> <IMG BORDER=0 SRC=icon1.gif></A> uint64 </TD><TD><B>leafCount</B> () const <br>
+<I> return number of leaf nodes</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.15"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>nVertices</B> () const <br>
+<I> return number of vertices</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.16"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>area</B> (uint64 ID) const <br>
+<I> The area in steradians for a given index ID</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.17"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>area</B> (const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v3) const <br>
+<I> The area in steradians for a given spatial triangle</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.18"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>nodeVertex</B> (const uint64 id, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v1, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v2, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v3) const <br>
+<I> return the actual vertex vectors</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.19"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>nodeVertex</B> (const size_t idx, size_t & v1, size_t & v2, size_t & v3) const <br>
+<I> return index of vertices for a node</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.7.20"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>showVertices</B> (ostream & out) const <br>
+<I> print all vertices to output stream</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.7.12"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I> find a node by giving a vector. </I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+
+The Spatial Index is a quad tree of spherical triangles. The tree
+is built in the following way: Start out with 8 triangles on the
+sphere using the 3 main circles to determine them. Then, every
+triangle can be decomposed into 4 new triangles by drawing main
+circles between midpoints of its edges:
+
+<pre>
+
+.                            /\
+.                           /  \
+.                          /____\
+.                         /\    /\
+.                        /  \  /  \
+.                       /____\/____\
+
+</pre> 
+This is how the quad tree is built up to a certain level by
+decomposing every triangle again and again.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="SpatialIndex">
+<A NAME ="DOC.7.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialIndex(size_t maxlevel, size_t buildlevel =2)</B></TT>
+<DD>Constructor.
+Give the level of the index and optionally the level to build -
+i.e. the depth to keep in memory.  if maxlevel - buildlevel > 0
+, that many levels are generated on the fly each time the index
+is called. 
+<DL></DL><P>
+<A NAME="idByName">
+<A NAME ="DOC.7.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  uint64  idByName(const char *)</B></TT>
+<DD> NodeName conversion to integer ID
+<DL></DL><P>
+<A NAME="nameById">
+<A NAME ="DOC.7.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> static  char*  nameById(uint64 ID, char * name = 0)</B></TT>
+<DD>int32 conversion to a string (name of database).
+WARNING: if name is already allocated, a size of at least 17 is
+required.  The conversion is done by directly calculating the
+name from a number.  To calculate the name of a certain level,
+the mechanism is that the name is given by (#of nodes in that
+level) + (id of node).  So for example, for the first level,
+there are 8 nodes, and we get the names from numbers 8 through
+15 giving S0,S1,S2,S3,N0,N1,N2,N3.  The order is always
+ascending starting from S0000.. to N3333...  
+<DL></DL><P>
+<A NAME="leafNumberById">
+<A NAME ="DOC.7.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint32  leafNumberById(uint64 ID) const </B></TT>
+<DD>Return leaf number in bitlist for a certain ID.  Since the ID
+here means the number computed from the name, this is simply
+returning ID -leafCount().  Bitlists only work until level 14.
+<DL></DL><P>
+<A NAME="idByLeafNumber">
+<A NAME ="DOC.7.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  idByLeafNumber(uint32 n) const </B></TT>
+<DD>Return leaf id for a certain bitlist index. 
+Same as the function above 
+<DL></DL><P>
+<A NAME="nameByLeafNumber">
+<A NAME ="DOC.7.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char*  nameByLeafNumber(uint32 n, char * name = 0) const </B></TT>
+<DD>return name for a certain leaf index (to be used for name lookup
+from a bitlist).  This function is simply shorthand for
+nameById(n + leafCount()).  
+<DL></DL><P>
+<A NAME="idByPoint">
+<A NAME ="DOC.7.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  idByPoint(<!1><A HREF="SpatialVector.html">SpatialVector</A> & vector) const </B></TT>
+<DD>find a node by giving a vector. 
+The ID of the node is returned. 
+<DL></DL><P>
+<A NAME="idByPoint">
+<A NAME ="DOC.7.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  idByPoint(const float64 & ra, const float64 & dec) const </B></TT>
+<DD> find a node by giving a ra,dec in degrees.
+<DL></DL><P>
+<A NAME="">
+<A NAME ="DOC.7.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD> find a node by giving a vector. 
+<DL></DL><P>
+<A NAME="nameByPoint">
+<A NAME ="DOC.7.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char*  nameByPoint(<!1><A HREF="SpatialVector.html">SpatialVector</A> & vector, char* s=NULL) const </B></TT>
+<DL><DT><B>Returns:</B><DD>The ID of the node is returned. 
+</DL><P>
+<A NAME="nameByPoint">
+<A NAME ="DOC.7.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char*  nameByPoint(const float64 & ra, const float64 & dec, char* s=NULL) const </B></TT>
+<DD> find a node by giving a ra,dec in degrees.
+<DL></DL><P>
+<A NAME="leafCount">
+<A NAME ="DOC.7.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  leafCount() const </B></TT>
+<DD> return number of leaf nodes
+<DL></DL><P>
+<A NAME="nVertices">
+<A NAME ="DOC.7.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  nVertices() const </B></TT>
+<DD> return number of vertices
+<DL></DL><P>
+<A NAME="area">
+<A NAME ="DOC.7.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  area(uint64 ID) const </B></TT>
+<DD> The area in steradians for a given index ID
+<DL></DL><P>
+<A NAME="area">
+<A NAME ="DOC.7.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  area(const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> & v3) const </B></TT>
+<DD> The area in steradians for a given spatial triangle
+<DL></DL><P>
+<A NAME="nodeVertex">
+<A NAME ="DOC.7.18">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  nodeVertex(const uint64 id, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v1, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v2, <!1><A HREF="SpatialVector.html">SpatialVector</A> & v3) const </B></TT>
+<DD> return the actual vertex vectors
+<DL></DL><P>
+<A NAME="nodeVertex">
+<A NAME ="DOC.7.19">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  nodeVertex(const size_t idx, size_t & v1, size_t & v2, size_t & v3) const </B></TT>
+<DD> return index of vertices for a node
+<DL></DL><P>
+<A NAME="showVertices">
+<A NAME ="DOC.7.20">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  showVertices(ostream & out) const </B></TT>
+<DD> print all vertices to output stream
+<DL></DL><P><DL>
+
+<A NAME="level_">
+<A NAME ="DOC.7.8.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  level_</B></TT>
+<DL></DL><P>
+<A NAME="nVert_">
+<A NAME ="DOC.7.8.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  nVert_</B></TT>
+<DD> layer level
+<DL></DL><P>
+<A NAME="nNode_">
+<A NAME ="DOC.7.8.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  nNode_</B></TT>
+<DD> number of vertices in this layer
+<DL></DL><P>
+<A NAME="nEdge_">
+<A NAME ="DOC.7.8.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  nEdge_</B></TT>
+<DD> number of nodes
+<DL></DL><P>
+<A NAME="firstIndex_">
+<A NAME ="DOC.7.8.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  firstIndex_</B></TT>
+<DD> number of edges
+<DL></DL><P>
+<A NAME="firstVertex_">
+<A NAME ="DOC.7.8.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  firstVertex_</B></TT>
+<DD> index of first node of this layer
+<DL></DL><P>
+<A NAME="">
+<A NAME ="DOC.7.8.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD> index of first vertex of this layer
+<DL></DL><P></DL>
+<DL>
+
+<A NAME="index_">
+<A NAME ="DOC.7.9.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  index_</B></TT>
+<DL></DL><P>
+<A NAME="v_">
+<A NAME ="DOC.7.9.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  v_[3]</B></TT>
+<DD> its own index
+<DL></DL><P>
+<A NAME="w_">
+<A NAME ="DOC.7.9.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  w_[3]</B></TT>
+<DD> The three vertex vector indices
+<DL></DL><P>
+<A NAME="childID_">
+<A NAME ="DOC.7.9.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  childID_[4]</B></TT>
+<DD> The three middlepoint vector indices
+<DL></DL><P>
+<A NAME="parent_">
+<A NAME ="DOC.7.9.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  parent_</B></TT>
+<DD> ids of children
+<DL></DL><P>
+<A NAME="id_">
+<A NAME ="DOC.7.9.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> uint64  id_</B></TT>
+<DD> id of the parent node (needed for sorting)
+<DL></DL><P></DL>
+</DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

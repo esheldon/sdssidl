@@ -1,0 +1,73 @@
+/*---------------------------------------------------------------------------
+
+  NAME:
+    ascii_write
+  
+  CALLING SEQUENCE:
+    IDL> ascii_write, struct, filename/lun, /append, 
+                    /csv, /tab, delimiter=, /bracket_arrays, status=, /help
+
+  PURPOSE:
+
+    Write an IDL structure to an ascii file.  This is about 12 times faster
+    than using the built in printf statement for small structure definitions.
+    For really big ones, getting the offsets is the bottleneck. For a tsObj
+    file its only about 5 times faster.
+    
+    The default field separator is a tab, but csv or any user-defined
+    delimeter character can be used.
+
+    This program is written in C++ and is linked to IDL via the DLM mechanism.
+
+  INPUTS: 
+    struct: The structure array to write. 
+    file/lun: Filename or file unit. For string file names, the user must 
+        expand all ~ or other environment variables.  If the file
+	    unit is entered, the file must be opened with the appropriate 
+	    keywords:
+                 openr, lun, file, /get_lun, /stdio, bufsize=0
+
+  OPTIONAL INPUTS:
+    /cvs: Use ',' as the field delimiter. The default delimeter is a tab
+        character.
+    /tab: Use a tab character as the field delimiter.  This is the default.
+    delimiter: The field delimiter.  Only the first character of the
+        input string is used. The default is the tab character.
+    /append: Append the file.
+    /bracket_arrays: {} is placed around array data in each row, with 
+        values comma delimited within.  Postgresql databases require
+        this format, with a whitespace delimiter for ordinary fields, for
+        the COPY command.
+    /help: Print this documentation.
+
+  OPTIONAL OUTPUTS:
+    status=: The status of the read. 0 for success, 1 for read failure, 
+             2 for input errors such as bad file unit.
+
+
+  REVISION HISTORY:
+    Created December-2005: Erin Sheldon, NYU
+    Converted to C++, 2006-July-17, E.S. NYU
+    More general treatment of delimiters.  2008-03-28, E.S.
+
+
+  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+  ---------------------------------------------------------------------------*/
+
+

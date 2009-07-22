@@ -1,0 +1,89 @@
+/*---------------------------------------------------------------------------
+  NAME:
+    binary_read
+  
+  CALLING SEQUENCE:
+    IDL> struct = binary_read(file/lun, structdef, numrows, 
+                              rows=, columns=, skiplines=, 
+                              verbose=, status=, /help)
+
+  PURPOSE:
+
+    Read unformatted binary data from a file into a structure.  The layout of
+    the file is determined by an input structure definition (e.g. {a:35, b:0L})
+    that is representative of each row in the file, and the number of records,
+    or rows.
+    
+    Particular rows or columns may be extracted by number. For very large
+    files, this is a big improvement in efficiency over the IDL built-in
+    procedure readu which can only read contiguous chunks.  
+
+    The fields/columns of the input file must be fixed length, and this
+    includes strings; this length must be represented in the input structure
+    definition.
+    
+    Either the file name or an IDL file unit may be sent.  When a file unit is
+    sent, it must be opened with the /stdio keyword and bufsize=0. Lines can
+    be skipped using the skiplines= keyword.
+    
+    In general, due to the complex inputs and the fact that most files will
+    have a header describing the data, this program will be used as a utility
+    program and an IDL wrapper will parse the header and format the structure
+    definition.
+
+    This program is written in C++ and is linked to IDL via the DLM mechanism.
+
+  INPUTS: 
+     file/lun: Filename or file unit. For string file names, the user must 
+               expand all ~ or other environment variables.  If the file
+	       unit is entered, the file must be opened with the appropriate 
+	       keywords:
+                 openr, lun, file, /get_lun, /stdio, bufsize=0
+     structdef: A structure that describes the layout of the data in each row.
+                Variable length fields are not supported.
+     numrows: Number of rows in the file.
+
+  OPTIONAL INPUTS:
+     rows=: An array or scalar of unique rows to read
+     columns=: An array or scalar of unique column numbers to extract.
+     skiplines=: The number of lines, or rows, to skip.  
+     verbose=: 0 for standard quiet. 1 for Basic info. > 1 for debug mode.
+     /help: Print this message, full documentation.
+
+  OPTIONAL OUTPUTS:
+    status=: The status of the read. 0 for success, 1 for read failure, 
+             2 for input errors such as bad file unit.
+
+  TODO:
+
+    Might write support for variable length columns, such as for strings.
+    This would need a binary_write.c to write them properly.  Would probably
+    require the user to specify which columns are variable and the first n
+    bytes of the field to describe the length. One byte supports strings of
+    length 255, two bytes would support 65,535 length strings, four
+    4,294,967,295
+
+  REVISION HISTORY:
+    Created 20-April-2006: Erin Sheldon, NYU
+    Converted to C++, 2006-July-17, E.S. NYU
+
+
+  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+  ---------------------------------------------------------------------------*/
+

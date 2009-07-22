@@ -1,0 +1,187 @@
+<html><head><TITLE>BitList</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  BitList  </H2><BLOCKQUOTE>
+BitList class
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.17.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>BitList</B> (size_t <!2><A HREF="BitList.html#DOC.17.4">size</A> = 0, size_t inc = 0)<br>
+<I>Default constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.7"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>BitList</B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)<br>
+<I> Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.8"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>& </TD><TD><B>operator = </B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)<br>
+<I> The assignment operator.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.2"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>set</B> (size_t index, bool value)<br>
+<I>Set a bit at a specific index to a given value</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.3"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>operator []</B> (size_t) const <br>
+<I>Get the bit at a given index</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.4"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>size</B> () const <br>
+<I>Get  the size of the BitList</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.9"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>count</B> () const <br>
+<I> Count the TRUE bits from a certain index on</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.10"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>trim</B> ()<br>
+<I> Just chop off all trailing 'false' bits. Returns new size.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.5"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>clear</B> (bool keepLength = false)<br>
+<I>Clear the list, reset size to 0 by default</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.11"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>& </TD><TD><B>operator &= </B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)<br>
+<I> The standard &= operator.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.12"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>& </TD><TD><B>operator |= </B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)<br>
+<I> The standard |= operator.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.13"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>& </TD><TD><B>operator ^= </B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)<br>
+<I> The standard ^= operator.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.14"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>invert</B> ()<br>
+<I> The inversion method, flip every bit in the BitList.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.15"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>covers</B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> & BL) const <br>
+<I> Check if BL is a subset of the current list</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.6"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>overlaps</B> (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> & BL) const <br>
+<I>Check if the current BitList overlaps with the other</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.16"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>compress</B> (ostream &) const <br>
+<I> compress output</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.17.17"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>decompress</B> (istream &)<br>
+<I> decompress input</I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+BitList class.
+The BitList is an array of bits. A bit can be set at any index using the
+set member function, the array expands itself automatically if the index
+exceeds the current size.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="BitList">
+<A NAME ="DOC.17.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  BitList(size_t <!2><A HREF="BitList.html#DOC.17.4">size</A> = 0, size_t inc = 0)</B></TT>
+<DD>Default constructor.
+You can initialize the BitList to a specific size
+and optionally the increment may be set by which the size internal ValVec
+will be incremented upon need. (See VarVec.h for explanation on this.)
+The default is to double the size of the array whenever an expansion
+is requested.
+<DL></DL><P>
+<A NAME="BitList">
+<A NAME ="DOC.17.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  BitList(const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)</B></TT>
+<DD> Copy constructor
+<DL></DL><P>
+<A NAME="operator = ">
+<A NAME ="DOC.17.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>&  operator = (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)</B></TT>
+<DD> The assignment operator.
+<DL></DL><P>
+<A NAME="set">
+<A NAME ="DOC.17.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  set(size_t index, bool value)</B></TT>
+<DD>Set a bit at a specific index to a given value. 
+If the index is larger
+than the current size, the BitList expands itself to be able to hold
+that value at the given index.
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.17.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  operator [](size_t) const </B></TT>
+<DD>Get the bit at a given index. 
+If the index exceeds the size, the return
+value is 'false'. All BitLists are treated as if they were of infinite
+size, all bits set to zero at initialization.
+<DL></DL><P>
+<A NAME="size">
+<A NAME ="DOC.17.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  size() const </B></TT>
+<DD>Get  the size of the BitList. 
+At construction time the size may be
+specified, and that much memory will be allocated. If the construction
+is done using the set() method, the size is 'minimal' i.e. as much as
+it needs to hold the last 'true' bit.
+<DL></DL><P>
+<A NAME="count">
+<A NAME ="DOC.17.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  count() const </B></TT>
+<DD> Count the TRUE bits from a certain index on
+<DL></DL><P>
+<A NAME="trim">
+<A NAME ="DOC.17.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  trim()</B></TT>
+<DD> Just chop off all trailing 'false' bits. Returns new size.
+<DL></DL><P>
+<A NAME="clear">
+<A NAME ="DOC.17.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  clear(bool keepLength = false)</B></TT>
+<DD>Clear the list, reset size to 0 by default. 
+If true is given as an
+argument, the size is kept. 
+<DL></DL><P>
+<A NAME="operator &= ">
+<A NAME ="DOC.17.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>&  operator &= (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)</B></TT>
+<DD> The standard &= operator.
+<DL></DL><P>
+<A NAME="operator |= ">
+<A NAME ="DOC.17.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>&  operator |= (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)</B></TT>
+<DD> The standard |= operator.
+<DL></DL><P>
+<A NAME="operator ^= ">
+<A NAME ="DOC.17.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="BitList.html#DOC.17.1">BitList</A>&  operator ^= (const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> &)</B></TT>
+<DD> The standard ^= operator.
+<DL></DL><P>
+<A NAME="invert">
+<A NAME ="DOC.17.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  invert()</B></TT>
+<DD> The inversion method, flip every bit in the BitList.
+<DL></DL><P>
+<A NAME="covers">
+<A NAME ="DOC.17.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  covers(const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> & BL) const </B></TT>
+<DD> Check if BL is a subset of the current list
+<DL></DL><P>
+<A NAME="overlaps">
+<A NAME ="DOC.17.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  overlaps(const <!2><A HREF="BitList.html#DOC.17.1">BitList</A> & BL) const </B></TT>
+<DD>Check if the current BitList overlaps with the other.
+(i.e. they have at least one common Bit) 
+<DL></DL><P>
+<A NAME="compress">
+<A NAME ="DOC.17.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  compress(ostream &) const </B></TT>
+<DD> compress output
+<DL></DL><P>
+<A NAME="decompress">
+<A NAME ="DOC.17.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  decompress(istream &)</B></TT>
+<DD> decompress input
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

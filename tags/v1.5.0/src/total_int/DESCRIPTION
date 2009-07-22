@@ -1,0 +1,2 @@
+title		total_int
+description	C extension to total an array as integers.  Like built in total(), but works on integers without converting to float. IDL versions greater than 6 also support total(x, /int)
