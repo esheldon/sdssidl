@@ -1,8 +1,8 @@
 pro ploth,x,y,hist,xrange=xrange,yrange=yrange,_extra=ex,$
-	nxbins=nxbins,nybins=nybins,range=range,$
-	log=log,sqrt=sqrt,median=median,smooth=smooth,g_smooth=g_smooth,$
-	silent=silent, $
-	asinh=asinh
+		nxbins=nxbins,nybins=nybins,range=range,$
+		log=log,sqrt=sqrt,asinh=asinh, $
+		median=median,smooth=smooth,g_smooth=g_smooth,$
+		silent=silent, tvim=tvim
 ;+
 ; NAME:		
 ;		ploth
@@ -86,10 +86,11 @@ pro ploth,x,y,hist,xrange=xrange,yrange=yrange,_extra=ex,$
 ;
 ;
 if n_params() eq 0 then begin
-	print,'-syntax ploth,x,y,hist,xrange=xrange,yrange=yrange,_extra=ex'
-	print,'nxbins=nxbins,nybins=nybins,range=range,'
-	print,'log=log,sqrt=sqrt,median=median,smooth=smooth,'
-	print,'g_smooth=g_smooth,silent=silent'
+	print,'-syntax ploth,x,y,hist,'
+	print,'    xrange=, yrange=,'
+	print,'    nxbins=, nybins=, range=,'
+	print,'    /log, /sqrt, /asinh, /median, /smooth='
+	print,'    /g_smooth, /silent, _extra='
 	return
 endif
  
