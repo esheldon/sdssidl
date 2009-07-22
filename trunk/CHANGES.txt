@@ -1,11 +1,44 @@
 v1.5.0
 ---------------------------------------
 bug fixes:
+	gcc 4.3 has turned many warnings into errors.  Hundreds of fixes were
+		applied to fixe these mostly harmless problems.
 	skiplines works properly now for ascii_read() C++ DLM.
     pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
         input arrays.
     pro/astro/spheredist.pro: Bug fix; output fixzed so values are between 0
     and 2!pi.
+	pro/sdss/gc2csurvey: misnamed procedure internally.  Incorrect docs.
+
+New Files:
+    pro/util/in.pro: Check if a value is contained in an array or matches
+        a scalar.
+    pro/util/tostring.pro:  Convert idl variables to strings.
+    pro/util/fromstring.pro:  Convert from idl strings to variables.
+	pro/plotting/plegend.pro:  A fork from legend.pro that supports color
+		strings, no default box, box color, etc.
+
+minor changes:
+	pro/files/which.pro:
+		1: Search for Dynamically Loadable module if no files are found.
+		   If /dlm is set search onlyl for those.
+		2: /show: display the first match found.
+		3: Now use file_search, to avoid a bug in idl 7.0. 
+	pro/idlstruct_files/idlstruct2fits.pro: support ascii
+	pro/plotting/pplot.pro: support color strings.
+	pro/plotting/textoidl.pro:  Added \sun and made roman font !3
+	pro/plotting/plot_box.pro: support color strings.
+	pro/plotting/ploth.pro:  support asinh scaling with tvasinh.pro
+	pro/htm/htm_match.pro:  Fixed incorrect docs
+	pro/fits/mrdfits_multi.pro:  Allow specify extension.
+	pro/util/doc_method.pro: Use file_which
+	pro/sdss/sdss_objname.pro: Use prefix=,suffix=
+	pro/sdss/sdss_flags__define.pro: flagname, plotting
+	pro/sdss/sdss_files__define.pro: sensible dealing with reruns.  Also
+		allow nyu/boss ordering of rerun
+	pro/sdss/make_cmodel_counts.pro: removed preselection with flags
+	pro/probgal/bayes_combine_gri.pro:  Use sdss_flag_select
+
 
 v1.4.0 2008-09-20
 ---------------------------------------
