@@ -182,6 +182,8 @@ END
 ;       $Id: textoidl.pro,v 1.8 2004/07/19 16:48:04 schlegel Exp $
 ;       $Log: textoidl.pro,v $
 ;
+;		Revision: Added \sun symbol.  Changed roman font to !3 which
+;		works better. 2009-07-22
 ;       Revision: Added \odot symbol. 2007-08-28, Erin Sheldon, NYU
 ;       Revision 1.8  2004/07/19 16:48:04  schlegel
 ;       Replace calls to the obsolete function RSTRPOS() with STRPOS(/REVERSE_SEARCH).
@@ -360,6 +362,7 @@ FUNCTION textoidl_table, POSTSCRIPT=ps, VECTOR=vec,  HELP=Help
 	[ '\cap', 		'3'   ,	 string(byte(199))  ],$
 	[ '\cdot', 		'.'   ,	 string(byte(215))  ],$
 	[ '\odot', 		'n'   ,	 '!SO!R!N!I ' + string(183b) + '!X'  ],$
+	[ '\sun', 		'n'   ,	 '!SO!R!N!I ' + string(183b) + '!X'  ],$
 	[ '\cup', 		'1'   ,	 string(byte(200))  ],$
 	[ '\exists', 		'E'   ,	        '$'         ],$
 	[ '\infty', 		'$'   ,	 string(byte(165))  ],$
