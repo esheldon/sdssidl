@@ -1,6 +1,0 @@
-#
-# Directories of routines to be built
-#
-
-CODE_DIRS = IDLStruct atlas fileio gauleg htmIndexIDL sphpoly_masks total_int
-
