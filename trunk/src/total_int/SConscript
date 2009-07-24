@@ -1,0 +1,7 @@
+# vim: set filetype=python :
+import os
+
+Import('env')
+
+env.SharedLibrary(target="total_int", source="total_int.c",
+                  SHLIBPREFIX='')
