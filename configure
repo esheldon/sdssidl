@@ -38,8 +38,9 @@ fi
 
 SRC_CODE_DIRS="src/codedirs"
 
-# Should compile IDLStruct first as it is needed by others
-CODE_DIRS="IDLStruct atlas fileio gauleg htmIndexIDL sphpoly_masks total_int"
+# IDLStruct is now header-only
+#CODE_DIRS="IDLStruct atlas fileio gauleg htmIndexIDL sphpoly_masks total_int"
+CODE_DIRS="atlas fileio gauleg htmIndexIDL sphpoly_masks total_int"
 
 # First we must check if the gnu-scientific library is here
 # if so, add sdsspixIDL to the CODE_DIRS

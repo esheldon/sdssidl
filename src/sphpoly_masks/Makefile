@@ -33,7 +33,7 @@ clean:
 	- rm -f ${SOFILES}; 
 	- rm -f ${OBJS}; 
 	- rm -f ../DLM/${SPHPOLYCOMP_SOFILE}
-	- rm -f ../DLM/${DLM}
+	- rm -f ../DLM/${DLMS}
 
 .SUFFIXES:
 .SUFFIXES: .o .c
