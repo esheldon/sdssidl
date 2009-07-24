@@ -3,5 +3,6 @@ import os
 
 Import('env')
 
-env.SharedLibrary(target="total_int", source="total_int.c",
+env.SharedLibrary(target="../DLM/total_int", source="total_int.c",
                   SHLIBPREFIX='')
+env.Command("../DLM/total_int.dlm","total_int.dlm",Copy("$TARGET","$SOURCE"))

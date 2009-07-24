@@ -37,7 +37,9 @@ all: ${SOFILES}
 
 fileio.so: fileio.o FileObj.o
 	@ echo linking $@
-	${LD} ${LDFLAGS} -o $@ fileio.o FileObj.o ../IDLStruct/IDLStruct.o
+	${LD} ${LDFLAGS} -o $@ fileio.o FileObj.o
+	# IDLStruct is header only now
+	#${LD} ${LDFLAGS} -o $@ fileio.o FileObj.o ../IDLStruct/IDLStruct.o
 
 
 clean:

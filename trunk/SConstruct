@@ -28,12 +28,13 @@ if idl_dir == '':
     Exit(1)
 
 idl_include_dir=os.path.join(idl_dir, 'external/include')
-env.Prepend(CPPPATH=idl_include_dir)
+env.Prepend(CPPPATH=[idl_include_dir])
 env.Prepend(CPATH=idl_include_dir)
+env.Prepend(CPPPATH=["#src/IDLStruct"])
 
 env.Append(CCFLAGS=["-Wall"])
 
-subdirs=['total_int']
+subdirs=['gauleg','total_int','fileio']
 if not config.CheckLibWithHeader('pq','libpq-fe.h',language='C'):
     stdout.write('postgres library/header not found (This is OK)\n')
 else:
