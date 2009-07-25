@@ -1,5 +1,5 @@
 # vim: set filetype=python :
-import os
+import os,sys
 
 Import('env')
 

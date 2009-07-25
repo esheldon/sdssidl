@@ -36,12 +36,12 @@ DLMS 	=	testidlstruct.dlm
 #	${CP} ${SOFILES} ${DLMS} ../DLM
 all: ${SOFILES}
 
-testidlstruct.so: testidlstruct.o IDLStruct.o
+testidlstruct.so: testidlstruct.o
 	@ echo linking $@
-	${LD} ${LDFLAGS} -o $@ testidlstruct.o IDLStruct.o
+	${LD} ${LDFLAGS} -o $@ testidlstruct.o
 
 clean:
-	- ${RM} *.o *.so
+	- ${RM} *.o *.os *.so
 	- cd ../DLM; ${RM} ${SOFILES} ${DLMS}
 
 .SUFFIXES:
@@ -52,5 +52,4 @@ clean:
 	${CC} -c ${CCFLAGS} $<
 
 
-IDLStruct.o: IDLStruct.cpp IDLStruct.hpp
 testidlstruct.o: testidlstruct.cpp IDLStruct.cpp IDLStruct.hpp

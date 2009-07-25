@@ -53,7 +53,7 @@ applyPixelMaskIDL.so: ${APPLY_PIXEL_MASK_OBJ}
 clean:
 	- ${RM} ${SOFILES} ${OBJFILES}
 	- ${RM} ../../DLM/${SOFILES}
-	- ${RM} ../../DLM/${DLM}
+	- ${RM} ../../DLM/${DLMS}
 
 
 .c.o:
