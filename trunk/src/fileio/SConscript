@@ -3,8 +3,10 @@ import os,sys,copy
 
 Import('env')
 
+idlstruct_obj=env.SharedObject(target="../IDLStruct/IDLStruct",
+                               source="../IDLStruct/IDLStruct.cpp")
 env.SharedLibrary(target="../DLM/fileio", 
-            source=["fileio.cpp","FileObj.cpp"],
+            source=["fileio.cpp","FileObj.cpp",idlstruct_obj],
 			CPPPATH=env['CPPPATH'] + ['.','../IDLStruct'],
             SHLIBPREFIX='')
 env.Command("../DLM/fileio.dlm","fileio.dlm",Copy("$TARGET","$SOURCE"))

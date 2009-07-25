@@ -56,9 +56,12 @@ if idl_dir == '':
 idl_include_dir=os.path.join(idl_dir, 'external/include')
 env.Prepend(CPPPATH=[idl_include_dir])
 env.Prepend(CPATH=[idl_include_dir])
-#env.Prepend(CPPPATH=["#src/IDLStruct"])
 
 env.Append(CCFLAGS=["-Wall"])
+
+
+env['SDSS_CFLAGS'] = ["-DLINKAGE","-DCHECK_LEAKS","-DSTAND_ALONE","-DSDSS_LITTLE_ENDIAN"]
+
 if os.uname()[0] == 'Darwin':
     # Use lists: Kludge to fix Darwin problem with putting quotes around 
     # strings when there are spaces
