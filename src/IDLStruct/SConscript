@@ -3,7 +3,9 @@ import os,sys
 
 Import('env')
 
-env.SharedLibrary(target="../DLM/testidlstruct", source="testidlstruct.cpp",
+object=env.SharedObject(target="IDLStruct",source="IDLStruct.cpp")
+env.SharedLibrary(target="../DLM/testidlstruct", 
+                  source=["testidlstruct.cpp",object],
                   SHLIBPREFIX='')
 env.Command("../DLM/testidlstruct.dlm","testidlstruct.dlm",
             Copy("$TARGET","$SOURCE"))
