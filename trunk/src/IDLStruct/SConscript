@@ -1,0 +1,9 @@
+# vim: set filetype=python :
+import os,sys
+
+Import('env')
+
+env.SharedLibrary(target="../DLM/testidlstruct", source="testidlstruct.cpp",
+                  SHLIBPREFIX='')
+env.Command("../DLM/testidlstruct.dlm","testidlstruct.dlm",
+            Copy("$TARGET","$SOURCE"))
