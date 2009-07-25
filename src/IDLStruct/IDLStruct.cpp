@@ -1,5 +1,3 @@
-// We don't use this any more.  IDLStruct.hpp now contains all the code
-// and should just be included as needed
 #include "IDLStruct.hpp"
 
 IDLStruct::IDLStruct() {}
