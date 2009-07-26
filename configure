@@ -70,7 +70,7 @@ fi
 # machine. If so, compile postgres module pgsql
 # Note, a common mistake is to install postgres in /usr/local/pgsql
 # but not update the /etc/ld.so.conf and run ldconfig
-incdirs="/usr/local/pgsql/include /usr/local/include /usr/include /sw/include/postgresql"
+incdirs="/usr/local/pgsql/include /usr/local/include /usr/include /sw/include/postgresql /sw/opt/postgresql-8.4/include  /sw/opt/postgresql-8.3/include /sw/opt/postgresql-8.2/include /sw/opt/postgresql-8.1/include /sw/opt/postgresql-8.0/include"
 pgTestFile="libpq-fe.h"
 pgExists="NO"
 for incDir in $incdirs; do
