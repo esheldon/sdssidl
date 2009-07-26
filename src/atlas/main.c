@@ -7,7 +7,7 @@
 #include "dervish.h"
 #include "phFits.h"
 #include "phConsts.h"
-#include "export.h"
+#include "idl_export.h"
 /*
  * some symbols to prevent dervish.o from being loaded from libatlas.a
  * if we are also linking against real dervish

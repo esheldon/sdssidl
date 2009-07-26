@@ -57,7 +57,7 @@
 #include "phFits.h"
 #include "phConsts.h"
 
-#include "export.h"
+#include "idl_export.h"
 #include "read_atlasUtil.h"
 #include "read_atlasIDL.h"
 
