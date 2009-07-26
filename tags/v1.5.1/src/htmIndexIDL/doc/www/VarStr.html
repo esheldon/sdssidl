@@ -1,0 +1,406 @@
+<html><head><TITLE>VarStr</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  VarStr  </H2><BLOCKQUOTE>
+Dynamic string
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.22.15"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>~VarStr</B> ( void )<br>
+<I>Destructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>VarStr</B> ( size_t capacity = 0, size_t increment = 0 )<br>
+<I>Default constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.16"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>VarStr</B> ( const char * )<br>
+<I>Construct from a string </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.2"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>VarStr</B> ( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& )<br>
+<I>Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.17"> <IMG BORDER=0 SRC=icon1.gif></A> char operator </TD><TD><B>()</B> ( size_t index ) const <br>
+<I>Efficient array operator (const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.18"> <IMG BORDER=0 SRC=icon1.gif></A> char& operator </TD><TD><B>()</B> ( size_t index )<br>
+<I>Efficient array operator (non-const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.19"> <IMG BORDER=0 SRC=icon1.gif></A> char </TD><TD><B>operator []</B> ( size_t index ) const <br>
+<I>Bounds-checking array operator (const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.20"> <IMG BORDER=0 SRC=icon1.gif></A> char& </TD><TD><B>operator []</B> ( size_t index )<br>
+<I>Bounds-checking array operator (non-const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.21"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>operator char* </B> () const <br>
+<I>Char conversion </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.8"> <IMG BORDER=0 SRC=icon1.gif></A> char& </TD><TD><B>at</B> ( size_t index )<br>
+<I>Bounds-adjusting array operator</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.22"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>length</B> ( void ) const <br>
+<I>Returns current occupied length of array </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.9"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>append</B> ( const char )<br>
+<I>Append method</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.10"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>append</B> ( unsigned char *buf, const int len )<br>
+<I>Append method for binary data</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.11"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>insert</B> ( size_t count, size_t offset = 0, char c = ' ' )<br>
+<I>Insert new array elements</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.12"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>cut</B> ( size_t count, size_t offset = 0 )<br>
+<I>Remove array elements</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.13"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>remove</B> ( size_t offset, size_t count = 1 )<br>
+<I>Removes the element specified by offset</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.14"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>write</B> ( ostream& _out ) const <br>
+<I>Write out the contents as a binary buffer</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.23"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>clear</B> ( void )<br>
+<I>clear method </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.24"> <IMG BORDER=0 SRC=icon1.gif></A> char* </TD><TD><B>data</B> () const <br>
+<I>return the string itself </I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.25"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>empty</B> () const <br>
+<I>return true if string is empty, false if not </I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.22.3"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I>Assignment/copy operator</I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.22.3.1"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator =</B> ( const char * )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.3.2"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator =</B> ( const char )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.3.3"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator =</B> ( const int )<br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.4"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I>Comparison operators </I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.22.4.1"> <IMG BORDER=0 SRC=icon1.gif></A> int </TD><TD><B>operator == </B> ( const char *) const <br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.4.2"> <IMG BORDER=0 SRC=icon1.gif></A> int </TD><TD><B>operator != </B> ( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> &) const <br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.4.3"> <IMG BORDER=0 SRC=icon1.gif></A> int </TD><TD><B>operator != </B> ( const char *) const <br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.5"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I>String extension </I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.22.5.1"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator + </B> ( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> &, const char * )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.5.2"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator + </B> ( const char *, const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> & )<br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.6"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I>String extension </I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.22.6.1"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator += </B> ( const char *)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.6.2"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator += </B> ( const char )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.6.3"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator += </B> ( const int )<br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B></B> <br>
+<I>Binary string extension, represented by operator "*=" </I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.22.7.1"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const int16 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.2"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const uint16 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.3"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const int32 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.4"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const uint32 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.5"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const int64 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.6"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const uint64 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.7"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const float32 )<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.22.7.8"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& </TD><TD><B>operator *= </B> ( const float64 )<br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+Dynamic string.
+
+This is a template for a general-purpose dynamic string.  The
+array grows automatically as needed, but reallocation occurs only
+when the length exceeds the capacity.  The capacity is increased
+in large blocks, the size of which may be optimized.  The public
+data member, increment_, specifies the amount by which the
+capacity is increased during reallocation.  By default, increment_
+is zero, which causes the capacity to double upon each
+reallocation.  A non-zero increment_ is simply added to the
+capacity upon each reallocation.  The capacity is extended by this
+amount or by whatever greater amount is necessary to accommodate
+the new length of the array.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="~VarStr">
+<A NAME ="DOC.22.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ~VarStr( void )</B></TT>
+<DD>Destructor
+<DL></DL><P>
+<A NAME="VarStr">
+<A NAME ="DOC.22.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  VarStr( size_t capacity = 0, size_t increment = 0 )</B></TT>
+<DD>Default constructor.
+optionally specify initial capacity and reallocation increment.
+<DL></DL><P>
+<A NAME="VarStr">
+<A NAME ="DOC.22.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  VarStr( const char * )</B></TT>
+<DD>Construct from a string 
+<DL></DL><P>
+<A NAME="VarStr">
+<A NAME ="DOC.22.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  VarStr( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>& )</B></TT>
+<DD>Copy constructor.  
+The initial capacity is the current capacity of the duplicated array.
+<DL></DL><P>
+<A NAME="">
+<A NAME ="DOC.22.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD>Assignment/copy operator. does not decrease the capacity. 
+<DL></DL><P><DL>
+
+<A NAME="operator =">
+<A NAME ="DOC.22.3.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator =( const char * )</B></TT>
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.22.3.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator =( const char )</B></TT>
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.22.3.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator =( const int )</B></TT>
+<DL></DL><P></DL>
+
+<A NAME="()">
+<A NAME ="DOC.22.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char operator  ()( size_t index ) const </B></TT>
+<DD>Efficient array operator (const version): no bounds checking
+<DL></DL><P>
+<A NAME="()">
+<A NAME ="DOC.22.18">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char& operator  ()( size_t index )</B></TT>
+<DD>Efficient array operator (non-const version): no bounds checking
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.22.19">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char  operator []( size_t index ) const </B></TT>
+<DD>Bounds-checking array operator (const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.22.20">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char&  operator []( size_t index )</B></TT>
+<DD>Bounds-checking array operator (non-const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="">
+<A NAME ="DOC.22.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD>Comparison operators 
+<DL></DL><P><DL>
+
+<A NAME="operator == ">
+<A NAME ="DOC.22.4.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> int  operator == ( const char *) const </B></TT>
+<DL></DL><P>
+<A NAME="operator != ">
+<A NAME ="DOC.22.4.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> int  operator != ( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> &) const </B></TT>
+<DL></DL><P>
+<A NAME="operator != ">
+<A NAME ="DOC.22.4.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> int  operator != ( const char *) const </B></TT>
+<DL></DL><P></DL>
+
+<A NAME="">
+<A NAME ="DOC.22.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD>String extension 
+<DL></DL><P><DL>
+
+<A NAME="operator + ">
+<A NAME ="DOC.22.5.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator + ( const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> &, const char * )</B></TT>
+<DL></DL><P>
+<A NAME="operator + ">
+<A NAME ="DOC.22.5.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator + ( const char *, const <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A> & )</B></TT>
+<DL></DL><P></DL>
+
+<A NAME="">
+<A NAME ="DOC.22.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD>String extension 
+<DL></DL><P><DL>
+
+<A NAME="operator += ">
+<A NAME ="DOC.22.6.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator += ( const char *)</B></TT>
+<DL></DL><P>
+<A NAME="operator += ">
+<A NAME ="DOC.22.6.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator += ( const char )</B></TT>
+<DL></DL><P>
+<A NAME="operator += ">
+<A NAME ="DOC.22.6.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator += ( const int )</B></TT>
+<DL></DL><P></DL>
+
+<A NAME="">
+<A NAME ="DOC.22.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  </B></TT>
+<DD>Binary string extension, represented by operator "*=" 
+<DL></DL><P><DL>
+
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const int16 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const uint16 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const int32 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const uint32 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const int64 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const uint64 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const float32 )</B></TT>
+<DL></DL><P>
+<A NAME="operator *= ">
+<A NAME ="DOC.22.7.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="VarStr.html#DOC.22.1">VarStr</A>&  operator *= ( const float64 )</B></TT>
+<DL></DL><P></DL>
+
+<A NAME="operator char* ">
+<A NAME ="DOC.22.21">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  operator char* () const </B></TT>
+<DD>Char conversion 
+<DL></DL><P>
+<A NAME="at">
+<A NAME ="DOC.22.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char&  at( size_t index )</B></TT>
+<DD>Bounds-adjusting array operator.  Returns the array
+element at the specified index, extending the array as necessary
+to bring it within bounds.  The fill value, if defined, is the
+initializer for any new elements. 
+<DL></DL><P>
+<A NAME="length">
+<A NAME ="DOC.22.22">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  length( void ) const </B></TT>
+<DD>Returns current occupied length of array 
+<DL></DL><P>
+<A NAME="append">
+<A NAME ="DOC.22.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  append( const char )</B></TT>
+<DD>Append method. efficiently insert given element at end of array.
+Avoids redundant initialization of new array element, except for
+when a reallocation is required.  Returns the new length. 
+<DL></DL><P>
+<A NAME="append">
+<A NAME ="DOC.22.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  append( unsigned char *buf, const int len )</B></TT>
+<DD>Append method for binary data.  Adds the contents of the given 
+buffer to the string byte by byte. Returns the new length. 
+<DL></DL><P>
+<A NAME="insert">
+<A NAME ="DOC.22.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  insert( size_t count, size_t offset = 0, char c = ' ' )</B></TT>
+<DD>Insert new array elements.  
+count specifies the number of new elements, and offset specifies
+where in the array to insert them.  By default the new elements
+are appended.  The fill value, if defined, is the initializer
+for the new elements.  offset refers to the end of the array:
+the first new element is located at index (length - offset).
+Returns the new length.  Throws sxBoundsError if offset is
+greater than length.
+<DL></DL><P>
+<A NAME="cut">
+<A NAME ="DOC.22.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  cut( size_t count, size_t offset = 0 )</B></TT>
+<DD>Remove array elements.
+count specifies the number of elements to remove, and offset
+specifies which elements to remove.  By default elements are
+removed from the end of the array.  The unused capacity grows by
+this amount.  offset refers to the end of the array: the first
+removed element is located at index (length - offset - count).
+Returns the new length.  Throws sxBoundsError if (offset+count)
+is greater than length. 
+<DL></DL><P>
+<A NAME="remove">
+<A NAME ="DOC.22.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  remove( size_t offset, size_t count = 1 )</B></TT>
+<DD>Removes the element specified by offset.
+This is basically a wrapper for the cut method 
+<pre>
+cut(1, length-offset-1)
+</pre>
+<DL></DL><P>
+<A NAME="write">
+<A NAME ="DOC.22.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  write( ostream& _out ) const </B></TT>
+<DD>Write out the contents as a binary buffer.  Use the low-level stream
+write function.
+<DL></DL><P>
+<A NAME="clear">
+<A NAME ="DOC.22.23">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  clear( void )</B></TT>
+<DD>clear method 
+<DL></DL><P>
+<A NAME="data">
+<A NAME ="DOC.22.24">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> char*  data() const </B></TT>
+<DD>return the string itself 
+<DL></DL><P>
+<A NAME="empty">
+<A NAME ="DOC.22.25">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  empty() const </B></TT>
+<DD>return true if string is empty, false if not 
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

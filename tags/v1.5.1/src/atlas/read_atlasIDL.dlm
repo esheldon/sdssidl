@@ -1,0 +1,7 @@
+MODULE rdatlas
+DESCRIPTION Read in atlas images.
+VERSION 1.0
+BUILD_DATE 17-Nov-2004
+SOURCE Erin Sheldon, UofChicago
+
+PROCEDURE rdatlas 0 IDL_MAXPARAMS KEYWORDS

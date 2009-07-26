@@ -1,0 +1,172 @@
+flagstruct = {
+	   object1: 
+		     {CANONICAL_CENTER :    '1'X, ; used canonical, not local, centre   
+		      BRIGHT       :        '2'X, ; detected by Bright Objects          
+		      EDGE         :        '4'X, ; object is too close to edge of frame
+		      BLENDED      :        '8'X, ; object is/was blended               
+		      CHILD        :       '10'X, ; object is a child                   
+		      PEAKCENTER   :       '20'X, ; given centre position of peak pixel 
+		      NODEBLEND    :       '40'X, ; no deblending attempted             
+		      NOPROFILE    :       '80'X, ; too small to estimate a profile     
+		      NOPETRO      :      '100'X, ; no Petrosian radius                 
+		      MANYPETRO    :      '200'X, ; more than one Petrosian radius      
+		      NOPETRO_BIG  :      '400'X, ; no Petrosian radius as object is too big
+		      DEBLEND_TOO_MANY_PEAKS : '800'X, ; too many peaks to deblend      
+		      CR            :     '1000'X, ; contains a CR pixel                
+		      MANYR50      :     '2000'X, ; more than one 50% radius            
+		      MANYR90      :     '4000'X, ; more than one 90% radius            
+		      BAD_RADIAL   :     '8000'X, ; some low S/N radial points          
+		      INCOMPLETE_PROFILE : '10000'X, ; r_P includes off-frame pixels    
+		      INTERP       :    '20000'X, ; object contains interpolated pixels 
+		      SATUR        :    '40000'X, ; object contains saturated pixels    
+		      NOTCHECKED   :    '80000'X, ; object contains NOTCHECKED pixels   
+		      SUBTRACTED   :   '100000'X, ; object had wings subtracted         
+		      NOSTOKES     :   '200000'X, ; object has no measured stokes params
+		      BADSKY       :   '400000'X, ; sky level so bad that object is -ve 
+		      PETROFAINT   :   '800000'X, ; >= 1 Petrosian radius too faint     
+		      TOO_LARGE    :  '1000000'X, ; object is too large                 
+		      DEBLENDED_AS_PSF : '2000000'X, ; deblender treated obj as PSF     
+		      DEBLEND_PRUNED : '4000000'X, ; deblender pruned peak list         
+		      ELLIPFAINT   : '8000000'X, ; Centre's fainter than desired elliptical isophote 
+		      BINNED1      : '10000000'X, ; object was found in 1x1 binned image
+		      BINNED2      : '20000000'X, ; object was found in 2x2 binned image
+		      BINNED4      : '40000000'X, ; object was found in 4x4 binned image
+		      MOVED        : '80000000'X},  ; Object appears to have moved during 
+                                       ; the exposure.  May have been        
+                                       ; deblended as a moving object.       
+
+
+	  object2:
+		     {DEBLENDED_AS_MOVING: '1'X, ; deblended as a moving object        
+		      NODEBLEND_MOVING   : '2'X, ; no deblend of moving object         
+		      TOO_FEW_DETECTIONS : '4'X, ; too few detections to deblend       
+		      BAD_MOVING_FIT     : '8'X, ; Fit to moving object was too poor   
+		      STATIONARY        : '10'X, ; velocity is consistent with zero    
+		      PEAKS_TOO_CLOSE   : '20'X, ; at least some peaks were too close, 
+                                    ; and thus merged                     
+		      MEDIAN_CENTRE     : '40'X, ; centre is of median-smoothed image  
+		      LOCAL_EDGE        : '80'X, ; per-band centre's too near edge     
+		      BAD_COUNTS_ERROR : '100'X, ; psf|fiberCountsErr is bad/unknown   
+		      BAD_MOVING_FIT_CHILD : '200'X, ; moving child's fit was too poor 
+		      DEBLEND_UNASSIGNED_FLUX : '400'X, ; deblender failed to assign   
+                                           ; enough of flux to children   
+		      SATUR_CENTER     : '800'X, ; object's centre's saturated         
+		      INTERP_CENTER   : '1000'X, ; object's centre is very close to at 
+                                    ; least one interpolated pixel        
+                      DEBLENDED_AT_EDGE:'2000'X, ; object is deblended though EDGE     
+		      DEBLEND_NOPEAK   :'4000'X, ; object had no detected peak         
+		      PSF_FLUX_INTERP  :'8000'X, ; a signifcant amount of PSF's flux   
+                                    ; is interpolated                     
+                      TOO_FEW_GOOD_DETECTIONS:'10000'X, ; too few good detections to   
+                                           ; deblend as moving            
+                      CENTER_OFF_AIMAGE   : '20000'X, ; at least one peak's centre lay   
+                                         ; off the atlas image in some band 
+
+                      DEBLEND_DEGENERATE : '40000'X, ; at least one potential child has
+                                        ;been pruned as being too similar
+                                        ;to some other template 
+                      BRIGHTEST_GALAXY_CHILD : '80000'X, ; this is the brightest child
+                                          ;galaxy in a blend 
+                      CANONICAL_BAND : '100000'X, ; This band was primary (usually r')
+                      AMOMENT_FAINT :  '200000'X, ; too faint for adaptive moments 
+                      AMOMENT_UNWEIGHTED : '200000'X, ; failed so tried unweighted mom
+                      AMOMENT_SHIFT :  '400000'X, ; centre moved too far while
+                                ;determining adaptive moments 
+                      AMOMENT_MAXITER : '800000'X, ; Too many iterations while
+                                ;determining adaptive moments 
+                      MAYBE_CR :       '1000000'X, ; object may be a cosmic ray 
+		      MAYBE_EGHOST :   '2000000'X, ; object may be an electronics ghost
+		      NOTCHECKED_CENTER : '4000000'X}, ; object's centre is NOTCHECKED 
+
+        primtarget: 
+                    {QSO_HIZ           : '1'X,
+		     QSO_CAP           : '2'X,
+		     QSO_SKIRT         : '4'X,
+		     QSO_FIRST_CAP     : '8'X,
+		     QSO_FIRST_SKIRT   : '10'X,
+		     QSO_MAG_OUTLIER  : '2000000'X,
+		     QSO_REJECT	      : '20000000'X,
+		     GALAXY_RED        : '20'X,
+		     GALAXY_RED_II     : '4000000'X,
+		     GALAXY            : '40'X,
+		     GALAXY_BIG        : '80'X,
+		     GALAXY_BRIGHT_CORE: '100'X,
+		     ROSAT_A           : '200'X,
+		     ROSAT_B           : '400'X,
+		     ROSAT_C           : '800'X,
+		     ROSAT_D           : '1000'X,
+		     ROSAT_E           : '8000000'X,
+		     STAR_BHB          : '2000'X,
+		     STAR_CARBON       : '4000'X,
+		     STAR_BROWN_DWARF  : '8000'X,
+		     STAR_SUB_DWARF    : '10000'X,
+		     STAR_CATY_VAR     : '20000'X,
+		     STAR_RED_DWARF    : '40000'X,
+		     STAR_WHITE_DWARF  : '80000'X,
+		     STAR_PN           : '10000000'X,
+		     SERENDIP_BLUE     : '100000'X,
+		     SERENDIP_FIRST    : '200000'X,
+		     SERENDIP_RED      : '400000'X,
+		     SERENDIP_DISTANT  : '800000'X,
+		     SERENDIP_MANUAL   : '1000000'X},
+
+
+        sectarget: 
+	           {LIGHT_TRAP        : '1'X,
+		    REDDEN_STD        : '2'X,
+		    TEST_TARGET       : '4'X,
+		    QA                : '8'X,
+		    SKY               : '10'X,
+		    SPECTROPHOTO_STD  : '20'X,
+		    GUIDE_STAR        : '40'X,
+		    BUNDLE_HOLE       : '80'X,
+		    QUALITY_HOLE      : '100'X,
+		    HOT_STD           : '200'X},
+
+        status: 
+                   {SET        : '1'X,    ; This object's status has been set 
+					; in reference to its own run.      
+                    GOOD       : '2'X,    ; Good as determined by its         
+					; object flags.  Absence implies    
+                                        ; bad.  This flag is set by         
+                                        ; "setObjectStatus".                
+                    DUPLICATE  : '4'X,    ; This object has one or more       
+					; duplicate detections in an        
+					; adjacent field of the same Frames 
+					; Pipeline Run.  This is set by     
+					; "setObjectStatus".                
+                   OK_RUN     : '10'X,   ; Located within the primary range  
+					; of rows for this field.  This is  
+                                        ; usable object.  This flag is set  
+                                        ; by "setObjectStatus".             
+                   RESOLVED   : '20'X,   ; This object has been resolved     
+					; against other runs.               
+                   PSEGMENT   : '40'X,   ; Belongs to a PRIMARY segment.     
+					; This does not imply that this is a
+					; primary object.                   
+                   FIRST_FIELD: '100'X,  ; Belongs to the first field in its 
+					; segment.  Used to distinguish     
+					; objects in fields shared by two   
+					; segments.                         
+                   OK_SCANLINE: '200'X,  ; Lies within valid nu range        
+					; for its scanline.                 
+                   OK_STRIPE  : '400'X,  ; Lies within valid eta range for   
+					; its stripe.                       
+                   SECONDARY  : '1000'X, ; This is a secondary survey object.
+                   PRIMARY    : '2000'X, ; This is a primary survey object.  
+                   TARGET     : '4000'X},  ; This is a spectroscopic target.   
+
+        runstatus: {
+            astrans_exist: '1'X,
+            tsobj_exist: '2'X,
+            tsfield_exist: '4'X, 
+            fpatlas_exist: '8'X,
+            fpobjc_exist: '10'X,
+            fpbin_exist: '20'X,
+            fpfieldstat_exist: '40'X,
+            fpm_exist: '80'X,
+            psfield_exist: '100'X,
+            psbb_exist: '200'X,
+            adatc_exist: '400'X,
+            photoz_exist: '800'X}
+}

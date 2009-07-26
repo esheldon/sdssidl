@@ -1,0 +1,12 @@
+C++ code linked to IDL via the DLM mechanism.
+
+ascii_read
+binary_read
+ascii_write
+
+Each program is documented. The full doc for each can be retrieved
+with the /help keyword.
+
+t=ascii_read(/help)
+t=binary_read(/help)
+ascii_write, /help
