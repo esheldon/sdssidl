@@ -11,7 +11,7 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_integration.h>
-#include "../idl/sdsspix.c"
+#include "sdsspix.c"
 #include "getopt.c"
 
 typedef struct {

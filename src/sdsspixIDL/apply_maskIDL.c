@@ -37,7 +37,7 @@ Ryan's comments:
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "pixel_util.c"
-#include "export.h"
+#include "idl_export.h"
 
 #define FLAGS_MASKED       0x1
 #define FLAGS_QUAD1_MASKED 0x2

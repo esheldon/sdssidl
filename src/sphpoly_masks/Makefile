@@ -1,7 +1,8 @@
 include ../make.conf
 
 CC	= gcc
-LD	= ld
+#LD	= ld
+LD	= gcc
 
 INCLUDE = -I../include -I${IDL_DIR}/external/include
 CCFLAGS = ${INCLUDE} ${OS_CFLAGS} -O3

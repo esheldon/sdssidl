@@ -1,0 +1,24 @@
+# vim: set filetype=python :
+import os,sys
+
+Import('env')
+
+# the shared library builds on darwin but gsl is the wrong architecture
+# so it doesn't actually work
+CPPPATH=env['CPPPATH'] + ['.']
+name="applyPixelMaskIDL"
+dlm=name+".dlm"
+LIBS=['gsl','gslcblas','m']
+env.SharedLibrary(target="../DLM/"+name, source=name+".c",
+                  LIBS=LIBS,
+                  CPPPATH=CPPPATH,
+                  SHLIBPREFIX='')
+env.Command("../DLM/"+dlm,dlm,Copy("$TARGET","$SOURCE"))
+
+
+if os.uname()[0] != 'Darwin':
+    # this doesn't work on darwin yet
+    name='jackknife_stripe'
+    env.Program(name, source=name+'.c',
+                LIBS=LIBS,
+                CPPPATH=CPPPATH)
