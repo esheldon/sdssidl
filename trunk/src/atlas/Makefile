@@ -4,6 +4,7 @@ include ../make.conf
 INCLUDE	= -I${IDL_DIR}/external/include
 LOCAL_CCFLAGS = $(INCLUDE) $(OS_CFLAGS) $(SDSS_CFLAGS)
 LDFLAGS = ${OS_LDFLAGS}
+LD=gcc
 
 LIBOBJS = \
           atlasImages.o\

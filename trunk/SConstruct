@@ -86,6 +86,18 @@ def LibAndHeaderChecks(config):
     else:
         env['subdirs'] += ['pgsql']
 
+    # See if we can build against postgres header/libraries
+    #if not config.CheckLibWithHeader('pq','libpq-fe.h',language='C'):
+    if not config.CheckHeader('gsl/gsl_vector.h',language='C'):
+        stdout.write('gsl headers not found. Not building sdsspix\n')
+        stdout.write('you might try augmenting your '+\
+                     'C_INCLUDE_PATH/LD_LIBRARY_PATH\n')
+    else:
+        pass
+        env['subdirs'] += ['sdsspixIDL']
+
+
+
 def AddPath(pathlist, newpath):
     """
     Add path(s) to a list of paths.  Check the path exists and that it is
@@ -131,8 +143,8 @@ def ImportPaths(env):
     env.Prepend(LIBPATH= lib_paths)
     env.Prepend(CPPPATH= cpp_paths)
     env.Prepend(CPATH= cpp_paths)
-    print 'c_paths=',cpp_paths
-    print 'lib_paths=',lib_paths
+    #print 'c_paths=',cpp_paths
+    #print 'lib_paths=',lib_paths
 
 
 def GetIDLArch():
@@ -223,6 +235,7 @@ if not GetOption('help'):
     src_dir='src'
     script_files=[]
     #env['subdirs']=['total_int']
+    #env['subdirs']=['sdsspixIDL']
     for d in env['subdirs']:
         script_dir = os.path.join(src_dir, d)
         script_file = os.path.join(script_dir, 'SConscript')

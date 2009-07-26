@@ -44,7 +44,7 @@
 #include <gsl/gsl_math.h>
 
 #include "sdsspix.c"
-#include "export.h"
+#include "idl_export.h"
 
 #include "applyPixelMaskIDL.h"
 #include "applyPixelMaskUtil.h"

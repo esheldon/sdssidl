@@ -17,7 +17,7 @@ calculate_area MaskFile
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
-#include "../idl/sdsspix.c"
+#include "sdsspix.c"
 
 
 /* Minimum size we want to resolve 

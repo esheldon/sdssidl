@@ -23,9 +23,10 @@
 
 include ../make.conf
 
-CC = 		gcc
-LD =            ld
-INCLUDE = 	-I../include -I${IDL_DIR}/external
+CC = gcc
+#LD =            ld
+LD = gcc
+INCLUDE = 	-I. -I${IDL_DIR}/external/include
 CCFLAGS =   ${INCLUDE} ${OS_CFLAGS} ${GSL_CFLAGS} -O6 
 LDFLAGS =	${OS_LDFLAGS} ${GSL_LDFLAGS}
 
@@ -36,22 +37,33 @@ APPLY_PIXEL_MASK_OBJ =	applyPixelMaskIDL.o
 
 OBJFILES = ${APPLY_PIXEL_MASK_OBJ}
 
+EXECUTABLES = jackknife_stripe calculate_area
+EXEC_OBJS = jackknife_stripe.o calculate_area.o
+
+
+
+
 SOFILES =	applyPixelMaskIDL.so
 DLMS =	applyPixelMaskIDL.dlm
 
 CP      =       cp
 RM      =       rm -f
 
-all: ${SOFILES} 
+all: ${SOFILES} ${EXECUTABLES} 
 	cp -f $(SOFILES) ../DLM
 	cp -f $(DLMS) ../DLM
 
+# idl extension
 applyPixelMaskIDL.so: ${APPLY_PIXEL_MASK_OBJ}
 	@echo linking $@
 	${LD} $< -o $@ ${LDFLAGS} ${LDLIBS} 
 
+# apps
+jackknife_stripe: jackknife_stripe.o
+calculate_area: calculate_area.o
+
 clean:
-	- ${RM} ${SOFILES} ${OBJFILES}
+	- ${RM} ${SOFILES} ${OBJFILES} ${EXEC_OBJS} ${EXECUTABLES} *.os
 	- ${RM} ../DLM/${SOFILES}
 	- ${RM} ../DLM/${DLMS}
 
