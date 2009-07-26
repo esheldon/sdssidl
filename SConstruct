@@ -79,7 +79,8 @@ if os.uname()[0] == 'Darwin':
 
     # IDL always looks for .so files
     env['SHLIBSUFFIX']='.so'
-    env['CCFLAGS'] = ['-Wall','-dynamic','-g','-m64']
+    env['CFLAGS'] = ['-Wall','-dynamic','-g','-m64']
+    env['CCFLAGS'] = env['CFLAGS']
 
 
 
@@ -89,7 +90,8 @@ if not config.CheckIDL_C():
     stdout.write('  Fatal Error\n')
     Exit(45)
 
-subdirs=['IDLStruct','gauleg','total_int','fileio','htm']
+subdirs=['IDLStruct','gauleg','total_int','fileio',
+         'htm','atlas','sphpoly_masks']
 if not config.CheckLibWithHeader('pq','libpq-fe.h',language='C'):
     stdout.write('postgres library/header not found (This is OK)\n')
 else:
