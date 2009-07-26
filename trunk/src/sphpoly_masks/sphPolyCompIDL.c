@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "export.h"
+#include "idl_export.h"
 #include "mask.h"
 
 

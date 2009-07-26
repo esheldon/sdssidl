@@ -3,7 +3,7 @@ include ../make.conf
 CC	= gcc
 LD	= ld
 
-INCLUDE = -I../include -I${IDL_DIR}/external
+INCLUDE = -I../include -I${IDL_DIR}/external/include
 CCFLAGS = ${INCLUDE} ${OS_CFLAGS} -O3
 LDFLAGS = ${OS_LDFLAGS}
 
