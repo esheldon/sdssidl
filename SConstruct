@@ -58,8 +58,11 @@ env.Prepend(CPPPATH=[idl_include_dir])
 env.Prepend(CPATH=[idl_include_dir])
 
 env.Append(CCFLAGS=["-Wall"])
+env['ARFLAGS'] = '-rvcs'
 
+SetOption('warn', ['no-duplicate-environment'] + GetOption('warn'))
 
+# put endian check here too?
 env['SDSS_CFLAGS'] = ["-DLINKAGE","-DCHECK_LEAKS","-DSTAND_ALONE","-DSDSS_LITTLE_ENDIAN"]
 
 if os.uname()[0] == 'Darwin':
@@ -86,7 +89,7 @@ if not config.CheckIDL_C():
     stdout.write('  Fatal Error\n')
     Exit(45)
 
-subdirs=['gauleg','total_int','fileio','IDLStruct']
+subdirs=['IDLStruct','gauleg','total_int','fileio','htm']
 if not config.CheckLibWithHeader('pq','libpq-fe.h',language='C'):
     stdout.write('postgres library/header not found (This is OK)\n')
 else:
