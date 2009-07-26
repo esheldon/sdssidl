@@ -19,13 +19,33 @@ case $osname in
     ;;
     "Darwin")
         # Have only checked on intel
-        OS_CFLAGS="-Wall -dynamic"
+        OS_CFLAGS="-Wall -dynamic -m64"
         SDSS_CFLAGS="-DLINKAGE -DCHECK_LEAKS -DSTAND_ALONE -DSDSS_LITTLE_ENDIAN"
-        OS_LDFLAGS="-bundle -L/usr/lib -lc -flat_namespace -undefined suppress"
+        #OS_LDFLAGS="-bundle -L/usr/lib -lc -flat_namespace -undefined suppress"
+
+        OS_LDFLAGS='-dynamiclib -undefined dynamic_lookup -single_module -m64'
+ 
+
         OS_ARFLAGS="-rvcs"
+
         # postgresql flags.  Currently only support fink install
-        PG_CFLAGS="-I/sw/include/postgresql"
-        PG_LDFLAGS="-L/sw/lib"
+		# we don't want -m64 for PG
+		PG_CFLAGS=""
+		for l in /sw/include /sw/opt/postgresql-8.4/include /sw/opt/postgresql-8.3/include /sw/opt/postgresql-8.2/include /sw/opt/postgresql-8.1/include /sw/opt/postgresql-8.0/include; do
+			if [ -e $l ]; then
+				echo "    adding include dir $l"
+				PG_CFLAGS="$PG_CFLAGS -I$l"
+			fi
+		done
+
+        PG_LDFLAGS=""
+		for l in /sw/lib /sw/opt/postgresql-8.4/lib /sw/opt/postgresql-8.3/lib /sw/opt/postgresql-8.2/lib /sw/opt/postgresql-8.1/lib /sw/opt/postgresql-8.0/lib; do
+			if [ -e $l ]; then
+				echo "    adding lib dir $l"
+				PG_LDFLAGS="$PG_LDFLAGS -L$l"
+			fi
+		done
+
         # gsl stuff
         GSL_CFLAGS="-I/sw/include"
         GSL_LDFLAGS="-L/sw/lib"

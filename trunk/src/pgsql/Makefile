@@ -20,14 +20,18 @@
 include ../make.conf
 
 CC = gcc
-LD = ld
+LD = gcc
+#LD = ld
 
 # Will include /usr/local/pgsql.  This is actually the default 
 # install place from the tar ball.
 
-INCLUDE = -I${IDL_DIR}/external 
+INCLUDE = -I${IDL_DIR}/external/include
 CFLAGS = ${INCLUDE} ${OS_CFLAGS} ${PG_CFLAGS}
+#CFLAGS = ${INCLUDE} ${PG_CFLAGS}
 LDFLAGS = ${OS_LDFLAGS} ${PG_LDFLAGS}
+#LDFLAGS = ${PG_LDFLAGS}
+
 LDLIBS = -lpq -lz 
 
 SOFILES = pgsql_query.so 

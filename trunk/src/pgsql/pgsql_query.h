@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "export.h"
+#include "idl_export.h"
 #include "libpq-fe.h"
 #include "types.h"
 //#include <byteswap.h>

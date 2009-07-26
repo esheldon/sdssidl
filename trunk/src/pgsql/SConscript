@@ -1,0 +1,15 @@
+# vim: set filetype=python :
+import os,sys
+
+Import('env')
+
+CPPPATH=env['CPPPATH'] + ['.']
+name="pgsql_query"
+dlm=name+".dlm"
+sources=[name+'.c',name+'_util.c']
+env.SharedLibrary(target="../DLM/"+name, 
+                  source=sources,
+                  LIBS=['pq','z'],
+                  CPPPATH=CPPPATH,
+                  SHLIBPREFIX='')
+env.Command("../DLM/"+dlm,dlm,Copy("$TARGET","$SOURCE"))
