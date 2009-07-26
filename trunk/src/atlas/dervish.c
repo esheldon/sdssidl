@@ -5,7 +5,7 @@
 #include "dervish.h"
 #include "phConsts.h"
 /* E.S.S. So we can use the IDL_Message routine */
-#include "export.h"
+#include "idl_export.h"
 
 /*****************************************************************************/
 /*

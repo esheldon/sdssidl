@@ -30,7 +30,7 @@
 #define FRAME_NCOLS 2048 
 #define FRAME_NROWS 1489
 
-#include "export.h"
+#include "idl_export.h"
 
 /* Read a row from the atlas fits file */
 ATLAS_IMAGE* readAtlasRow(FITS *fits, int row);

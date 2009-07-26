@@ -1,7 +1,7 @@
 # system dependent stuff is in the config
-include ../../make.conf
+include ../make.conf
 
-INCLUDE	= -I${IDL_DIR}/external
+INCLUDE	= -I${IDL_DIR}/external/include
 LOCAL_CCFLAGS = $(INCLUDE) $(OS_CFLAGS) $(SDSS_CFLAGS)
 LDFLAGS = ${OS_LDFLAGS}
 
@@ -25,8 +25,8 @@ DLMS = read_atlasIDL.dlm read_objmaskIDL.dlm recframeIDL.dlm
 # build and install library
 
 all: $(LIBRARIES)
-	cp -f $(LIBRARIES) ../../DLM
-	cp -f $(DLMS) ../../DLM
+	cp -f $(LIBRARIES) ../DLM
+	cp -f $(DLMS) ../DLM
 
 # Rules for building library
 
@@ -44,7 +44,7 @@ recframeIDL.so: $(LIBOBJS) recframeIDL.o
 
 clean: 
 	- rm -f $(LIBOBJS_ALL) $(LIBRARIES) 
-	- cd ../../DLM/; rm -f $(LIBRARIES); rm -f $(DLMS)
+	- cd ../DLM/; rm -f $(LIBRARIES); rm -f $(DLMS)
 
 .SUFFIXES:
 .SUFFIXES: .o .c
