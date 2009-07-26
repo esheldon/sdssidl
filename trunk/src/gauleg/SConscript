@@ -3,6 +3,10 @@ import os,sys
 
 Import('env')
 
-env.SharedLibrary(target="../DLM/gauleg", source="gauleg.c",
+CPPPATH=env['CPPPATH'] + ['.']
+name="gauleg"
+dlm=name+".dlm"
+env.SharedLibrary(target="../DLM/"+name, source=name+".c",
+                  CPPPATH=CPPPATH,
                   SHLIBPREFIX='')
-env.Command("../DLM/gauleg.dlm","gauleg.dlm",Copy("$TARGET","$SOURCE"))
+env.Command("../DLM/"+dlm,dlm,Copy("$TARGET","$SOURCE"))
