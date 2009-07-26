@@ -184,8 +184,8 @@ def SetFlags(env):
                           "-DCHECK_LEAKS",
                           "-DSTAND_ALONE",
                           "-DSDSS_LITTLE_ENDIAN"]
-    env['CFLAGS'] += ['-02']
-    env['CCFLAGS'] += ['-02']
+    env['CFLAGS'] += ['-O2']
+    env['CCFLAGS'] += ['-O2']
     if os.uname()[0] == 'Darwin':
         # Use lists: Kludge to fix Darwin problem with putting quotes around 
         # strings when there are spaces
