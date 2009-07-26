@@ -1,2 +1,0 @@
-title		pgsql
-description	C extension for interfacing with a postgres database.  Returns the results in an IDL structure.

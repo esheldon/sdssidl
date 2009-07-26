@@ -1,2 +1,0 @@
-title		Postgres
-description	A class wrapping the pgsql_query() C function.
