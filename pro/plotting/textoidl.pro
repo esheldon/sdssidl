@@ -1375,11 +1375,11 @@ FUNCTION Textoidl, InputString, $
 
 ;  Bomb out if user wants non-PostScript hardware font.
     IF (PostScript EQ 1) AND (!d.name NE 'PS') THEN BEGIN   
-                                              ; Device isn't postscript 
-                                              ; and user wants hardware
-                                              ; font.  Not good.
+                                ; Device isn't postscript and user wants
+                                ; hardware font.  If this is on purpose (i.e.,
+                                ; user set font keyword), let it pass.
         print,'Warning: No translation for device: ',!d.name
-        return,InputString               
+        if n_elements(fnt) eq 0 then return,InputString               
     ENDIF 
     
     IF keyword_set (tex_seq) THEN BEGIN
@@ -1412,6 +1412,7 @@ FUNCTION Textoidl, InputString, $
 ; PostScript has been set to 1 if PostScript fonts are desired.
     strn = InputString
     table = textoidl_table(POSTSCRIPT=PostScript)
+    
     
 ;   Greek sub/superscripts need to be protected by putting braces
 ;   around them if they are unbraced.  This will have the result the
