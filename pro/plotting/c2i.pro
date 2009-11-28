@@ -126,7 +126,7 @@ end
 ; This must be done slowly due to possible dups and preserve order
 function c2i_match_cnames, cnames_in, all=all, struct=struct
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
 
 
     if keyword_set(all) then begin
@@ -160,7 +160,7 @@ function c2i_info2struct, names, indices
 end
 function c2i_extract_colorinfo, match_cstruct, struct=struct
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
 
     if bitsperpixel eq 8 then begin
         index = cstruct[match_cstruct].index8
@@ -177,13 +177,13 @@ function c2i_extract_colorinfo, match_cstruct, struct=struct
 
 end
 
-pro c2i_create8, rct=rct, gct=gct, bct=bct
+pro c2i_create8
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
 
     ; Make sure we have the 24-bit colors read.
-    if n_elements(cstruct24) then begin
-        cstruct24 = c2i_read_rgb()
+    if n_elements(cstruct) eq 0 then begin
+        cstruct = c2i_read_rgb()
     endif
 
     n_colors=!d.n_colors < 256
@@ -215,8 +215,11 @@ pro c2i_create8, rct=rct, gct=gct, bct=bct
 
     ; Look up the rgb
     w=c2i_match_cnames(cnames8)
+	rtable=cstruct[w].r
+	gtable=cstruct[w].g
+	btable=cstruct[w].b
     if dexist or (!d.name EQ 'PS') then begin
-        tvlct, cstruct[w].r, cstruct[w].g, cstruct[w].b
+        tvlct, rtable, gtable, btable
     endif
 
     ; reset index8 and copy in values
@@ -235,7 +238,7 @@ end
 
 function c2i_get_sample, struct=struct
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
     ;; Can return a list of standard colors
     if !d.name eq 'PS' then begin 
         ; White background
@@ -284,7 +287,7 @@ end
 
 
 pro c2i_getbits, bits=bits
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
     if n_elements(bits) eq 0 then begin 
         if !d.n_colors le 256 then bitsperpixel=8 $
         else bitsperpixel=24
@@ -300,7 +303,7 @@ end
 
 pro c2i_setup, bits=bits, rgbfile=rgbfile
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
 
     c2i_getbits, bits=bits
 
@@ -318,12 +321,22 @@ pro c2i_setup, bits=bits, rgbfile=rgbfile
     if n_elements(cstruct) eq 0 then cstruct = c2i_read_rgb(file=rgbfile)
 
     ; We need to create a color table for 8-bit devices
-    if bitsperpixel eq 8 then c2i_create8
+    if bitsperpixel eq 8 then begin
+		; this will create the color table
+		c2i_create8
+	endif else begin
+		; delete variables
+		if n_elements(rtable) ne 0 then begin
+			crap=temporary(rtable) 
+			crap=temporary(gtable) 
+			crap=temporary(btable) 
+		endif
+	endelse
 
 end
 
 pro c2i_showcolors
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
     c2i_create8
     head='--- r -- g -- b -------------- name --- 8-bit'
     for i=0L, n_elements(cstruct)-1 do begin
@@ -345,7 +358,7 @@ function c2i, cnames, $
         rct=rct, gct=gct, bct=bct, $
         colorlist=colorlist
 
-    common c2i_block, cstruct, xsetup, dexist, bitsperpixel
+    common c2i_block, cstruct, xsetup, dexist, bitsperpixel, rtable, gtable, btable
 
     if ( (n_elements(cnames) eq 0) $
           and (not keyword_set(all)) $
@@ -372,6 +385,10 @@ function c2i, cnames, $
     if size(cnames, /tname) ne 'STRING' then return, cnames
 
     w = c2i_match_cnames(cnames, all=all)
+
+	if arg_present(rct) then rct=rtable
+	if arg_present(gct) then gct=gtable
+	if arg_present(bct) then bct=btable
     return, c2i_extract_colorinfo(w, struct=struct)
 
 end 

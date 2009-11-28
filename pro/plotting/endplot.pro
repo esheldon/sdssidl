@@ -52,7 +52,7 @@ pro endplot, setup=setup, landfix=landfix, trim_bbox=trim_bbox, help=help, $
    if n_elements(plotfile) eq 0 then plotfile = 'null'
    if n_elements(save_device) eq 0 then save_device = !d.name
       
-   message, 'Closing current plot file ' + plotfile, /continue
+   print, 'BEGPLOT: Closing current plot file ', plotfile, f='(a,a)'
    if !D.name ne 'X' then device, /close
    set_plot, save_device
    
@@ -67,13 +67,13 @@ pro endplot, setup=setup, landfix=landfix, trim_bbox=trim_bbox, help=help, $
    endelse 
 
    if keyword_set(landfix) then begin 
-       message,'Fixing landscape mode',/inf
+       print,'BEGPLOT: Fixing landscape mode', f='(a,a)'
        pslandfix,plotfile
    endif 
 
    if keyword_set(trim_bbox) then begin 
 
-       message,'Trimming the bounding box',/inf
+       print,'BEGPLOT: Trimming the bounding box',f='(a)'
        tf = tmpfile(tmpdir='/tmp', prefix='endplot-tmpfile-',suffix='.ps')
 
        pfile = expand_path(plotfile)

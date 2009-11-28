@@ -203,7 +203,8 @@ PRO Begplot, plotfile_in, $
    IF sv(sv(0)+1) EQ 0 THEN plotfile = 'null' ; Null 'plotfile' if no leftovers
    
    IF plotfile NE 'null' THEN BEGIN ; Close device if plotfile defined.
-       message, 'Closing current plot file '+plotfile, /continue 
+       print, 'BEGPLOT: Closing current plot file: ',plotfile, $
+		   f='(a,a)'
        IF !D.name NE 'X' THEN device, /close
    ENDIF
    
@@ -389,7 +390,7 @@ PRO Begplot, plotfile_in, $
        !P.COLOR=255
    endif
 
-   message, 'Plotting directed to file '+plotfile, /continue
+   print, 'BEGPLOT: Plotting directed to file ',plotfile, f='(a,a)'
       
 END
 
