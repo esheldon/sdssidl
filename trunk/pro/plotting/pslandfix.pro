@@ -30,7 +30,7 @@ pro pslandfix,filename, xw=xw, yw=yw
   
   putstr = ntostr(long(yw))+' '+ntostr(long(xw))
   
-  openr,1,filename
+  openr,lun,filename,/get_lun
   lin=''
   replinz=strarr(100)
   linno=lonarr(100)
@@ -45,8 +45,8 @@ pro pslandfix,filename, xw=xw, yw=yw
   ENDELSE 
 
   print,'Fixing Landscape for file: '+filename
-  while not EOF(1) do begin
-      readf,1,lin
+  while not EOF(lun) do begin
+      readf,lun,lin
       if (strmid(lin,sr[0],sr[1]) eq search_string) then begin
           print,lin
           
@@ -62,23 +62,23 @@ pro pslandfix,filename, xw=xw, yw=yw
       endif
       linctr=linctr+1
   endwhile
-  close,1
+  close,lun
   
   
-  openu,1,filename
+  openu,lun,filename
   lin=''
   ctr=0 & linctr=0L
   
-  while not EOF(1) do begin
+  while not EOF(lun) do begin
       if (linctr ne linno(ctr)) then begin
-          readf,1,lin
+          readf,lun,lin
       endif else begin
-          printf,1,replinz(ctr)
+          printf,lun,replinz(ctr)
           ctr=ctr+1
       endelse
       linctr=linctr+1
   endwhile
-  close,1
+  close,lun
   
   return
 end

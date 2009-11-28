@@ -138,7 +138,7 @@ function mrdfits_multi, infiles, $
 
   if not keyword_set(silent) then begin
       print
-      print,'Total number of rows: '+ntostr(ntotal)
+      print,'Total number of rows: ',ntotal,f='(a,i0)'
   endif 
 
   if not keyword_set(diff) then begin 
@@ -178,7 +178,7 @@ function mrdfits_multi, infiles, $
               t = 0
               
           endif else begin  
-              print,'File is empty: '+ntostr(files[i])
+              print,'File is empty: ',files[i],form='(a,a)'
           endelse 
       endfor 
   endif else begin 
@@ -192,7 +192,7 @@ function mrdfits_multi, infiles, $
       for i=0l, nfiles-1 do begin 
           
           if numlist[i] ne 0 then begin 
-              print,'Reading File: '+ntostr(files[i])
+              print,'Reading File: ',files[i],form='(a,a)'
 
               t = mrdfits(files[i], extension, $
                           columns=columns, $
@@ -240,7 +240,8 @@ function mrdfits_multi, infiles, $
                       endfor 
                   endif else begin 
                       message,'No compatible tags from file: '+files[i],/inf
-                      message,'Structure will be zero for rows ['+ntostr(beg)+', '+ntostr(numlist[i]-1)+']'
+                      message,'Structure will be zero for rows [',beg,', ',numlist[i]-1,']', $
+						  form='(a,i0,a,i0,a)'
                   endelse 
 
                   beg = beg+numlist[i]
@@ -249,7 +250,7 @@ function mrdfits_multi, infiles, $
               t = 0
               
           endif else begin  
-              print,'File is empty: '+ntostr(files[i])
+              print,'File is empty: ',files[i],form='(a,a)'
           endelse 
       endfor 
   endelse 

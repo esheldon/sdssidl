@@ -95,31 +95,25 @@ pro ptime, ttime, num, tstr=tstr, savetime=savetime, command=command
     tstr='Time: '
 
     ;; Number of integer days
-    days = long(ttime/oneday)
+    days = long64(ttime/oneday)
     ;; Fraction of a day left over
     dayfrac = ttime/oneday-days
     ;; How many hours that is
-    hr = long(dayfrac*24.0)
+    hr = long64(dayfrac*24.0)
     ;; fraction of an hour left over
     hrfrac = dayfrac*24.0 - hr
     ;; how many minutes that is
-    min = long(hrfrac*60.0)
+    min = long64(hrfrac*60.0)
     ;; fraction of a minute left over
     minfrac = hrfrac*60.0 - min
     ;; How many seconds that is
     sec = minfrac*60.0
-    
-    if days gt 0 then begin
-        tstr = ntostr(days)+' days '+ntostr(hr)+' hours '+ntostr(min)+' min '+ntostr(sec)+' sec'
-    endif else if hr gt 0 then begin 
-        tstr = ntostr(hr)+' hours '+ntostr(min)+' min '+ntostr(sec)+' sec'
-    endif else if min gt 0 then begin 
-        tstr = ntostr(min)+' min '+ntostr(sec)+' sec'
-    endif else begin 
-        tstr = ntostr(sec)+' sec'
-    endelse
-    print,'Time: '+tstr
-    return
 
+	tstr = string(sec,' sec ',f='(g0,a)')
+	if min gt 0 then tstr = string(min,' min ',f='(i0,a)') + tstr
+	if hr gt 0 then tstr = string(hr,' hours ',f='(i0,a)') + tstr
+	if days gt 0 then tstr = string(days,' days ',f='(i0,a)') + tstr
+    print,'Time: '+tstr
+	return
 
 end
