@@ -276,7 +276,11 @@ endif else begin
 		comm = 'carr = c2i(colors)'
 		if not execute(comm) then begin
 			carr = !p.color + lonarr(n)
-		endif
+		endif else begin
+			if n_elements(carr) eq 1 then begin
+				carr=replicate(carr[0], n)
+			endif
+		endelse
 	endif else begin
 		carr = colors + lonarr(n)
 	endelse

@@ -66,31 +66,6 @@
 ;
 ;
 
-pro combine_ptrlist_free, ptrlist, numlist, output
-  ;; Copy from the pointers into the output
-  nlist = n_elements(ptrlist)
-  beg=0ULL
-  for i=0ull, nlist-1 do begin 
-      if numlist[i] ne 0 then begin 
-          output[beg:beg+numlist[i]-1] = temporary(*ptrlist[i])
-          ptr_free, ptrlist[i]
-          beg=beg+numlist[i]
-      endif 
-  endfor 
-end 
-pro combine_ptrlist_nofree, ptrlist, numlist, output
-  ;; Copy from the pointers into the output
-  nlist = n_elements(ptrlist)
-  beg=0ULL
-  for i=0ull, nlist-1 do begin 
-      if numlist[i] ne 0 then begin 
-          output[beg:beg+numlist[i]-1] = *ptrlist[i]
-          beg=beg+numlist[i]
-      endif 
-  endfor 
-end 
-
-
 function combine_ptrlist, ptrlist, nofree=nofree, status=status
 
   status = 1
@@ -122,11 +97,17 @@ function combine_ptrlist, ptrlist, nofree=nofree, status=status
   ;; prepare the output
   output = replicate(one, ntot)
 
-  if keyword_set(nofree) then begin 
-      combine_ptrlist_nofree, ptrlist, numlist, output
-  endif else begin 
-      combine_ptrlist_free,   ptrlist, numlist, output
-  endelse 
+  ;; Copy from the pointers into the output
+  beg=0ULL
+  for i=0ull, nlist-1 do begin 
+      if numlist[i] ne 0 then begin 
+          output[beg:beg+numlist[i]-1] = *ptrlist[i]
+		  if not keyword_set(nofree) then begin
+			  ptr_free, ptrlist[i]
+		  endif
+          beg=beg+numlist[i]
+      endif 
+  endfor 
 
   status = 0
   return,output

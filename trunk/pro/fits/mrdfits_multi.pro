@@ -76,187 +76,208 @@ function mrdfits_multi, infiles, $
                         error_action = error_action, $
                         status=status
 
-  count=0
-  if n_params() lt 1 then begin 
-      print,'-Syntax: st = mrdfits_multi(files, extension=, /diff, extension=, columns=, /unsigned, /compress, count=, error_action=, status=, /silent)'
-      print
-      print,'Must all be the same structure unless /diff is set. If /diff then'
-      print,' the structure is taken from the *first* file and matching tags are copied in'
-      return,-1
-  endif 
+	count=0
+	if n_params() lt 1 then begin 
+		print,'-Syntax: st = mrdfits_multi(files, extension=, /diff, extension=, columns=, /unsigned, /compress, count=, error_action=, status=, /silent)'
+		print
+		print,'Must all be the same structure unless /diff is set. If /diff then'
+		print,' the structure is taken from the *first* file and matching tags are copied in'
+		return,-1
+	endif 
 
-  delvarx,struct
+	delvarx,struct
 
-  if n_elements(extension) eq 0 then extension=1
-  extstr='['+string(extension,f='(i0)')+']'
+	if n_elements(extension) eq 0 then extension=1
+	extstr='['+string(extension,f='(i0)')+']'
 
-  ;; See which files actually exist
-  nfiles = n_elements(infiles)
-  for i=0l, nfiles-1 do begin
-      if fexist(infiles[i]) then begin 
-          add_arrval, infiles[i], files
-      endif else begin 
-          print,'File '+infiles[i]+' does not exist. Skipping'
-      endelse 
-  endfor 
+	;; See which files actually exist
+	nfiles = n_elements(infiles)
+	for i=0l, nfiles-1 do begin
+		if fexist(infiles[i]) then begin 
+			add_arrval, infiles[i], files
+		endif else begin 
+			print,'File '+infiles[i]+' does not exist. Skipping'
+		endelse 
+	endfor 
 
-  nfiles = n_elements(files)
-  if nfiles eq 0 then begin  
-      print,'None of the files were found'
-      return,-1
-  endif 
+	nfiles = n_elements(files)
+	if nfiles eq 0 then begin  
+		print,'None of the files were found'
+		return,-1
+	endif 
 
-  ;; just one file?
-  if nfiles eq 0 then begin 
-      struct = mrdfits(files, extension, $
-                       columns=columns, $
-                       unsigned=unsigned, $
-                       compress=compress, $
-                       silent=silent, $
-                       error_action = error_action, $
-                       status=status)
-      count=n_elements(struct)
-      return,struct
-  end 
+	;; just one file?
+	if nfiles eq 0 then begin 
+		struct = mrdfits(files, extension, $
+			columns=columns, $
+			unsigned=unsigned, $
+			compress=compress, $
+			silent=silent, $
+			error_action = error_action, $
+			status=status)
+		if n_tags(struct) ne 0 then begin
+			count=n_elements(struct)
+		endif
+		return,struct
+	end 
 
-  ;; first go through, read the headers and find how many objects
-  ;; are in each.  Then allocate a big struct and copy it in.
+	;; first go through, read the headers and find how many objects
+	;; are in each.  Then allocate a big struct and copy it in.
 
-  if not keyword_set(silent) then begin
-      print
-      print,'Reading headers'
-  endif 
-  ntotal = 0LL
-  numlist = lonarr(nfiles)
-  for i=0l, nfiles-1 do begin 
+	if not keyword_set(silent) then begin
+		print
+		print,'Reading headers'
+	endif 
+	ntotal = 0LL
+	numlist = lonarr(nfiles)
+	for i=0l, nfiles-1 do begin 
 
-      hdr = headfits(files[i], ext=extension)
-      numlist[i] = sxpar(hdr,'naxis2')
-      ntotal = ntotal + numlist[i]
+		; make sure the file exists
+		if file_test(files[i]) then begin
+			hdr = headfits(files[i], ext=extension)
+			; make sure we were able to read the header.
+			; it should be a string array
+			if size(hdr,/type) eq 7 then begin
+				numlist[i] = sxpar(hdr,'naxis2')
+				ntotal = ntotal + numlist[i]
+			endif
+		endif
 
-  endfor 
+	endfor 
 
-  if not keyword_set(silent) then begin
-      print
-      print,'Total number of rows: ',ntotal,f='(a,i0)'
-  endif 
+	if not keyword_set(silent) then begin
+		print
+		print,'Total number of rows: ',ntotal,f='(a,i0)'
+	endif 
 
-  if not keyword_set(diff) then begin 
+	if not keyword_set(diff) then begin 
 
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;; No indication structs are different
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		;; No indication structs are different
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-      beg =0L
-      for i=0l, nfiles-1 do begin 
-          
-          if numlist[i] ne 0 then begin 
-              print,'Reading File: ',files[i],extstr,form='(a,a,a)'
-              t = mrdfits(files[i], extension, $
-                          columns=columns, $
-                          unsigned=unsigned, $
-                          compress=compress, $
-                          silent=silent, $
-                          error_action = error_action, $
-                          status=status)
+		beg =0L
+		for i=0l, nfiles-1 do begin 
 
-              if i eq 0 then begin 
-                  struct=replicate(t[0], ntotal)
-                  struct[beg:beg+numlist[i]-1] = t
-                  beg = beg+numlist[i]
-              endif else begin 
-                  struct[beg:beg+numlist[i]-1] = t
-                  beg = beg+numlist[i]
-              endelse 
+			if numlist[i] ne 0 then begin 
+				print,'Reading File: ',files[i],extstr,form='(a,a,a)'
+				t = mrdfits(files[i], extension, $
+					columns=columns, $
+					unsigned=unsigned, $
+					compress=compress, $
+					silent=silent, $
+					error_action = error_action, $
+					status=status)
 
-              if status ne 0 then begin 
-                  message,'Error reading file: ',files[i],/inf
-                  message,'No data returned',/inf
-                  return,-1
-              endif 
-              
-              t = 0
-              
-          endif else begin  
-              print,'File is empty: ',files[i],form='(a,a)'
-          endelse 
-      endfor 
-  endif else begin 
+				if status ne 0 then begin 
+					message,'Error reading file: ',files[i],/inf
+					message,'No data returned',/inf
+					return,-1
+				endif 
+				if n_tags(t) eq 0 then begin
+					message,'Result is not a structure',/inf
+					message,'No data returned',/inf
+					return,-1
+				endif
 
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;; User has indicated that the structures may be 
-      ;; different.  Use slower but safer method.
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				if i eq 0 then begin 
+					struct=replicate(t[0], ntotal)
+					struct[beg:beg+numlist[i]-1] = t
+					beg = beg+numlist[i]
+				endif else begin 
+					struct[beg:beg+numlist[i]-1] = t
+					beg = beg+numlist[i]
+				endelse 
 
-      beg =0L
-      for i=0l, nfiles-1 do begin 
-          
-          if numlist[i] ne 0 then begin 
-              print,'Reading File: ',files[i],form='(a,a)'
 
-              t = mrdfits(files[i], extension, $
-                          columns=columns, $
-                          unsigned=unsigned, $
-                          compress=compress, $
-                          silent=silent, $
-                          error_action = error_action, $
-                          status=status)
+				t = 0
 
-              if status ne 0 then begin 
-                  message,'Error reading file: ',files[i],/inf
-                  message,'No data returned',/inf
-                  return,-1
-              endif 
+			endif else begin  
+				print,'File is empty: ',files[i],form='(a,a)'
+			endelse 
+		endfor 
+	endif else begin 
 
-              if i eq 0 then begin 
-                  struct_tags = tag_names(t[0])
-                  struct_ind  = lindgen(n_elements(struct_tags))
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		;; User has indicated that the structures may be 
+		;; different.  Use slower but safer method.
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-                  ;; "zero" the struct for those tags that
-                  ;; will not be copied.
-                  struct = t[0]
-                  zero_struct,struct
+		beg =0L
+		for i=0l, nfiles-1 do begin 
 
-                  ;; simple copy on first one
-                  struct=replicate(struct, ntotal)
-                  struct[beg:beg+numlist[i]-1] = t
-                  beg = beg+numlist[i]
-              endif else begin 
+			if numlist[i] ne 0 then begin 
+				print,'Reading File: ',files[i],form='(a,a)'
 
-                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                  ;; must match up the tags for possibly different struct
-                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				t = mrdfits(files[i], extension, $
+					columns=columns, $
+					unsigned=unsigned, $
+					compress=compress, $
+					silent=silent, $
+					error_action = error_action, $
+					status=status)
 
-                  newtags = tag_names(t[0])
-                  match, struct_tags, newtags, mstr, mnew
+				if status ne 0 then begin 
+					message,'Error reading file: ',files[i],/inf
+					message,'No data returned',/inf
+					return,-1
+				endif 
+				if n_tags(t) eq 0 then begin
+					message,'Result is not a structure',/inf
+					message,'No data returned',/inf
+					return,-1
+				endif
 
-                  if mstr[0] ne -1 then begin 
-                      nmatch = n_elements(mnew)
-                      ;; loop over tags
-                      for j=0l, nmatch-1 do begin 
-                          si = mstr[j]
-                          sn = mnew[j]
-                          struct[beg:beg+numlist[i]-1].(si) = t.(sn)
-                      endfor 
-                  endif else begin 
-                      message,'No compatible tags from file: '+files[i],/inf
-                      message,'Structure will be zero for rows [',beg,', ',numlist[i]-1,']', $
-						  form='(a,i0,a,i0,a)'
-                  endelse 
 
-                  beg = beg+numlist[i]
-              endelse 
-              
-              t = 0
-              
-          endif else begin  
-              print,'File is empty: ',files[i],form='(a,a)'
-          endelse 
-      endfor 
-  endelse 
+				if i eq 0 then begin 
+					struct_tags = tag_names(t[0])
+					struct_ind  = lindgen(n_elements(struct_tags))
 
-  count = ntotal
-  status=0
-  return,struct
+					;; "zero" the struct for those tags that
+					;; will not be copied.
+					struct = t[0]
+					zero_struct,struct
+
+					;; simple copy on first one
+					struct=replicate(struct, ntotal)
+					struct[beg:beg+numlist[i]-1] = t
+					beg = beg+numlist[i]
+				endif else begin 
+
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+					;; must match up the tags for possibly different struct
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+					newtags = tag_names(t[0])
+					match, struct_tags, newtags, mstr, mnew
+
+					if mstr[0] ne -1 then begin 
+						nmatch = n_elements(mnew)
+						;; loop over tags
+						for j=0l, nmatch-1 do begin 
+							si = mstr[j]
+							sn = mnew[j]
+							struct[beg:beg+numlist[i]-1].(si) = t.(sn)
+						endfor 
+					endif else begin 
+						message,'No compatible tags from file: '+files[i],/inf
+						message,'Structure will be zero for rows [',beg,', ',numlist[i]-1,']', $
+							form='(a,i0,a,i0,a)'
+					endelse 
+
+					beg = beg+numlist[i]
+				endelse 
+
+				t = 0
+
+			endif else begin  
+				print,'File is empty: ',files[i],form='(a,a)'
+			endelse 
+		endfor 
+	endelse 
+
+	count = ntotal
+	status=0
+	return,struct
 
 end 
