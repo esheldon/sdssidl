@@ -1,5 +1,8 @@
 v1.5.0
 ---------------------------------------
+General comments:  The support for mac os x seems to be pretty solid now,
+let us know if you have problems compiling.
+
 bug fixes:
 	gcc 4.3 has turned many warnings into errors.  Hundreds of fixes were
 		applied to fixe these mostly harmless problems.
