@@ -86,6 +86,7 @@ function mrdfits_multi, infiles, $
 	endif 
 
 	delvarx,struct
+	status=1
 
 	if n_elements(extension) eq 0 then extension=1
 	extstr='['+string(extension,f='(i0)')+']'
@@ -96,18 +97,18 @@ function mrdfits_multi, infiles, $
 		if fexist(infiles[i]) then begin 
 			add_arrval, infiles[i], files
 		endif else begin 
-			print,'File '+infiles[i]+' does not exist. Skipping'
+			print,'File "'+infiles[i]+'" does not exist. Skipping'
 		endelse 
 	endfor 
 
 	nfiles = n_elements(files)
 	if nfiles eq 0 then begin  
-		print,'None of the files were found'
+		message,'None of the files were found',/inf
 		return,-1
 	endif 
 
 	;; just one file?
-	if nfiles eq 0 then begin 
+	if nfiles eq 1 then begin 
 		struct = mrdfits(files, extension, $
 			columns=columns, $
 			unsigned=unsigned, $
@@ -132,16 +133,17 @@ function mrdfits_multi, infiles, $
 	numlist = lonarr(nfiles)
 	for i=0l, nfiles-1 do begin 
 
-		; make sure the file exists
-		if file_test(files[i]) then begin
-			hdr = headfits(files[i], ext=extension)
-			; make sure we were able to read the header.
-			; it should be a string array
-			if size(hdr,/type) eq 7 then begin
-				numlist[i] = sxpar(hdr,'naxis2')
-				ntotal = ntotal + numlist[i]
-			endif
-		endif
+		; we already know the files exists from above
+		hdr = headfits(files[i], ext=extension)
+		; make sure we were able to read the header.
+		; it should be a string array
+		if size(hdr,/type) eq 7 then begin
+			numlist[i] = sxpar(hdr,'naxis2')
+			ntotal = ntotal + numlist[i]
+		endif else begin
+			message,'Could not read header',/inf
+			return,-1
+		endelse
 
 	endfor 
 
@@ -171,12 +173,12 @@ function mrdfits_multi, infiles, $
 
 				if status ne 0 then begin 
 					message,'Error reading file: ',files[i],/inf
-					message,'No data returned',/inf
+					message,'Returning -1 and nonzero status',/inf
 					return,-1
 				endif 
 				if n_tags(t) eq 0 then begin
 					message,'Result is not a structure',/inf
-					message,'No data returned',/inf
+					message,'Returning -1 and nonzero status',/inf
 					return,-1
 				endif
 
@@ -219,12 +221,12 @@ function mrdfits_multi, infiles, $
 
 				if status ne 0 then begin 
 					message,'Error reading file: ',files[i],/inf
-					message,'No data returned',/inf
+					message,'Returning -1 and nonzero status',/inf
 					return,-1
 				endif 
 				if n_tags(t) eq 0 then begin
 					message,'Result is not a structure',/inf
-					message,'No data returned',/inf
+					message,'Returning -1 and nonzero status',/inf
 					return,-1
 				endif
 
