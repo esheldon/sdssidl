@@ -1158,11 +1158,13 @@ end
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function sdss_files::get_all_structdef, files, status=status
+function sdss_files::get_all_structdef, files, status=status, $
+		extension=extension
 
   status=1
+  if n_elements(extension) eq 0 then extension=1
   
-  lnew = self->rdtable(files[0], 1, /silent, status=status)
+  lnew = self->rdtable(files[0], extension, /silent, status=status)
   
   if status ne 0 then begin 
       ;; do ones best to find a non-empty file to make the structure
@@ -1217,10 +1219,11 @@ end
 ;; user's requested order.
 
 function sdss_files::get_structdef, filetype, filelist, $
-            taglist=taglist_in, tagids=tagids,  $
-            ex_struct=ex_struct, $
-            copy=copy, deja_vu=deja_vu, $
-            verbose=verbose, status=status
+		extension=extension, $
+		taglist=taglist_in, tagids=tagids,  $
+		ex_struct=ex_struct, $
+		copy=copy, deja_vu=deja_vu, $
+		verbose=verbose, status=status
 
     common sdss_files_read_block, filetype_old, all_structdef
   
@@ -1231,7 +1234,8 @@ function sdss_files::get_structdef, filetype, filelist, $
     ;; Only need to get all_structdef if filetype has changed
     if filetype ne filetype_old then begin
         ;; Get struct information for these files
-        all_structdef = self->get_all_structdef(filelist, status=sstatus)
+        all_structdef = self->get_all_structdef(filelist, status=sstatus, $
+			extension=extension)
         if sstatus ne 0 then return, -1
         filetype_old = filetype
         deja_vu=1
@@ -1548,6 +1552,10 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
         return,-1
     endif 
 
+    if n_elements(extension) eq 0 then begin
+		extension = self->_extension(filetype)
+	endif
+
     ; astrans are special
     if filetype eq 'astrans' then begin
         return, self->astrans_read(run, camcol, bandpass, rerun=rerun, $
@@ -1563,14 +1571,12 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
 
     if filetype eq 'psfield' then begin
         if n_elements(extension) ne 0 then begin
-            if extension[0] ne 6 then begin
-                if n_elements(fields) eq 0 then begin
-                    print,'For psfield and ext ne 6 you must specify a field'
-                    return,-1
-                endif
-                return,self->psfield_read(run, camcol, fields, rerun=rerun, $
-                                          extension=extension, status=status)
-            endif
+			if n_elements(fields) eq 0 then begin
+				print,'For psfield you must specify a field'
+				return,-1
+			endif
+			return,self->psfield_read(run, camcol, fields, rerun=rerun, $
+				extension=extension, status=status, verbose=verbose)
         endif
     endif
 
@@ -1579,7 +1585,6 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
 
     ;; for tsobj files we want to cut rows
     if keyword_set(nomodrow) then modrow=0 else modrow = self->modrow(filetype)
-    extension = self->_extension(filetype)
 
     ;; get the file list.  this is smart in that it only will retrieve
     ;; the file list from disk if the arguments have changed.
@@ -1606,6 +1611,7 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
         addrun=addrun, addrerun=addrerun, addcamcol=addcamcol, addfield=addfield
 
     structdef = self->get_structdef(filetype, filelist, $
+		extension=extension, $
         taglist=taglist, tagids=tagids, $
         ex_struct=ex_struct, $
         copy=copy, deja_vu=deja_vu, verbose=verbose, status=sstatus)
@@ -1624,7 +1630,8 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
     endif
     for i=0l, nfiles-1 do begin 
         file = filelist[i]
-        if verbose gt 1 then print,'Reading file: ',file
+        if verbose gt 1 then print,'Reading file: ',file,extension, $
+			format='(a,a," [",i0,"]")'
         lnew = self->rdtable(file, extension, hdr, /silent, $
                              deja_vu=deja_vu, status=status)
         if status eq 0 then begin 
@@ -1731,36 +1738,46 @@ end
 ;docend::sdss_files::psfield_read
 
 function sdss_files::psfield_read, run, camcol, field, $
-                   extension=extension, rerun=rerun, status=status
+                   extension=extension, rerun=rerun, status=status, $
+				   verbose=verbose
 
-  status = 1
-  if n_params() lt 3 then begin 
-      print,$
-        '-Syntax: ps = sf->psfield_read(run, camcol, field, rerun=, extension=, status=]'
-      print,' Default is all extensions in a pointer array'
-      print
-      message,'Halting'
-  endif 
-  
-  file = self->filelist('psField', run, camcol, rerun=rerun, fields=field[0])
+	status = 1
+	if n_params() lt 3 then begin 
+		print,$
+			'-Syntax: ps = sf->psfield_read(run, camcol, field, rerun=, extension=, status=]'
+		print,' Default is all extensions in a pointer array'
+		print
+		message,'Halting'
+	endif 
 
-  if n_elements(extension) ne 0 then begin
-      return, mrdfits(file, extension, status=status)
-  endif
-  
-  psp = ptrarr(6)
-  for ext=1,6 do begin 
-      tmp = mrdfits(file, ext, status=rstatus,/silent)
-      if rstatus ne 0 then begin 
-          message,'Could not read extension '+strn(ext),/inf
-          ptr_free, psp
-          return,-1
-      endif 
-      
-      psp[ext-1] = ptr_new( tmp, /no_copy )
-  endfor 
-  status = 0
-  return,psp
+	file = self->filelist('psField', run, camcol, rerun=rerun, fields=field[0])
+
+
+	if n_elements(extension) ne 0 then begin
+
+		if keyword_set(verbose) then begin
+			print,'Reading: ',file,extension,f='(a,a," [",i0,"]")'
+		endif
+		return, mrdfits(file, extension, status=status,/silent)
+	endif
+
+
+	if keyword_set(verbose) then begin
+		print,'Reading all psf: ',file
+	endif
+	psp = ptrarr(6)
+	for ext=1,6 do begin 
+		tmp = mrdfits(file, ext, status=rstatus,/silent)
+		if rstatus ne 0 then begin 
+			message,'Could not read extension '+strn(ext),/inf
+			ptr_free, psp
+			return,-1
+		endif 
+
+		psp[ext-1] = ptr_new( tmp, /no_copy )
+	endfor 
+	status = 0
+	return,psp
 
 end 
 

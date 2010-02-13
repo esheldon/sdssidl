@@ -28,7 +28,9 @@
 ;  An image of the PSF.
 ;
 ; EXAMPLE:
+;  ; read r-band kl psf decomposition in extension 3
 ;  kl=sdss_read('psfield',run, camcol, field=field, extension=3)
+;  ; reconstruct the image
 ;  psf=sdss_psfrec(kl, row, col, counts=1000)
 ;
 ; MODIFICATION HISTORY:
@@ -57,8 +59,53 @@
 
 function sdss_psfrec, pstruct, row, col, counts=counts
 
-    on_error, 2
-    sdssidl_setup
-    return, !sdss->psfrec(pstruct, row, col, counts=counts)
+	np = $
+		(n_elements(pstruct) gt 0) $
+		+ (n_elements(row) gt 0) $
+		+ (n_elements(col) gt 0)
+
+	if np lt 3 then begin 
+		on_error, 2
+		print,'-Syntax: psf_image = sdss_psfrec(pstruct, row, col, counts=)'
+		message,'Halting'
+	endif 
+
+	rcs=.001
+
+	nrow_b=(pstruct.nrow_b)[0]
+	ncol_b=(pstruct.ncol_b)[0]
+	;assumes they are the same for each eigen
+	;so only use the 0 one
+	rnrow=(pstruct.rnrow)[0]
+	rncol=(pstruct.rncol)[0]
+
+	nb=nrow_b*ncol_b
+	coeffs=fltarr(nb)
+	ecoeff=fltarr(3)
+	cmat=pstruct.c
+
+
+	for i=0l, nb-1 do coeffs[i]=(row*rcs)^(i mod nrow_b) * (col*rcs)^(i/nrow_b)
+
+	for j=0,2 do begin
+		for i=0l, nb-1 do begin
+			ecoeff[j]=ecoeff[j]+cmat(i/nrow_b,i mod nrow_b,j)*coeffs[i]
+		endfor	
+	endfor
+	p=(pstruct.rrows)[*,0]*ecoeff[0]+$
+		(pstruct.rrows)[*,1]*ecoeff[1]+$
+		(pstruct.rrows)[*,2]*ecoeff[2]
+
+	if n_elements(counts) ne 0 then begin 
+		p = p/total(p)*counts
+	endif 
+
+	p = reform(p,rncol,rnrow)
+	return,p
+
+
+    ;on_error, 2
+    ;sdssidl_setup
+    ;return, !sdss->psfrec(pstruct, row, col, counts=counts)
 
 end
