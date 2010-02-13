@@ -93,10 +93,7 @@ pro endplot, setup=setup, landfix=landfix, $
 
 		command = ['convert']
 		if keyword_set(trim_bbox) then begin
-			; only trim if the epstool call failed
-			if trim_err ne '' then begin
-				command=[command,'-trim']
-			endif
+			command=[command,'-trim']
 		endif
 		command = [command,'-antialias','-density',dpi,pfile,newfile]
 		print,strjoin(command,' ')
