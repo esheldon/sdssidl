@@ -29,7 +29,7 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
                counts=counts, cen=cen, status=status
 
 	status = 1
-	if n_params() LT 2 then begin 
+	if n_params() LT 4 then begin 
 		print,'-Syntax gauss = mom2gauss(ixx, ixy, iyy, nx,ny, counts=, cen=)'
 		print,'produce a gaussian image from the input ixx,ixy,iyy'
 		return, -1
