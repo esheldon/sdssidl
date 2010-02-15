@@ -49,7 +49,8 @@ readAtlasRow(FITS *fits, int row)
   
   /* no atlas image for this object */
   if((ai)->id < 0) {			
-    shError("Object %d has no atlas image", row); 
+	  // shut up!
+    //shError("Object %d has no atlas image", row); 
     /* Still need to clean up memory if this particular object not found */
      return(NULL);
   }
