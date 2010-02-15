@@ -30,19 +30,19 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 
 	status = 1
 	if n_params() LT 4 then begin 
-		print,'-Syntax gauss = mom2gauss(ixx, ixy, iyy, nx,ny, counts=, cen=)'
+		print,'-Syntax gauss = mom2gauss(ixx, ixy, iyy, imsize, counts=, cen=)'
 		print,'produce a gaussian image from the input ixx,ixy,iyy'
 		return, -1
 	endif
 
 	det = ixx*iyy - ixy^2
-	if det eq 0 then begin
+	if det eq 0.0 then begin
 		print,'Error:  determinant is zero.  Returning nothing'
 		return, -1
 	endif
 
-	sx=float(imsize[0])
-	sy=float(imsize[1])
+	sx=imsize[0]
+	sy=imsize[1]
 
     if n_elements(counts) eq 0 then counts=1.
 	if n_elements(cen) eq 0 then begin
@@ -54,8 +54,8 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 	endelse
 
 
-	;; Compute the exponent of the gaussian at each point in
-	;; the image.  Use clever indexing technique
+	; Compute the exponent of the gaussian at each point in the image.  
+	; Use clever indexing technique
 
 	index=lindgen(sx*sy)
 
@@ -66,29 +66,19 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 
 	rr = 0.5*rr/det
 
-    ;aratio=aratio > .1
-    ;ct=cos(theta*!Pi/180.)
-    ;st=sin(theta*!Pi/180.)
-    ;xp=(x-cx)*ct + (y-cy)*st
-    ;yp=((cx-x)*st + (y-cy)*ct)/aratio
 
-
-	;; The exponent
-	;rr=(1.0/2.0/sigma^2)*(xp^2+yp^2)
-
-	;; Compute the gaussian
-
+	; Compute the gaussian
 	gauss=fltarr(sx,sy)
 	w=where(rr lt 10.8, nw)      ; watch floating point underflow
                                  ; this will allow ~.00002 as smallest number
                                  ; in disk
 
-  IF nw GT 0 THEN gauss[index[w]]=exp(-rr[w])
+	if nw gt 0 then gauss[index[w]]=exp(-rr[w])
  
-  ;; set the counts
-  gauss = counts/total(gauss)*gauss
-  return, gauss
-END
+	;; set the counts
+	gauss = counts/total(gauss)*gauss
+	return, gauss
+end
 
 
 
