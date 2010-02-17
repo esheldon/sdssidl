@@ -60,6 +60,13 @@
 ;
 ;
 
+function _expand_tilde_gdl_kludge, fname
+	; expand_tilde fails in gdl, do a kludge
+	dir=file_dirname(fname)
+	newdir = expand_tilde(dir)
+	return, path_join(newdir, file_basename(fname))
+end
+
 
 FUNCTION read_idlstruct_multi, infiles, $
                                hdr=hdr, $
@@ -83,10 +90,11 @@ FUNCTION read_idlstruct_multi, infiles, $
   ;; See which files actually exist
   nfiles = n_elements(infiles)
   FOR i=0L, nfiles-1 DO BEGIN
-      IF fexist(infiles[i]) THEN BEGIN 
-          add_arrval, infiles[i], files
+	  f=_expand_tilde_gdl_kludge( infiles[i] )
+      IF fexist(f) THEN BEGIN 
+          add_arrval, f, files
       ENDIF ELSE BEGIN 
-          message,'File '+infiles[i]+' does not exist. Skipping',/inf
+          message,'File '+f+' does not exist. Skipping',/inf
           return,-1
       ENDELSE 
   ENDFOR 

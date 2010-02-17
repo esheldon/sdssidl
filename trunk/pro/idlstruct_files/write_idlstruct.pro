@@ -495,9 +495,16 @@ PRO wi_check_string_formats, struct, info_struct, filename, append
 END 
 
 
+function _expand_tilde_gdl_kludge, fname
+	; expand_tilde fails in gdl, do a kludge
+	dir=file_dirname(fname)
+	newdir = expand_tilde(dir)
+	return, path_join(newdir, file_basename(fname))
+end
 
 
-PRO write_idlstruct, struct, filename, $
+
+PRO write_idlstruct, struct, filename_in, $
                      ascii=ascii, csv=csv, $
                      ieee_big=ieee_big, ieee_little=ieee_little, $
                      append_in=append_in, $
@@ -518,6 +525,8 @@ PRO write_idlstruct, struct, filename, $
     print,'                status=, error='
     return 
   ENDIF 
+
+  filename = _expand_tilde_gdl_kludge(filename_in)
 
   COMMON write_idlstruct_block, $
     ROW_STRING_FORMAT, isbig_endian, version, use_c_write, old_info_struct
