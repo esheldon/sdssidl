@@ -32,7 +32,8 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 	if n_params() LT 4 then begin 
 		print,'-Syntax gauss = mom2gauss(ixx, ixy, iyy, imsize, counts=, cen=)'
 		print,'produce a gaussian image from the input ixx,ixy,iyy'
-		return, -1
+		on_error, 2
+		message,'halting'
 	endif
 
 	det = ixx*iyy - ixy^2
@@ -41,8 +42,8 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 		return, -1
 	endif
 
-	sx=imsize[0]
-	sy=imsize[1]
+	sx=long(imsize[0])
+	sy=long(imsize[1])
 
     if n_elements(counts) eq 0 then counts=1.
 	if n_elements(cen) eq 0 then begin
@@ -76,7 +77,10 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 	if nw gt 0 then gauss[index[w]]=exp(-rr[w])
  
 	;; set the counts
-	gauss = counts/total(gauss)*gauss
+	norm=total(gauss)
+	if norm gt 0 then begin
+		gauss = counts/total(gauss)*gauss
+	endif
 	return, gauss
 end
 
