@@ -410,9 +410,16 @@ FUNCTION ri_getdata, hdrStruct, lun, $
 
 END 
 
+function _expand_tilde_gdl_kludge, fname
+	; expand_tilde fails in gdl, do a kludge
+	dir=file_dirname(fname)
+	newdir = expand_tilde(dir)
+	return, path_join(newdir, file_basename(fname))
+end
 
 
-FUNCTION read_idlstruct, filename, $
+
+FUNCTION read_idlstruct, filename_in, $
                          error=error, status=status, $
                          rows=rows, columns=columns, $
                          numrows=numrows, $
@@ -421,7 +428,7 @@ FUNCTION read_idlstruct, filename, $
                          silent=silent
 
   status = 1
-  IF n_params() LT 1 THEN BEGIN 
+  IF n_elements(filename_in) eq 0 THEN BEGIN 
       print,'-Syntax: struct = read_idlstruct(filename, /silent, $'
       print,'                rows=, numrows=, columns=, hdrStruct=, error=, status=)'
       return,-1
@@ -429,6 +436,8 @@ FUNCTION read_idlstruct, filename, $
 
   ;; can use binary_read when we want just certain columns or rows
   COMMON read_idlstruct_block, c_bread_found, c_aread_found, isbig_endian
+
+  filename = _expand_tilde_gdl_kludge(filename_in)
 
   IF n_elements(c_bread_found) EQ 0 THEN BEGIN 
       funcNames  = routine_info(/system,/functions)

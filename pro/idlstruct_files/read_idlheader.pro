@@ -58,6 +58,13 @@
 ;
 ;
 
+function _expand_tilde_gdl_kludge, fname
+
+	; expand_tilde fails in gdl, do a kludge
+	dir=file_dirname(fname)
+	newdir = expand_tilde(dir)
+	return, path_join(newdir, file_basename(fname))
+end
 
 FUNCTION rih_openfile, filename, error=error, tname=tname
 
@@ -74,7 +81,8 @@ FUNCTION rih_openfile, filename, error=error, tname=tname
 
   ENDIF ELSE IF tname EQ 'STRING' THEN BEGIN 
 
-      openr, lun, filename, /get_lun, error=error
+	  fname = _expand_tilde_gdl_kludge(filename)
+      openr, lun, fname, /get_lun, error=error
 
       IF error NE 0 THEN BEGIN 
           print,'Error opening file '+filename+': '+!error_state.sys_msg

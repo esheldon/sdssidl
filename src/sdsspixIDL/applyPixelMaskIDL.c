@@ -65,6 +65,7 @@
    in square degrees */
 #define Amin 0.05
 /* Chance of missing Amin sized region */
+//#define Pmax 0.001
 #define Pmax 0.02
 
 
@@ -619,16 +620,15 @@ int ApplyEdgeMask(double *lambdav, double *etav, float *maxAngle,
         {
             tmp = log10(Pmax)/log10(Pmiss);
             if (tmp < 20) tmp = 20;
+            //if (tmp < 100) tmp = 100;
             if (tmp > 10000) tmp = 10000;
             nrand = lround(tmp);
-            /*
-               if(nrand < 20) nrand=20;
-               if(nrand > 10000) nrand = 10000;
-               */
         }
         else 
         {
-            nrand = 20;
+			// we reach here often because the search radius is very small
+            //nrand = 100;
+			nrand = 20;
         }
 
         /*printf("obj: %d  nrand: %d\n", i, nrand);*/

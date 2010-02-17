@@ -462,7 +462,8 @@ function cosmology::genrandz, nrand, zmin, zmax, $
     nz = 1000
     z = arrscl( findgen(nz), zmin,  zmax )
 
-    velement = self->velement(z, omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, $
+    velement = self->velement(z, $
+		omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, $
         flat=flat, $
         comoving=comoving, $
         h=h, npts=npts)
