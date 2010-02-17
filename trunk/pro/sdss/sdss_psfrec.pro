@@ -57,7 +57,7 @@
 ;
 ;
 
-function sdss_psfrec, pstruct, row, col, counts=counts
+function sdss_psfrec, pstruct, row, col, counts=counts, trim=trim
 
 	np = $
 		(n_elements(pstruct) gt 0) $
@@ -66,7 +66,8 @@ function sdss_psfrec, pstruct, row, col, counts=counts
 
 	if np lt 3 then begin 
 		on_error, 2
-		print,'-Syntax: psf_image = sdss_psfrec(pstruct, row, col, counts=)'
+		print,'-Syntax: psf_image = ' +$
+			'sdss_psfrec(pstruct, row, col, /trim, counts=)'
 		message,'Halting'
 	endif 
 
@@ -101,6 +102,11 @@ function sdss_psfrec, pstruct, row, col, counts=counts
 	endif 
 
 	p = reform(p,rncol,rnrow)
+
+	if keyword_set(trim) then begin
+		; trim to the non-zero region
+		p = p[10:40, 10:40]
+	endif
 	return,p
 
 
