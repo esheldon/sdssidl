@@ -10,18 +10,23 @@
 ;
 ; CALLING SEQUENCE:
 ;	admom, $
-;		image, x, y, sky, skysig, shiftmax, wguess, $
+;		image, x, y, sky, skysig, wguess, $
 ;		ixx, iyy, ixy, momerr, rho4, whyflag, $
-;		/recompile
+;		shiftmax=5.0, /recompile
 ;
 ; INPUTS:
-;	image: The input image.  Must be floating point, two dimensional.
+;	** All inputs must be floating point ** or an error is raised.
+;
+;	image: The input image.  Must be two dimensional.
 ;	x,y: Locations in the image to measure adaptive moments.  Must be
 ;		floating point.
 ;	sky: Sky value, Either scalar or same len as x,y
 ;	skysig: Sky sigma value, Either scalar or same len as x,y
-;	shiftmax: Max allowed shift in centroid, Either scalar or same len as x,y
 ;	wguess: Guess at ixx,iyy moment.  Either scalar or same len as x,y
+;
+; OPTIONAL INPUTS:
+;	shiftmax: Max allowed shift in centroid, Either scalar or same len as x,y
+;		default is 5
 ;
 ; KEYWORD PARAMETERS:
 ;	/recompile:  Recompile the C code.
@@ -75,10 +80,9 @@ pro admom_test_with_compile, recompile=recompile
 	skysig=5.5
 	shiftmax=10.0
 	wguess=2.0
-	print,'re-compiling admom'
 
 	admom,$
-		im,x,y,sky,skysig,shiftmax,wguess,$
+		im,x,y,sky,skysig,wguess,$
 		tixx,tiyy,tixy,tmomerr,trho4,twhyflag,$
 		recompile=recompile
 
@@ -110,20 +114,26 @@ pro _admom_testfloat, par, parname
 end
 
 pro admom, $
-		image, x, y, sky, skysig, shiftmax, wguess, $
+		image, x, y, sky, skysig, wguess, $
 		ixx, iyy, ixy, momerr, rho4, whyflag, $
+		shiftmax=shiftmax, $
 		recompile=recompile
 
 	tm0=systime(1)
-	if n_params() lt 13 then begin
+	if n_params() lt 12 then begin
 		on_error, 2
-		print,'usage: admom, image, x, y, sky, skysig, shiftmax, wguess, '
+		print,'usage: admom, image, x, y, sky, skysig, wguess, '
 		print,'              ixx, iyy, ixy, momerr, rho4, whyflag, '
-		print,'              /recompile'
+		print,'              shiftmax=, /recompile'
 		message,'halting'
 	endif
 
+	; default to 5 pixels allowed shift
+	if n_elements(shiftmax) eq 0 then shiftmax=5.0
+
+	; compile if not yet compiled.  Get dll path and entry name.
 	_admom_compile, dll_path, name, extra_cflags, recompile=recompile
+
 
 	if keyword_set(recompile) then begin
 		unload=1
