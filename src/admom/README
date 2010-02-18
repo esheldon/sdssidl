@@ -1,0 +1,4 @@
+Minimal adaptive moments calculator with no dependencies.
+Gets automagically compiled when you run admom from IDL.
+Make sure you set SDSSIDL_DIR, or use setup sdssidl which
+will automatically set that var.
