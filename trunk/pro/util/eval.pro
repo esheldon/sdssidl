@@ -31,6 +31,7 @@
 ;-
 function eval, stringvar
 	if n_elements(stringvar) ne 1 then begin
+		on_error, 2
 		print,'usage: val = eval(string)'
 		message,'halting'
 	endif
