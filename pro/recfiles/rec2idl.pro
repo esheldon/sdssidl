@@ -1,15 +1,20 @@
-function rec2idl, recfile
+function rec2idl, recfile, noshell=noshell
 	
 	sdssidl_dir=getenv('SDSSIDL_DIR')
 	if sdssidl_dir eq '' then message,'SDSSIDL_DIR is not set'
 
 	pyfile=filepath(root=sdssidl_dir,sub=['python'],'rec2idl.py')
 
-	command='python '+pyfile+' '+recfile
+	if not keyword_set(noshell) then begin
+		command='python '+pyfile+' '+recfile
+		spawn, command, res, err
+		if err ne '' then message,'Command failed: "'+command+'"'
+	endif else begin
+		command=['python',pyfile,recfile]
+		spawn, command, res, err, /noshell
+		if err ne '' then message,'Command failed: "'+command+'"'
+	endelse
 
-	spawn, command, res, err
-
-	if err ne '' then message,'Command failed: "'+command+'"'
 
 	res = strjoin(res,' ')
 
@@ -26,7 +31,8 @@ function rec2idl, recfile
 	for i=0L, ntags-1 do begin
 
 		if tn[i] eq '_DTYPE' then begin
-			val=dtype2struct(st.(i))
+			dtype = st.(i)
+			val=dtype2struct(dtype, endian=endian)
 			name = '_structdef'
 		endif else begin
 
@@ -46,6 +52,12 @@ function rec2idl, recfile
 			struct=create_struct(struct,name,val)
 		endelse
 	endfor
+
+	; add in endian and dtype
+	struct = create_struct($
+		struct, $
+		'_dtype', dtype, $
+		'_endian', endian)
 
 	return, struct
 end

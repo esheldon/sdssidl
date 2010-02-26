@@ -230,7 +230,7 @@ FUNCTION read_idlheader, filename, status=status
 
   line = ''
   readf, lun, line
-  line=strtrim(line)
+  line=strtrim(line,2)
   WHILE line NE 'END' DO BEGIN 
 
       ;; remove comments
@@ -323,7 +323,7 @@ FUNCTION read_idlheader, filename, status=status
           
       ENDIF 
       readf, lun, line
-      line=strtrim(line)
+      line=strtrim(line,2)
   ENDWHILE 
 
   ;; read the next line which should be empty

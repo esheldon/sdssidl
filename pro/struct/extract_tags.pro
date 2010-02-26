@@ -1,9 +1,7 @@
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;+
 ;
 ; NAME:
-;    EXTRACT_TAGS()
+;    EXTRACT_TAGS
 ;       
 ; PURPOSE:
 ;   Extract the specified tags from input structure and return in a new
@@ -32,7 +30,6 @@
 ;       
 ;                                      
 ;-                                       
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 FUNCTION extract_tags, struct, tagnames
 
@@ -49,25 +46,18 @@ FUNCTION extract_tags, struct, tagnames
     n=n_elements(tags)
     tagnames=strupcase(tagnames)
     nt=n_elements(tagnames)
-    if nt eq 1 then begin
-        t=where(tags eq tagnames[0],nw) 
-        if nw eq n then begin
-            message,'Tag did not match, returning -1',/inf
-            return, -1
-        endif 
-    endif else begin 
-        match, tags, tagnames, m, min, count=nm
-        if nm eq 0 then begin
-            message,'No tags matched, returning -1',/inf
-            return, -1
-        endif 
-        if nm eq n then begin 
-            return, struct
-        endif 
-    endelse 
-      
-    ;; create new structure
-    s=sort(min)
+
+	match, tags, tagnames, m, minput, count=nm
+	if nm eq 0 then begin
+		message,'No tags matched'
+	endif 
+	if nm eq n then begin 
+		return, struct
+	endif 
+
+    ; create new structure.  Sort by the *index* in the requested tags so
+	; we get the right order.
+    s=sort(minput)
     m = m[s]
     tags=tags[m]
     n=n_elements(tags)

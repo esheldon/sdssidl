@@ -92,7 +92,8 @@
 
 pro rrec_swap_endian, struct, endian
 
-	common read_rec_block, c_bread_found, c_aread_found, isbig_endian
+	common read_rec_block, $
+		c_bread_found, c_aread_found, isbig_endian, subcol, subrow
 
 	for i=0, n_tags(struct)-1 do begin  
 		;; idl built-in procedure swap_endian
@@ -106,94 +107,88 @@ pro rrec_swap_endian, struct, endian
 
 end 
 
-FUNCTION rrec_match_columns, hdrStruct, columns
 
-  ;; Always returned in numerical order, the order they are in
-  ;; the structure
+pro rrec_extract_rows, rows, struct, nkeep
 
-  ;; remove duplicates
-  col = columns[rem_dup(columns)]
+	nstruct = n_elements(struct)
+	w=where(rows lt nstruct and rows ge 0, nkeep)
 
-  IF size(col, /tname) EQ 'STRING' THEN BEGIN 
-      ;; column names sent
-      match, hdrStruct.field_names, strlowcase(col), mstr, mcol
+	if nkeep eq 0 then begin 
+		print,'None of requested rows are in struct. No data returned.'
+	endif else begin 
+		tst = struct[rows[w]]
+		struct = 0
+		struct = temporary(tst)
+	endelse 
 
-      IF mstr[0] NE -1 THEN BEGIN 
-          nrequest = n_elements(columns)
-          ngood = n_elements(mstr)
-          IF ngood NE nrequest THEN BEGIN 
-              ind = lindgen(nrequest)
-              remove, mcol, ind
-              IF n_elements(ind) EQ 1 THEN BEGIN 
-                  message,$
-                    "Column '"+col[ind]+"' not found. Skipping",/inf
-              ENDIF ELSE BEGIN 
-                  message,$
-                    "Columns ['"+strjoin(col[ind], "','")+$
-                    "'] not found. Skipping",/inf
-              ENDELSE 
-          ENDIF 
-      ENDIF 
-  ENDIF ELSE BEGIN 
-      ;; columns numbers sent
-      ntags = n_elements(hdrStruct.field_names)
-      w = where(col LT ntags, nw)
-      IF nw EQ 0 THEN mstr = -1 ELSE mstr = col[w]
-  ENDELSE 
-
-  mstr = mstr[sort(mstr)]
-  return,mstr
-
-END 
-
-PRO rrec_extract_columns, hdrStruct, columns, struct
-
-  mstr = rrec_match_columns(hdrStruct, columns)
-
-  IF mstr[0] EQ -1 THEN BEGIN 
-      print,'None of the requested columns match the existing columns.'
-      print,'Returning all data'
-  ENDIF ELSE BEGIN 
-      ;; Only need to extract if they are a subset of the original
-      ;; columns
-      IF n_elements(mstr) LT n_elements(hdrStruct.field_names) THEN BEGIN 
-          
-          tst = mrd_struct(hdrStruct.field_names[mstr], $
-                           hdrStruct.field_descriptions[mstr], $
-                           n_elements(struct))
-          struct_assign, struct, tst, /nozero
-          struct = 0
-          struct = temporary(tst)
-      ENDIF
-  ENDELSE 
-      
-END 
-
-PRO rrec_extract_rows, rows, struct, nkeep
-
-  nstruct = n_elements(struct)
-  w=where(rows LT nstruct AND rows GE 0, nkeep)
-
-  IF nkeep EQ 0 THEN BEGIN 
-      print,'None of requested rows are in struct. No data returned.'
-  ENDIF ELSE BEGIN 
-      tst = struct[rows[w]]
-      struct = 0
-      struct = temporary(tst)
-  ENDELSE 
-
-END 
+end 
 
 
-FUNCTION rrec_ascii, hdrStruct, lun, nkeep, $
+pro rrec_var_info, var, type_name, format
+
+    tstr = size(var, /struct)
+    nel = tstr.n_elements
+    if nel eq 1 then repcnt = '' else repcnt = strtrim(nel,2)
+
+    ;; for mrd_struct we need more description
+	type_name = tstr.type_name
+
+    case tstr.type_name of
+        'INT': format = repcnt+'I0'
+        'LONG': format = repcnt+'I0'
+        'UINT': format = repcnt+'I0'
+        'ULONG': format = repcnt+'I0'
+        'LONG64': format = repcnt+'I0'
+        'ULONG64': format = repcnt+'I0'
+
+        'BYTE': format = repcnt+'I0'
+
+        'FLOAT': format = repcnt+'g0'
+        'DOUBLE': format = repcnt+'f0'
+        'STRING': BEGIN 
+            ;; need to read the extra character in front, either tab or ,
+            ;; That is what the X does
+            lenstr = ntostr(strlen(var[0]))
+            maxlenarr = 'X,A'+replicate(lenstr, nel)
+            format = strjoin(maxlenarr, ',')
+        end 
+        else: begin 
+            print,'Type not supported: '+tstr.type_name
+            error = -4000
+        end 
+    endcase 
+
+end 
+
+pro rrec_get_ascii_format_string, struct, format
+	; need a format string only if there are strings in the structure
+	; format will be undefined otherwise
+
+	delvarx, format
+	for i=0L, n_tags(struct)-1 do begin
+		rrec_var_info, struct[0].(i), type_name, fmt
+		add_arrval, fmt, formats
+		add_arrval, type_name, type_names
+	endfor
+
+
+	w=where(type_names EQ 'STRING', nw)
+	if nw ne 0 then begin
+		format = '('+strjoin(formats,', ')+')'
+	endif
+
+end
+
+function rrec_ascii, hdrstruct, lun, nkeep, $
         rows=rows, numrows=numrows, columns=columns, $
         silent=silent, verbose=verbose, $
         status=status
 
 
     status = 1
-    COMMON read_rec_block, c_bread_found, c_aread_found, isbig_endian
 
+	common read_rec_block, $
+		c_bread_found, c_aread_found, isbig_endian, subcol, subrow
 
 	structdef = hdrStruct._structdef
 
@@ -208,11 +203,11 @@ FUNCTION rrec_ascii, hdrStruct, lun, nkeep, $
         ; even if its never called.
 
 		; will this work?
-		tab = string(9b)
+		tabstring = string(9b)
 
         if hdrStruct._delim eq ',' then begin 
             csv=1
-        endif else if hdrstruct._delim eq tab then begin
+        endif else if hdrstruct._delim eq tabstring then begin
             tab=1
         endif else begin
             ; This is probably an old space separated file from the early
@@ -222,7 +217,7 @@ FUNCTION rrec_ascii, hdrStruct, lun, nkeep, $
       
         struct = CALL_FUNCTION($
             'ascii_read',$
-            lun, structdef, hdrStruct._nrows, $
+            lun, structdef, hdrStruct._size, $
             rows=rows, columns=columns, csv=csv, tab=tab, $
             whitespace=whitespace, $
             verbose=verbose, $
@@ -236,29 +231,26 @@ FUNCTION rrec_ascii, hdrStruct, lun, nkeep, $
 
     endif else begin 
 
-        ; Reading ascii without ascii_read() and there are string fields
-        ; In this case we need a format string
-        w=where(hdrStruct.field_types EQ 'STRING', nw)
-        if nw ne 0 then begin
-            format = '('+strjoin(hdrstruct.field_input_formats,', ')+')'
-        endif
-      
+        ; Reading ascii without ascii_read(). If there are string
+		; fields, format will return defined.
+		rrec_get_ascii_format_string, structdef, format 
+
         ; rows= takes precedence
         if n_elements(rows) eq 0 and n_elements(numrows) ne 0 then begin 
           
-            nrows = numrows < hdrStruct._nrows
+            nrows = numrows < hdrStruct._size
             if not keyword_set(silent) then begin 
                 print,'Reading first '+strtrim(nrows,2)+' rows'
             endif 
           
         endif else begin 
-            nrows = hdrStruct._nrows
+            nrows = hdrStruct._size
             if not keyword_set(silent) then begin 
                 print,'Reading '+strtrim(nrows,2)+' rows'
             endif 
         endelse 
 
-        struct = replicate(structdef, hdrStruct._nrows)
+        struct = replicate(structdef, hdrStruct._size)
         readf, lun, struct, format=format
 
         ; Extract rows
@@ -270,98 +262,100 @@ FUNCTION rrec_ascii, hdrStruct, lun, nkeep, $
           
             rrec_extract_rows, rows, struct, nkeep
             if nkeep eq 0 then return,struct
-        endif else nkeep = hdrstruct._nrows
+        endif else nkeep = hdrstruct._size
       
         ; extract collumns
         if n_elements(columns) ne 0 then begin 
-            rrec_extract_columns, hdrStruct, columns, struct  
+			newstruct = extract_tags(struct, columns)
+			struct=0
+			struct = temporary(newstruct)
         endif 
     endelse 
 
     return,struct
 end 
 
-FUNCTION rrec_binary, hdrStruct, lun, nkeep, $
+function rrec_binary, hdrstruct, lun, nkeep, $
                     rows=rows, numrows=numrows, columns=columns, $
                     verbose=verbose, silent=silent, $
                     status=status
 
-  COMMON read_rec_block, c_bread_found, c_aread_found, isbig_endian
+
+	common read_rec_block, $
+		c_bread_found, c_aread_found, isbig_endian, subcol, subrow
 
 
+	structdef = hdrStruct._structdef
+	if (n_elements(rows) ne 0 or n_elements(columns) ne 0) and $
+		c_bread_found then begin  
 
-  structdef = hdrStruct._structdef
-  IF (n_elements(rows) NE 0 OR n_elements(columns) NE 0) AND $
-    c_bread_found THEN BEGIN  
+		; This can save lots of memory and time reading small subsets
 
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;; User wants subset of data and we have binary_read compiled
-      ;; This can save lots of memory and time reading small subsets
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; need CALL_FUNCTION for the systems that don't have binary_read
+		; compiled.  For some reason, IDL gives a compile error if it doesn't
+		; find it even if its never called.
 
-      ;; need CALL_FUNCTION for the systems that don't have binary_read
-      ;; compiled.  For some reason, IDL gives a compile error if it doesn't
-      ;; find it even if its never called.
+		struct = CALL_FUNCTION('binary_read', $
+			lun, structdef, hdrStruct._size, $
+			rows=rows, columns=columns, $
+			verbose=verbose, $
+			status = status)
 
-      struct = CALL_FUNCTION('binary_read', $
-                             lun, structdef, hdrStruct._nrows, $
-                             rows=rows, columns=columns, $
-                             verbose=verbose, $
-                             status = status)
+		if size(struct, /tname) EQ 'STRUCT' then begin 
+			nkeep = n_elements(struct)
+		endif else begin 
+			nkeep = 0
+		endelse 
 
-      IF size(struct, /tname) EQ 'STRUCT' THEN BEGIN 
-          nkeep = n_elements(struct)
-      ENDIF ELSE BEGIN 
-          nkeep = 0
-      ENDELSE 
+	endif else begin 
 
-  ENDIF ELSE BEGIN 
+		;; rows= takes precedence
+		if n_elements(rows) eq 0 and n_elements(numrows) ne 0 then begin 
 
-      ;; rows= takes precedence
-      IF n_elements(rows) EQ 0 AND n_elements(numrows) NE 0 THEN BEGIN 
+			nrows = numrows < hdrStruct._size
+			if not keyword_set(silent) then begin 
+				print,'Reading first '+strtrim(nrows,2)+' rows'
+			endif 
 
-          nrows = numrows < hdrStruct._nrows
-          IF NOT keyword_set(silent) THEN BEGIN 
-              print,'Reading first '+strtrim(nrows,2)+' rows'
-          ENDIF 
+		endif else begin 
+			nrows = hdrStruct._size
+			if not keyword_set(silent) then begin 
+				print,'Reading '+strtrim(nrows,2)+' rows'
+			endif 
+		endelse 
 
-      ENDIF ELSE BEGIN 
-          nrows = hdrStruct._nrows
-          IF NOT keyword_set(silent) THEN BEGIN 
-              print,'Reading '+strtrim(nrows,2)+' rows'
-          ENDIF 
-      ENDELSE 
+		struct = replicate(structdef, nrows)
+		readu, lun, struct
 
-      struct = replicate(structdef, nrows)
-      readu, lun, struct
+		;; extract requested rows
+		if n_elements(rows) ne 0 then begin 
+			;; tell the user how much we are reading
+			if not keyword_set(silent) then begin 
+				nextract = n_elements(rows)
+				print,'Extracting '+strtrim(nextract,2)+' rows'
+			endif 
 
-      ;; extract requested rows
-      IF n_elements(rows) NE 0 THEN BEGIN 
-          ;; Tell the user how much we are reading
-          IF NOT keyword_set(silent) THEN BEGIN 
-              nextract = n_elements(rows)
-              print,'Extracting '+strtrim(nextract,2)+' rows'
-          ENDIF 
+			rrec_extract_rows, rows, struct, nkeep
+			if nkeep eq 0 then return,struct
+		endif else nkeep = hdrstruct._size
 
-          rrec_extract_rows, rows, struct, nkeep
-          IF nkeep EQ 0 THEN return,struct
-      ENDIF ELSE nkeep = hdrstruct._nrows
-      
-      ;; extract requested columns
-      IF n_elements(columns) NE 0 THEN BEGIN 
-          rrec_extract_columns, hdrStruct, columns, struct  
-      ENDIF 
+		;; extract requested columns
+		if n_elements(columns) ne 0 then begin 
+			newstruct = extract_tags(struct, columns)
+			struct=0
+			struct = temporary(newstruct)
+		endif 
 
-  ENDELSE 
+	endelse 
 
-  ; swap if this is BIG_ENDIAN machine and the byte order
-  ; is not IEEE standard OR if little endian and its IEEE
-      
-  rrec_swap_endian, struct, hdrStruct._endian
+	; swap if this is BIG_ENDIAN machine and the byte order
+	; is not IEEE standard OR if little endian and its IEEE
+
+	rrec_swap_endian, struct, hdrStruct._endian
 
 
-  return,struct
-END 
+	return,struct
+end 
 
 
 function rrec_getdata, hdrStruct, lun, $
@@ -371,7 +365,12 @@ function rrec_getdata, hdrStruct, lun, $
 
 	; Different file formats
 
-	if hdrstruct._delim ne 'none' then begin 
+	do_ascii=0
+	if tag_exist(hdrStruct,'_delim') then begin 
+		if hdrStruct._delim ne '' then do_ascii = 1
+	endif
+
+	if do_ascii then begin
 		struct = rrec_ascii(hdrstruct, lun, nkeep, $
 			rows=rows, numrows=numrows, $
 			columns=columns, $
@@ -398,82 +397,101 @@ function rrec_expand_tilde_gdl_kludge, fname
 end
 
 
+function rrec_skip_header, filename
 
-FUNCTION read_rec, filename_in, $
-                         error=error, status=status, $
-                         rows=rows, columns=columns, $
-                         numrows=numrows, $
-                         hdrStruct=hdrStruct, $
-                         verbose=verbose, $
-                         silent=silent
+	common read_rec_block, $
+		c_bread_found, c_aread_found, isbig_endian, subcol, subrow
 
-  status = 1
-  IF n_elements(filename_in) eq 0 THEN BEGIN 
-      print,'-Syntax: struct = read_rec(filename, /silent, $'
-      print,'                rows=, numrows=, columns=, hdrStruct=, error=, status=)'
-      return,-1
-  ENDIF 
+	if (c_bread_found or c_aread_found) and ( subcol or subrow ) then begin
+		openr, lun, filename, /get_lun, error=error, /stdio, bufsize=0
+	endif else begin 
+		openr, lun, filename, /get_lun, error=error
+	endelse 
 
-  ;; can use binary_read when we want just certain columns or rows
-  COMMON read_rec_block, c_bread_found, c_aread_found, isbig_endian
+	line = ''
+	readf, lun, line
+	line = strtrim(line,2)
+	while line ne 'END' do begin
+		readf, lun, line
+		line = strtrim(line,2)
+	endwhile
 
-  filename = rrec_expand_tilde_gdl_kludge(filename_in)
+	;; read the next line which should be empty
+	readf, lun, line
+	line=strtrim(line,2)
+	IF line NE '' THEN message,'Expected blank line after END'
 
-  IF n_elements(c_bread_found) EQ 0 THEN BEGIN 
-      funcNames  = routine_info(/system,/functions)
+	return, lun
 
-      w = where(funcNames EQ 'BINARY_READ',nw)
-      IF nw EQ 0 THEN c_bread_found = 0 ELSE c_bread_found = 1
-
-      w = where(funcNames EQ 'ASCII_READ',nw)
-      IF nw EQ 0 THEN c_aread_found = 0 ELSE c_aread_found = 1
-
-      isbig_endian = is_ieee_big()
-  ENDIF 
+end
 
 
-  ;; Open the file, watching for errors. Need /stdio and bufsize=0
-  ;; for binary_read and ascii_read.  Note reading with /stdio is
-  ;; much slower if all fields are being read and we are just using
-  ;; readu or readf in IDL, so we check first
+FUNCTION read_rec, filename, $
+		error=error, status=status, $
+		rows=rows, columns=columns, $
+		numrows=numrows, $
+		hdrStruct=hdrStruct, $
+		verbose=verbose, $
+		silent=silent
 
-  IF ( (c_bread_found OR c_aread_found) AND $
-       ( (n_elements(columns) NE 0) OR (n_elements(rows) NE 0) ) ) THEN BEGIN
-      openr, lun, filename, /get_lun, error=error, /stdio, bufsize=0
-  ENDIF ELSE BEGIN 
-      openr, lun, filename, /get_lun, error=error
-  ENDELSE 
-  IF error NE 0 THEN BEGIN 
-      print,'Error opening file '+filename+': '+!error_state.sys_msg
-      return,-1
-  ENDIF  
+	status = 1
+	IF n_elements(filename) eq 0 THEN BEGIN 
+		print,'-Syntax: struct = read_rec(filename, /silent, $'
+		print,'                rows=, numrows=, columns=, hdrStruct=, error=, status=)'
+		return,-1
+	ENDIF 
 
-  ;; read the header. This will read through the END and the empty
-  ;; line afterward
-  hdrStruct = read_recheader(lun)
+	;; can use binary_read when we want just certain columns or rows
+	common read_rec_block, $
+		c_bread_found, c_aread_found, isbig_endian, subcol, subrow
 
 
-  IF hdrStruct._nrows LE 0 THEN BEGIN 
-      free_lun, lun
-      print,'NROWS = 0.  No data read'
-      error = -1000
-      return, -1
-  ENDIF 
+	if n_elements(columns) ne 0 then subcol=1 else subcol=0
+	if n_elements(rows) ne 0 then subrow=1 else subrow=0
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; Create the structure and replicate it nrows
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  struct = rrec_getdata(hdrStruct, lun, $
-                      rows=rows, numrows=numrows, $
-                      columns=columns, $
-                      verbose=verbose, $
-                      silent=silent, error=error)
+	; can we use binary_read/ascii_read?
+	IF n_elements(c_bread_found) EQ 0 THEN BEGIN 
+		funcNames  = routine_info(/system,/functions)
 
-  ;; free the unit if just filename was entered
-  free_lun,lun
+		w = where(funcNames EQ 'BINARY_READ',nw)
+		IF nw EQ 0 THEN c_bread_found = 0 ELSE c_bread_found = 1
 
-  IF error EQ 0 THEN status = 0
-  return,struct
+		w = where(funcNames EQ 'ASCII_READ',nw)
+		IF nw EQ 0 THEN c_aread_found = 0 ELSE c_aread_found = 1
+
+		isbig_endian = is_ieee_big()
+	ENDIF 
+
+
+
+	; expand tilde and such
+	filename = rrec_expand_tilde_gdl_kludge(filename)
+
+
+	; read the header and return as a structure.   
+	hdrStruct = read_recheader(filename)
+
+
+	; This will read through the END and the empty line afterward
+	lun = rrec_skip_header(filename)
+
+
+	if hdrstruct._size le 0 then begin 
+		message,'nrows <= 0, something is wrong'
+	endif 
+
+
+	; read ascii/binary data
+	struct = rrec_getdata(hdrStruct, lun, $
+		rows=rows, numrows=numrows, $
+		columns=columns, $
+		verbose=verbose, $
+		silent=silent, error=error)
+
+	free_lun,lun
+
+	IF error EQ 0 THEN status = 0
+	return,struct
 
 END 
