@@ -62,7 +62,7 @@ xind=floor((x(w)-xmin)*(nxbins/(xmax-xmin)))
 yind=floor((y(w)-ymin)*(nybins/(ymax-ymin)))
 
 ind=xind+nxbins*yind
-h=histogram(ind,min=0l,max=long(nxbins*nybins)-1,reverse_indices=reverse_indices)
+h=histogram(ind,min=0l,max=long(nxbins)*nybins-1,reverse_indices=reverse_indices)
 nh = n_elements(h)
 
 hist=reform(h,nxbins,nybins)
