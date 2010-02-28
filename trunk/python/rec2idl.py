@@ -1,25 +1,25 @@
 """
-Convert the header for a .rec file to something IDL can understand. The
-result will be a string representing and IDL structure.
+
+Convert the header for a .rec file to something IDL can understand and print
+to stdout. The result will be a string representing and IDL structure. The
+variable in the struct will all be strings which must be evaled to get
+idl variables.
+
 """
 
 import sys
 import os
-import esutil
-
 
 def read_header(filename):
     """
     Name:
         read_header()
 
-    Calling Sequence:
-        sf = sfile.Open(file)
-        hdr = sf.read_header()
+    Read the header from the simple self-describing file format 'rec' with an
+    ascii header.  See the write() function for information about reading this
+    file format, and read() for reading.
 
-    Read the header from a simple self-describing file format with an
-    ascii header.  See the write() function for information about reading
-    this file format, and read() for reading.
+    See the esutil/sfile.py module for more info.
 
 
     The file format:
@@ -114,29 +114,6 @@ def read_header(filename):
 
         -- data begins --
 
-    Modification History:
-        Created: 2007-05-25, Erin Sheldon, NYU
-        Allow continuation characters "\\" to continue header keywords
-            onto the next line.  2009-05-05
-
-        Switched header to be simply a dictionary representation.
-            SIZE = %20d
-            { a dictionary representation }
-            END
-            blank line
-        This is much more powerful and simple.  Anything that can be eval()d
-        can be in the header, including numpy arrays.  
-                    2009-10-28. Erin Sheldon, BNL
-
-        Allow simple arrays (without fields) to be written.  Switch to
-        using SIZE = %20d on the first row instead of NROWS, this makes
-        more sense for both structured and simple arrays.  Note the
-        old style can still be read, just not appended.
-            2009-11-16, ESS
-        
-        2010-02-18  Added '_VERSION' to the header, allowing future changes
-            while still supporting backwards compatibility.  
-                Erin Sheldon, BNL
     """
 
     fobj = open(filename)
@@ -185,11 +162,11 @@ def read_header(filename):
 
 def hdrdict2idlstruct(hdr_dict):
     """
-    Convert the header dict into a string representing an idl structure
-    All fields are represented as strings, so it is up to the user to
-    attempt to convert them to IDL variables using eval().  Not all
-    will convert correctly, such as tuples or lists of non-equal
-    member types.
+
+    Convert the header dict into a string representing an idl structure All
+    fields are represented as strings, so it is up to the user to attempt to
+    convert them to IDL variables using eval() or similar. Not all will
+    convert correctly, such as tuples or lists of non-equal member types.
 
     """
 
@@ -206,10 +183,13 @@ def hdrdict2idlstruct(hdr_dict):
 
         struct_items.append(item)
 
-    structdef = '{' + ', $\n'.join(struct_items)+'}'
+    structdef = '{' + ', '.join(struct_items)+'}'
 
     return structdef
 
+if len(sys.argv) < 2:
+    sys.stdout.write("usage: python rec2idl.py recfile")
+    sys.exit(45)
 
 
 fname=sys.argv[1]
