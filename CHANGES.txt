@@ -1,3 +1,31 @@
+v1.6.0
+---------------------------------------
+Major additions:  Added support for extended UPS and compiling using scons.  
+
+bug fixes:
+
+	pro/statistics/hist2d.pro: Bug fix for casting nxbins*nybins to long
+		integer.
+
+Tweaks:
+	pro/idlstruct/*:  Made work with GDL.
+
+New Files:
+	pro/admon/admom.pro:  Calculate adaptive moments of an object
+		in an image.
+	pro/recfiles:  Support for reading python rec files.
+		dtype2struct.pro: Convert numpy data type descriptor to idl
+			struct definition.
+		read_rec.pro:  Read a rec file.
+		read_recheader.pro:  Read header of a rec file.
+	python/rec2idl.py:  Convert the header of a .rec file to something
+		idl can parse.
+	pro/util/tostring.pro: convert a scalar, array, struct to a string
+		representation that can be evaluated by "execute()"
+	pro/util/numlines.pro:  Copied from the Goddard libraries.  They have
+		dropped this from their distro.
+	pro/sdss/nmgy2lups.pro: Convert nanomaggies to luptitudes.
+
 v1.5.0
 ---------------------------------------
 General comments:  The support for mac os x seems to be pretty solid now,
