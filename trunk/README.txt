@@ -28,6 +28,10 @@ type
     ./configure
     make
 
+Alternatively, if you have scons installed:
+
+	scons
+
 The configure script will check the operating system and set some
 system-dependent CFLAGS and such.  Note, only the htmIndex and atlas
 distributions currently support platforms other than linux, although some of
@@ -50,6 +54,16 @@ Move the directory to its final destination and set the variable SDSSIDL_DIR
 equal to this directory in your .cshrc or .bashrc file.  All users should do
 this.
 
+
+USING EUPS:
+
+You can "setup" sdssidl in the usual way.
+
+	setup sdssidl
+
+Or if you have a local install:
+	
+	setup sdssidl -r /path/to/install
 
 
 SETUP FILES:
