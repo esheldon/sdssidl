@@ -1,0 +1,15 @@
+# vim: set filetype=python :
+import os,sys,copy
+
+Import('env')
+
+CPPPATH=env['CPPPATH'] + ['.','../IDLStruct']
+idlstruct_obj=env.SharedObject(target="../IDLStruct/IDLStruct",
+                               source="../IDLStruct/IDLStruct.cpp")
+name="fileio"
+dlm=name+".dlm"
+env.SharedLibrary(target="../DLM/"+name, 
+            source=[name+".cpp","FileObj.cpp",idlstruct_obj],
+			CPPPATH=CPPPATH,
+            SHLIBPREFIX='')
+env.Command("../DLM/"+dlm,dlm,Copy("$TARGET","$SOURCE"))

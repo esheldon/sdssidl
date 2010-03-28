@@ -1,0 +1,264 @@
+<html><head><TITLE>ValVec</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A> template <class T>   class  ValVec  </H2><BLOCKQUOTE>
+Dynamic array of arbitrary values
+
+This is a template for a general-purpose dynamic array
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Fields</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.19.22"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>increment_</B> <br>
+<I> Linear growth increment */</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.23"> <IMG BORDER=0 SRC=icon1.gif></A> T* </TD><TD><B>vector_</B> <br>
+<I> dynamic array of values */</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.19.14"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>~ValVec</B> ( void )<br>
+<I>Destructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>ValVec</B> ( size_t capacity = 0, size_t increment = 0 )<br>
+<I>Default constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.2"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>ValVec</B> ( const T &<!2><A HREF="ValVec.html#DOC.19.11">fill</A>, size_t capacity, size_t increment )<br>
+<I>Alternate constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.3"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>ValVec</B> ( const <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>& )<br>
+<I>Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.4"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>& </TD><TD><B>operator =</B> ( const <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>& )<br>
+<I>Assignment/copy operator</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.15"> <IMG BORDER=0 SRC=icon1.gif></A> const  T& operator </TD><TD><B>()</B> ( size_t index ) const <br>
+<I>Efficient array operator (const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.16"> <IMG BORDER=0 SRC=icon1.gif></A> T& operator </TD><TD><B>()</B> ( size_t index )<br>
+<I>Efficient array operator (non-const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.17"> <IMG BORDER=0 SRC=icon1.gif></A> const  T& </TD><TD><B>operator []</B> ( size_t index ) const <br>
+<I>Bounds-checking array operator (const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.18"> <IMG BORDER=0 SRC=icon1.gif></A> T& </TD><TD><B>operator []</B> ( size_t index )<br>
+<I>Bounds-checking array operator (non-const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.5"> <IMG BORDER=0 SRC=icon1.gif></A> T& </TD><TD><B>at</B> ( size_t index )<br>
+<I>Bounds-adjusting array operator</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.19"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>length</B> ( void ) const <br>
+<I>Returns current occupied length of array</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.6"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>append</B> ( const T& )<br>
+<I>Efficiently insert given element at end of array</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.7"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>insert</B> ( size_t count, size_t offset = 0 )<br>
+<I>Insert new array elements</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.8"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>cut</B> ( size_t count, size_t offset = 0 )<br>
+<I>Remove array elements</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.9"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>remove</B> ( size_t offset )<br>
+<I>Removes the element specified by offset</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.10"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>keep</B> ( size_t count )<br>
+<I>Cut but keep capacity</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.11"> <IMG BORDER=0 SRC=icon1.gif></A> T& </TD><TD><B>fill</B> ( void )<br>
+<I>Return the fill value, defining it if necessary</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.20"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>fillExists</B> ( void ) const <br>
+<I>Returns true if the fill value is defined</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.12"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>unsetFill</B> ( void )<br>
+<I>Undefine and destroy the current fill value</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.13"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>clear</B> ( void )<br>
+<I>Reset every value to the fill value</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.19.21"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>sort</B> ( int (*compar)(const void*, const void*) )<br>
+<I>Do a qsort </I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+Dynamic array of arbitrary values
+
+This is a template for a general-purpose dynamic array.  The array
+grows automatically as needed, but reallocation occurs only when
+the length exceeds the capacity.  The capacity is increased in
+large blocks, the size of which may be optimized.  A fill value may
+be defined, in which case it is used to initialize new elements of
+the array, but not new capacity.  Which is to say that
+initialization is deferred until the array grows into its capacity.
+The public data member, increment_, specifies the amount by which
+the capacity is increased during reallocation.  By default,
+increment_ is zero, which causes the capacity to double upon each
+reallocation.  A non-zero increment_ is simply added to the
+capacity upon each reallocation.  The capacity is extended by this
+amount or by whatever greater amount is necessary to accommodate
+the new length of the array.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="~ValVec">
+<A NAME ="DOC.19.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ~ValVec( void )</B></TT>
+<DD>Destructor
+<DL></DL><P>
+<A NAME="ValVec">
+<A NAME ="DOC.19.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ValVec( size_t capacity = 0, size_t increment = 0 )</B></TT>
+<DD>Default constructor.
+optionally specify initial capacity and
+reallocation increment.  
+<DL></DL><P>
+<A NAME="ValVec">
+<A NAME ="DOC.19.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ValVec( const T &<!2><A HREF="ValVec.html#DOC.19.11">fill</A>, size_t capacity, size_t increment )</B></TT>
+<DD>Alternate constructor.
+define a fill value in addition to the
+parameters of the default constructor.  class T must have
+well-defined copy semantics.  The fill value does not exist
+unless it is defined.  
+<DL></DL><P>
+<A NAME="ValVec">
+<A NAME ="DOC.19.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ValVec( const <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>& )</B></TT>
+<DD>Copy constructor.  
+The initial capacity is the current capacity of the duplicated array.  
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.19.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>&  operator =( const <!2><A HREF="ValVec.html#DOC.19.2">ValVec</A>& )</B></TT>
+<DD>Assignment/copy operator.
+does not decrease the capacity. 
+<DL></DL><P>
+<A NAME="()">
+<A NAME ="DOC.19.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  T& operator  ()( size_t index ) const </B></TT>
+<DD>Efficient array operator (const version): no bounds checking
+<DL></DL><P>
+<A NAME="()">
+<A NAME ="DOC.19.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T& operator  ()( size_t index )</B></TT>
+<DD>Efficient array operator (non-const version): no bounds checking
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.19.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  T&  operator []( size_t index ) const </B></TT>
+<DD>Bounds-checking array operator (const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.19.18">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T&  operator []( size_t index )</B></TT>
+<DD>Bounds-checking array operator (non-const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="at">
+<A NAME ="DOC.19.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T&  at( size_t index )</B></TT>
+<DD>Bounds-adjusting array operator.  Returns the array
+element at the specified index, extending the array as necessary
+to bring it within bounds.  The fill value, if defined, is the
+initializer for any new elements. 
+<DL></DL><P>
+<A NAME="length">
+<A NAME ="DOC.19.19">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  length( void ) const </B></TT>
+<DD>Returns current occupied length of array
+<DL></DL><P>
+<A NAME="append">
+<A NAME ="DOC.19.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  append( const T& )</B></TT>
+<DD>Efficiently insert given element at end of array.
+Avoids redundant initialization of new array element, except for
+when a reallocation is required.  Returns the new length. 
+<DL></DL><P>
+<A NAME="insert">
+<A NAME ="DOC.19.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  insert( size_t count, size_t offset = 0 )</B></TT>
+<DD>Insert new array elements.  
+Count specifies the number of new elements, and offset specifies
+where in the array to insert them.  By default the new elements
+are appended.  The fill value, if defined, is the initializer
+for the new elements.  offset refers to the end of the array:
+the first new element is located at index (length - offset).
+Returns the new length.  Throws sxBoundsError if offset is
+greater than length. 
+<DL></DL><P>
+<A NAME="cut">
+<A NAME ="DOC.19.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  cut( size_t count, size_t offset = 0 )</B></TT>
+<DD>Remove array elements.  
+
+count specifies the number of elements to remove, and offset
+specifies which elements to remove.  By default elements are
+removed from the end of the array.  The unused capacity grows by
+this amount.  offset refers to the end of the array: the first
+removed element is located at index (length - offset - count).
+Returns the new length.  Throws sxBoundsError if (offset+count)
+is greater than length. 
+<DL></DL><P>
+<A NAME="remove">
+<A NAME ="DOC.19.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  remove( size_t offset )</B></TT>
+<DD>Removes the element specified by offset.
+This is basically a wrapper for the cut method cut(1, length-offset-1) 
+<DL></DL><P>
+<A NAME="keep">
+<A NAME ="DOC.19.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  keep( size_t count )</B></TT>
+<DD>Cut but keep capacity. 
+Just like the cut method, it resets the length of the vector by
+count, but it always starts from the end.  The elements, however
+are not deleted and rebuilt with the default, but rather left as
+they are for the user to reuse. 
+<DL></DL><P>
+<A NAME="fill">
+<A NAME ="DOC.19.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T&  fill( void )</B></TT>
+<DD>Return the fill value, defining it if necessary.
+If the fill value is not defined, a default value is created
+using the default constructor for class T.  The returned object
+is an lvalue, to which a new fill value may be assigned. 
+<DL></DL><P>
+<A NAME="fillExists">
+<A NAME ="DOC.19.20">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  fillExists( void ) const </B></TT>
+<DD>Returns true if the fill value is defined
+<DL></DL><P>
+<A NAME="unsetFill">
+<A NAME ="DOC.19.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  unsetFill( void )</B></TT>
+<DD>Undefine and destroy the current fill value.
+(if it is defined) 
+<DL></DL><P>
+<A NAME="clear">
+<A NAME ="DOC.19.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  clear( void )</B></TT>
+<DD>Reset every value to the fill value. If no fill is
+defined, nothing is done!  
+<DL></DL><P>
+<A NAME="sort">
+<A NAME ="DOC.19.21">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  sort( int (*compar)(const void*, const void*) )</B></TT>
+<DD>Do a qsort 
+<DL></DL><P>
+<A NAME="increment_">
+<A NAME ="DOC.19.22">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  increment_</B></TT>
+<DD> Linear growth increment */
+<DL></DL><P>
+<A NAME="vector_">
+<A NAME ="DOC.19.23">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T*  vector_</B></TT>
+<DD> dynamic array of values */
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

@@ -1,0 +1,200 @@
+<html><head><TITLE>SpatialConstraint</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  SpatialConstraint : public <!2><A HREF="SpatialSign.html#DOC.2.1">SpatialSign</A> </H2><BLOCKQUOTE>
+
+The Constraint is really a cone on the sky-sphere
+</BLOCKQUOTE>
+<hr>
+ <h2> Inheritance:</h2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CSpatialSign,MSpatialSign.html,CSpatialConstraint,MSpatialConstraint.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.3.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConstraint</B> ()<br>
+<I> Constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.2"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConstraint</B> (<!1><A HREF="SpatialVector.html">SpatialVector</A>, float64)<br>
+<I> Initialization constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.3"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConstraint</B> (const <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A> &)<br>
+<I> Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.4"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A>& </TD><TD><B>operator =</B> (const <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A> &)<br>
+<I> Assignment</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.5"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>setVector</B> (<!1><A HREF="SpatialVector.html">SpatialVector</A> &)<br>
+<I> set vector</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.6"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>setDistance</B> (float64)<br>
+<I> set distance</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.7"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>invert</B> ()<br>
+<I> Invert</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.8"> <IMG BORDER=0 SRC=icon1.gif></A> bool </TD><TD><B>contains</B> (const <!1><A HREF="SpatialVector.html">SpatialVector</A> <!2><A HREF="SpatialConstraint.html#DOC.3.9">v</A>)<br>
+<I> check whether a vector is inside this</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.9"> <IMG BORDER=0 SRC=icon1.gif></A> <!1><A HREF="SpatialVector.html">SpatialVector</A>& </TD><TD><B>v</B> ()<br>
+<I> give back vector</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.10"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>d</B> () const <br>
+<I> give back distance</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.11"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>read</B> (istream &in)<br>
+<I> read</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.12"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>readRaDec</B> (istream &in)<br>
+<I> read</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.3.13"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>write</B> (ostream &out) const <br>
+<I> write</I>
+</TD></TR></TABLE></DL>
+<hr><H3>Inherited from <A HREF="SpatialSign.html">SpatialSign:</A></h3>
+
+<DL>
+<DL>
+<DT><h3>Protected Fields</h3><DD><DT><IMG SRC=icon2.gif> Sign  <B>sign_</B>
+</DL></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+
+The Constraint is really a cone on the sky-sphere. It is characterized
+by its direction a_, the opening angle s_ and its cosine -- the distance
+of the plane intersecting the sphere and the sphere center.
+If d_ = 0, we have a half-sphere. If it is negative, we have a 'hole'
+i.e. the room angle is larger than 90degrees.
+
+Example: positive distance
+<pre>
+.                   ____
+.                ---    ---
+.               /        /|\
+.              /        / |=\
+.             |        /  |==|     this side is in the convex.
+.            |        /\s |===|
+.            |------------|---| -> direction a
+.            |        \   |===|
+.             |        \  |==|
+.              \        \ |=/
+.               \        \|/
+.                ---____---
+.
+.
+.                     <-d-> is positive (s < 90)
+
+</pre>
+Example: negative distance
+<pre>
+.                   ____
+.                ---====---
+.  this side is /========/|\
+.  in the      /========/=| \
+.  convex     |==== s__/==|  |
+.            |===== / /===|   |
+.  dir. a <- |------------|---|  'hole' in the sphere
+.            |========\===|   |
+.             |========\==|  |
+.              \========\=| /
+.               \========\|/
+.                ---____---
+.
+.
+.                     <-d-> is negative (s > 90)
+</pre>
+for d=0 we have a half-sphere. Combining such, we get triangles, rectangles
+etc on the sphere surface (pure ZERO convexes)
+
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="SpatialConstraint">
+<A NAME ="DOC.3.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConstraint()</B></TT>
+<DD> Constructor
+<DL></DL><P>
+<A NAME="SpatialConstraint">
+<A NAME ="DOC.3.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConstraint(<!1><A HREF="SpatialVector.html">SpatialVector</A>, float64)</B></TT>
+<DD> Initialization constructor
+<DL></DL><P>
+<A NAME="SpatialConstraint">
+<A NAME ="DOC.3.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConstraint(const <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A> &)</B></TT>
+<DD> Copy constructor
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.3.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A>&  operator =(const <!2><A HREF="SpatialConstraint.html#DOC.3.1">SpatialConstraint</A> &)</B></TT>
+<DD> Assignment
+<DL></DL><P>
+<A NAME="setVector">
+<A NAME ="DOC.3.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  setVector(<!1><A HREF="SpatialVector.html">SpatialVector</A> &)</B></TT>
+<DD> set vector
+<DL></DL><P>
+<A NAME="setDistance">
+<A NAME ="DOC.3.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  setDistance(float64)</B></TT>
+<DD> set distance
+<DL></DL><P>
+<A NAME="invert">
+<A NAME ="DOC.3.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  invert()</B></TT>
+<DD> Invert
+<DL></DL><P>
+<A NAME="contains">
+<A NAME ="DOC.3.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> bool  contains(const <!1><A HREF="SpatialVector.html">SpatialVector</A> <!2><A HREF="SpatialConstraint.html#DOC.3.9">v</A>)</B></TT>
+<DD> check whether a vector is inside this
+<DL></DL><P>
+<A NAME="v">
+<A NAME ="DOC.3.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!1><A HREF="SpatialVector.html">SpatialVector</A>&  v()</B></TT>
+<DD> give back vector
+<DL></DL><P>
+<A NAME="d">
+<A NAME ="DOC.3.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  d() const </B></TT>
+<DD> give back distance
+<DL></DL><P>
+<A NAME="read">
+<A NAME ="DOC.3.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  read(istream &in)</B></TT>
+<DD> read
+<DL></DL><P>
+<A NAME="readRaDec">
+<A NAME ="DOC.3.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  readRaDec(istream &in)</B></TT>
+<DD> read
+<DL></DL><P>
+<A NAME="write">
+<A NAME ="DOC.3.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  write(ostream &out) const </B></TT>
+<DD> write
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

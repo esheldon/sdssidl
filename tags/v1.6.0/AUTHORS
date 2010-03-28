@@ -1,0 +1,39 @@
+Most of the IDL code is written by 
+    Erin Sheldon
+    Dave Johnston
+    Tim Mckay
+    Ryan Scranton
+
+With contributions from others as well as direct copies of programs from people
+who aren't even aware.  In the latter case the documentation has been left
+intact in order to preserve authorship.  All code written by the above authors
+is licenced under the Gnu General Public License (see gpl.txt).  Other codes
+are licenced in one of the following ways:
+
+    1) According to the license listed in the source code
+    2) When no license is shown in the source code the code
+    was assumed to be in the public domain. If you see code for which
+    this is not the case, let us know.
+
+The following C/C++ routines were partly or wholly authored by someone else and
+linked by Erin Sheldon through an interface.  If you see licensing conflicts
+let us know.
+
+atlas:
+	Stand alone atlas reader: Robert Lupton
+    License: public domain.
+	Interface to IDL Erin Sheldon
+
+htmIndexIDL: 
+	Original C++ by Peter Kunszt
+    License: 
+	Interface to IDL and modifications of some methods: Erin Sheldon
+
+sdsspixIDL:
+	Original stand alone C Ryan Scranton
+	Interface to IDL and edge checking code Erin Sheldon
+
+sphpoly_masks: 
+	Original stand alone C Andreas Berlind
+        Interface to IDL Erin Sheldon
+

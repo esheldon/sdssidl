@@ -1,0 +1,187 @@
+<html><head><TITLE>SpatialConvex</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  SpatialConvex : public <!2><A HREF="SpatialSign.html#DOC.2.1">SpatialSign</A> </H2><BLOCKQUOTE>
+
+A spatial convex is composed of spatial constraints
+</BLOCKQUOTE>
+<hr>
+ <h2> Inheritance:</h2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CSpatialSign,MSpatialSign.html,CSpatialConvex,MSpatialConvex.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.5.4"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConvex</B> ()<br>
+<I> Default Constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.5"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConvex</B> (const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v3)<br>
+<I> Constructor from a triangle</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.6"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConvex</B> (const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v3, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v4)<br>
+<I> Constructor from a rectangle</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.7"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialConvex</B> (const <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A> &)<br>
+<I> Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.8"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A>& </TD><TD><B>operator =</B> (const <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A> &)<br>
+<I> Assignment</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.9"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>add</B> (<!1><A HREF="SpatialConstraint.html">SpatialConstraint</A> &)<br>
+<I> Add a constraint</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.10"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>simplify</B> ()<br>
+<I> Simplify the convex, remove redundancies</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.1"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>intersect</B> (const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="BitList.html">BitList</A> * partial, <!1><A HREF="BitList.html">BitList</A> * full)<br>
+<I>
+Intersect with index</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.2"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>intersect</B> (const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="ValVec.html">ValVec</A><uint64> * partial, <!1><A HREF="ValVec.html">ValVec</A><uint64> * full)<br>
+<I>
+Intersect with index</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.3"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>intersect</B> (const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="ValVec.html">ValVec</A><uint64> * idList)<br>
+<I>
+Intersect with index</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.11"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>numConstraints</B> ()<br>
+<I> Return the number of constraints</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.12"> <IMG BORDER=0 SRC=icon1.gif></A> <!1><A HREF="SpatialConstraint.html">SpatialConstraint</A>& </TD><TD><B>operator []</B> (size_t i)<br>
+<I> [] operator: give back constraint</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.13"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>read</B> (istream&)<br>
+<I> read from stream</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.14"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>readRaDec</B> (istream&)<br>
+<I> read from stream</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.5.15"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>write</B> (ostream&) const <br>
+<I> write to stream</I>
+</TD></TR></TABLE></DL>
+<hr><H3>Inherited from <A HREF="SpatialSign.html">SpatialSign:</A></h3>
+
+<DL>
+<DL>
+<DT><h3>Protected Fields</h3><DD><DT><IMG SRC=icon2.gif> Sign  <B>sign_</B>
+</DL></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+
+A spatial convex is composed of spatial constraints. It does not
+necessarily define a continuous area on the sphere since it is a
+3D-convex of planar intersections which may intrersect with the
+unit sphere at disjoint locations. Especially 'negative'
+constraints tend to tear 'holes' into the convex area.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="SpatialConvex">
+<A NAME ="DOC.5.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConvex()</B></TT>
+<DD> Default Constructor
+<DL></DL><P>
+<A NAME="SpatialConvex">
+<A NAME ="DOC.5.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConvex(const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v3)</B></TT>
+<DD> Constructor from a triangle
+<DL></DL><P>
+<A NAME="SpatialConvex">
+<A NAME ="DOC.5.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConvex(const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v1, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v2, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v3, const <!1><A HREF="SpatialVector.html">SpatialVector</A> * v4)</B></TT>
+<DD> Constructor from a rectangle
+<DL></DL><P>
+<A NAME="SpatialConvex">
+<A NAME ="DOC.5.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialConvex(const <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A> &)</B></TT>
+<DD> Copy constructor
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.5.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A>&  operator =(const <!2><A HREF="SpatialConvex.html#DOC.5.4">SpatialConvex</A> &)</B></TT>
+<DD> Assignment
+<DL></DL><P>
+<A NAME="add">
+<A NAME ="DOC.5.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  add(<!1><A HREF="SpatialConstraint.html">SpatialConstraint</A> &)</B></TT>
+<DD> Add a constraint
+<DL></DL><P>
+<A NAME="simplify">
+<A NAME ="DOC.5.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  simplify()</B></TT>
+<DD> Simplify the convex, remove redundancies
+<DL></DL><P>
+<A NAME="intersect">
+<A NAME ="DOC.5.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  intersect(const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="BitList.html">BitList</A> * partial, <!1><A HREF="BitList.html">BitList</A> * full)</B></TT>
+<DD>
+Intersect with index. 
+The partial and full bitlists for the result have to be
+given. If the conves occupies a large percent of the area
+of the sphere, bitlists are the preferred result method.
+<DL></DL><P>
+<A NAME="intersect">
+<A NAME ="DOC.5.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  intersect(const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="ValVec.html">ValVec</A><uint64> * partial, <!1><A HREF="ValVec.html">ValVec</A><uint64> * full)</B></TT>
+<DD>
+Intersect with index.
+Same intersection as with bitlists (see above), but the result
+is given in a list of nodes.  If the conves is very small, this
+is the preferred result method.  
+<DL></DL><P>
+<A NAME="intersect">
+<A NAME ="DOC.5.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  intersect(const <!1><A HREF="SpatialIndex.html">SpatialIndex</A> * index, <!1><A HREF="ValVec.html">ValVec</A><uint64> * idList)</B></TT>
+<DD>
+Intersect with index.
+Now only a single list of IDs is returned. The IDs need not be
+level.
+<DL></DL><P>
+<A NAME="numConstraints">
+<A NAME ="DOC.5.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  numConstraints()</B></TT>
+<DD> Return the number of constraints
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.5.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!1><A HREF="SpatialConstraint.html">SpatialConstraint</A>&  operator [](size_t i)</B></TT>
+<DD> [] operator: give back constraint
+<DL></DL><P>
+<A NAME="read">
+<A NAME ="DOC.5.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  read(istream&)</B></TT>
+<DD> read from stream
+<DL></DL><P>
+<A NAME="readRaDec">
+<A NAME ="DOC.5.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  readRaDec(istream&)</B></TT>
+<DD> read from stream
+<DL></DL><P>
+<A NAME="write">
+<A NAME ="DOC.5.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  write(ostream&) const </B></TT>
+<DD> write to stream
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>

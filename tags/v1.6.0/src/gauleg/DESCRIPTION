@@ -1,0 +1,2 @@
+title		gauleg
+description	C extension for calculating gauss-legendre integration weights and abscissa.
