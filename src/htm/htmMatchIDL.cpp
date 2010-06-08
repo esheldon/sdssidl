@@ -200,6 +200,8 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
 
             t0 = clock();
 
+            // these are temporary vectors to hold matches to this point
+            std::vector<PAIR_INFO> pair_info;
 
             IDL_MEMINT nKeep = 0;
             for (IDL_MEMINT j=0; j<nFound; j++) {
@@ -229,6 +231,13 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
                             // and the gcirc.
                             if (dis <= angle) {
 
+                                PAIR_INFO pi;
+                                pi.i1 = i1;
+                                pi.i2 = i2;
+                                pi.d12 = dis;
+                                pair_info.push_back(pi);
+
+                                /*
                                 if (kw.file_there) 
                                 {
                                     fwrite(&i1, sizeof(IDL_LONG), 1, fptr);
@@ -242,22 +251,51 @@ void htmmatchc(int argc, IDL_VPTR *argv, char *argk)
                                     d12.push_back(dis);
                                 }
                                 nKeep += 1;
+                                */
                             } // Within distance 
 
-                            /* this is WRONG, we should sort and keep the closest */
-                            if (nKeep >= maxmatch)
-                                break;
                         } // loop over objects in leaf 
 
                     } // any in leaf?
 
                 } // leaf id in list 2?
-                if (nKeep >= maxmatch)
-                    break;
             } // loop over leaves
 
             ntotal += nKeep;
             tother += clock()-t0;
+
+
+            IDL_MEMINT nkeep = pair_info.size();
+            if ( nkeep > 0 ) {
+
+                // Sort the result by distance
+                std::sort( 
+                        pair_info.begin(), 
+                        pair_info.end(), 
+                        PAIR_INFO_ORDERING());
+
+                if ((maxmatch > 0) ) {
+                    // setting maxmatch to zero is same as "keep all matches"
+                    if (nkeep > maxmatch) {
+                        nkeep=maxmatch;
+                    }
+                }
+                for (IDL_MEMINT ci=0; ci<nkeep; ci++) {
+                    if (fptr) {
+                        fwrite(&(pair_info[ci].i1), sizeof(int32), 1, fptr);
+                        fwrite(&(pair_info[ci].i2), sizeof(int32), 1, fptr);
+                        fwrite(&(pair_info[ci].d12), sizeof(double), 1, fptr);
+                    } else {
+                        m1.push_back(pair_info[ci].i1);
+                        m2.push_back(pair_info[ci].i2);
+                        d12.push_back(pair_info[ci].d12);
+                    }
+                    // keep track of the total number actually saved or written
+                    ntotal += 1;
+                }
+            }
+
+
 
         } /* loop over first list */
 
@@ -407,15 +445,18 @@ htmMatchGetData(IDL_VPTR ra1Vptr, IDL_VPTR dec1Vptr,
     }
 
 
-    if (kw.depth_there)
+    if (kw.depth_there) {
         *depth = IDL_MEMINTScalar(kw.depth);
-    else
+    } else {
         *depth = DEFAULT_DEPTH;
+    }
 
-    if (kw.maxmatch_there)
+    if (kw.maxmatch_there) {
         *maxmatch = IDL_MEMINTScalar(kw.maxmatch);
-    else
+    } else {
+        // this default is 1
         *maxmatch = DEFAULT_MAXMATCH;
+    }
 
     return(1);
 
@@ -424,10 +465,9 @@ htmMatchGetData(IDL_VPTR ra1Vptr, IDL_VPTR dec1Vptr,
 
 
 
-    double
-gcirc(double ra1, double dec1, 
+double gcirc(
+        double ra1, double dec1, 
         double ra2, double dec2)
-
 {
 
 
@@ -462,8 +502,7 @@ gcirc(double ra1, double dec1,
 
 
 
-    void
-htmMatchErrOut(const char *message)
+void htmMatchErrOut(const char *message)
 {
 
     IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, message);

@@ -3,7 +3,21 @@
 #define NO_MATCHES 2
 
 #define DEFAULT_DEPTH 10
-#define DEFAULT_MAXMATCH 100000000
+#define DEFAULT_MAXMATCH 1
+
+typedef struct {
+	int64_t i1;	
+	int64_t i2;	
+	double d12;
+} PAIR_INFO;
+
+struct PAIR_INFO_ORDERING {
+	bool operator()(PAIR_INFO const& pi1, PAIR_INFO const& pi2) {
+		return pi1.d12 < pi2.d12;
+	}
+};
+
+
 
 int 
 htmMatchGetData(IDL_VPTR ra1Vptr, IDL_VPTR dec1Vptr, 
