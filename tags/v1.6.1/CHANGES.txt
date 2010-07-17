@@ -1,0 +1,266 @@
+v1.6.1
+---------------------------------------
+
+src/htm/*: Bug fix in htm match when maxmatch was not 1: the closest matches
+    were not being returned.  Also there is no longer an upper limit on number of
+    matches.  Matches are now returned sorted by distance.
+
+pro/math/asinh2.pro: copied from idlutils for nmgy2lups.pro
+
+pro/astro/spheredist.pro: Fixed bug in spheredist: theta was off by 
+    factor of r2d^2 for units=2 or units=4
+
+
+v1.6.0
+---------------------------------------
+Major additions:  Added support for extended UPS and compiling using scons.  
+
+bug fixes:
+
+	pro/statistics/hist2d.pro: Bug fix for casting nxbins*nybins to long
+		integer.
+
+Tweaks:
+	pro/idlstruct/*:  Made work with GDL.
+
+New Files:
+	pro/admon/admom.pro:  Calculate adaptive moments of an object
+		in an image.
+	pro/recfiles:  Support for reading python rec files.
+		dtype2struct.pro: Convert numpy data type descriptor to idl
+			struct definition.
+		read_rec.pro:  Read a rec file.
+		read_recheader.pro:  Read header of a rec file.
+	python/rec2idl.py:  Convert the header of a .rec file to something
+		idl can parse.
+	pro/util/tostring.pro: convert a scalar, array, struct to a string
+		representation that can be evaluated by "execute()"
+	pro/util/numlines.pro:  Copied from the Goddard libraries.  They have
+		dropped this from their distro.
+	pro/sdss/nmgy2lups.pro: Convert nanomaggies to luptitudes.
+
+v1.5.0
+---------------------------------------
+General comments:  The support for mac os x seems to be pretty solid now,
+let us know if you have problems compiling.
+
+bug fixes:
+	gcc 4.3 has turned many warnings into errors.  Hundreds of fixes were
+		applied to fixe these mostly harmless problems.
+	skiplines works properly now for ascii_read() C++ DLM.
+    pro/util/match_dup.pro: Bug fix; code checks for overlapping ranges of
+        input arrays.
+    pro/astro/spheredist.pro: Bug fix; output fixzed so values are between 0
+    and 2!pi.
+	pro/sdss/gc2csurvey: misnamed procedure internally.  Incorrect docs.
+
+New Files:
+    pro/util/in.pro: Check if a value is contained in an array or matches
+        a scalar.
+    pro/util/tostring.pro:  Convert idl variables to strings.
+    pro/util/fromstring.pro:  Convert from idl strings to variables.
+	pro/plotting/plegend.pro:  A fork from legend.pro that supports color
+		strings, no default box, box color, etc.
+
+minor changes:
+	pro/files/which.pro:
+		1: Search for Dynamically Loadable module if no files are found.
+		   If /dlm is set search onlyl for those.
+		2: /show: display the first match found.
+		3: Now use file_search, to avoid a bug in idl 7.0. 
+	pro/idlstruct_files/idlstruct2fits.pro: support ascii
+	pro/plotting/pplot.pro: support color strings.
+	pro/plotting/textoidl.pro:  Added \sun and made roman font !3
+	pro/plotting/plot_box.pro: support color strings.
+	pro/plotting/ploth.pro:  support asinh scaling with tvasinh.pro
+	pro/htm/htm_match.pro:  Fixed incorrect docs
+	pro/fits/mrdfits_multi.pro:  Allow specify extension.
+	pro/util/doc_method.pro: Use file_which
+	pro/sdss/sdss_objname.pro: Use prefix=,suffix=
+	pro/sdss/sdss_flags__define.pro: flagname, plotting
+	pro/sdss/sdss_files__define.pro: sensible dealing with reruns.  Also
+		allow nyu/boss ordering of rerun
+	pro/sdss/make_cmodel_counts.pro: removed preselection with flags
+	pro/probgal/bayes_combine_gri.pro:  Use sdss_flag_select
+
+
+v1.4.0 2008-09-20
+---------------------------------------
+Completely revamped the configure system.  Now creates a single file
+src/make.conf with the CFLAGS and LDFLAGS needed for the OS.  This is included
+in the Makefiles for each module.
+
+Added support for Darwin.  This has been tested on leopard intel core 2 duo.
+Need more testing.  Also, postgres and gsl support is currently only for code
+installed in one of the "usual places" or via Fink.  
+
+
+
+New Files: 
+    pro/sdss/sdssidl_test_suite.pro: A suite of tests for the sdssidl distro.  
+        Mainly tests the C/C++ extensions
+    pro/util/match_hist.pro:  Get a subset ind2 from array2 such that the 
+        histogram of array2[ind2] is proportional to that of another 
+        array array1
+    pro/files/dirsep.pro:  This was left out accidentally in release v1.3.0.  
+        A couple of programs depend upon it.
+    data/sample-pixel.mask:  A sample sdsspix mask
+    data/sample-sphpoly-mask.dat: A sample spherical polygon mask
+
+major changes:
+    Reading string fields in csv is now fully supported by the READ_IDLSTRUCT()
+    procedure. Previously this was only supported if the ascii_read() C++
+    code was linked.
+
+    ascii_read() can now deal properly with variable length strings whenever a
+        proper delimiter is used for all fields.  If just white space is used
+        the string fields must sill be fixed length.  Added the following
+        keywords:
+            /tab, delimiter=, /whitespace
+        Default is /tab.  The whitespace separated fields is now a special
+        case since the specific delimiter is a better model and doesn't
+        require fixed length fields.
+    pgsql_query().  This C extension for querying Postgresql databases
+        now supports reading of multi-dimensional arrays from databases.
+    pro/postgres/postgres__define:  Now uses the postgres binary format
+        for copying data into tables, as used by struct2table.  This is
+        more flexible but not significantly more efficient.  But now all
+        IDL native code rather than relying on ascii_write DLM.
+        
+minor changes:
+    pro/files/path_join.pro: More flexible behavior.
+    pro/util/match_multi.pro: Check number of matches > 0 before creating 
+        output array.
+
+
+v1.3.0 2007-10-09
+---------------------------------------
+
+New files:
+plotting/setfont.pro: Set the font. Currently vector only.
+plotting/textoidl.pro: This is a highly modified version of Matt Craig's 
+    program.  Most of the mods are by David Schlegel and Doug Finkbeiner.
+    I added the \odot symbol and incorporated into sdssidl.
+astro/spheredist.pro: Compute spherical distances and angles.  Used to be
+    mygcirc.pro
+
+Major Modifications:
+plotting/multiplot.pro:
+    Can now place titles on the overall x and y axes, as well as a top title
+    using these new keywords. 
+      mtitle=mtitle, mTitSize=mTitSize, mTitOffset=mTitOffset, $
+      mxTitle=mxTitle, mxTitSize=mxTitSize, mxTitOffset=mxTitOffset, $
+      myTitle=myTitle, myitSize=myitSize, myitOffset=myitOffset
+    Can now control gaps between the plots with the gap=, xgap=, and ygap=
+    keywords
+plotting/setupplot.pro:
+    For vector fonts, now calls setfont with the index from
+    !pslayout.font_index (which was unused before).
+plotting/pslayout.pro:
+    Not defaults to vector fonts, font_index=6, which results in much
+    nicer fonts and works better with the textoidl() program.
+
+sdss/read_objmask.pro:
+    rerun,camcol,field,parent now included in objmask. This is done by the
+    C code when the object has an atlas image.  If it doesn't, the id info
+    is added by this IDL wrapper.
+util/match_multi.pro:
+    Two new optional outputs: 
+   match1: The array of match indices from array 1.  This may not be the same
+       length as the match array for array 2.  See dupmatch1 for that.
+   dupmatch1: An array of matches from array 1 that correspond direclty
+       to all matches from array2, so it may contain duplicates.
+fileio/read_struct.pro: 
+    Can now read multiple files.  More self-sufficient method for determining 
+    number of lines, but for idl < 5.6 is unix only.
+
+Minor Modifications:
+ascii_read() DLM: Fixed documentation error stating that string columns
+    could be variable length.
+
+v1.2 2007-05-09
+---------------------------------------
+
+New files:
+statistics/bootstrap.pro
+    Create bootstrap samples and calculate statistics for input variables.
+    The input data are up to 8 equal length arrays where each element 
+    represents information about the same event or object. For example they
+    could be the flux in different wavelenghts of some astronomical object,
+    or parameters of an event in a detector.
+statistics/boot_indices.pro
+    Returns random indices between 0 and imax-1 drawn with replacement for use 
+    in bootstrapping.
+statistics/boot_samples.pro
+    Create bootstrap data for input variables. The input data are up to 
+    8 equal length arrays where each element represents information about 
+    the same event or object. For example they could be the flux in different 
+    wavelenghts of some astronomical object, or parameters of an event in a 
+    detector. The output is the mean of each bootstrap sample, for each input
+    variable, in an [nsample, nvar] array, or 1-d for nvar=1.  
+statistics/boot_stats.pro
+    Calculate the statistics (mean, sdev, covariance) for a set of bootstrap samples. 
+    This program does not create bootstrap samples, see boot_indices() and 
+    boot_samples() for that.  The input data are a 1-d array of bootstrap samples
+    or a 2-d [nsample, nvar] array with the second dimension representing the value
+    of different variables for each bootstrap sample.
+statistics/boot_hist.pro
+    Create a histogram with bootstrapped errors.
+
+Major Modifications:
+files/ddir.pro and dfile.pro
+    Major re-write to take an array of path elements instead of different
+    parameters as the path elements. Much more flexible.
+plotting/plothist
+    Allow bootstrapping using the nboot keyword. Calls boot_hist in
+        this case.  Can use /error to plot poisson errors on unweighted
+        histograms.  2006-04-24 Erin Sheldon, NYU
+
+Minor Modifications:
+statistics/binner.pro
+    Calculate xlow,xhigh stats when binning by number
+sdss/sdss_read.pro (sdss_files__define.pro): Bug where the /all flag was
+    not being used.
+sdss/many files: error in docs saying status of 1 is success, 0 failure, when
+    actually the opposite is true.
+
+Other:
+Moved statistics related programs into the statistics subdirectory.
+
+Comments:
+This is the final version used in the maxbcg lensing analysis from 2007.
+ 
+v1.1a 2007-04-23
+---------------------------------------
+Bug fix in ddir.pro
+
+v1.1 2007-04-22
+---------------------------------------
+New files:
+pro/util/binner.pro
+    Generic binning routine.  Bins 1- or 2-d data sets and supports weighted
+    histograms and binning into groups with N elements.  For 1-d it generates 
+    histograms, returning info about bin edges and centers and allowing weighted 
+    histograms.  For 2-d the data are binned by x and the y values are averaged in 
+    each bin using a specified method.  NOTE for 2-d, bins containing no objects 
+    are not returned in the result.  The result is a structure containing the
+    relevant information.    
+pro/files/path_join.pro
+    Join path elements using the default path separator, such as directory and
+    filenames.
+pro/files/ddir.pro
+    Generate a directory name based upon input elements.  Combined with dfile
+    defines a generic naming scheme for directories and files.
+pro/files/dfile.pro
+    Create a generic filename based upon the directory structure.  Combined
+    with ddir defines a generic naming scheme for directories and files.
+pro/sdss/nmgy2lups.pro: 
+    Convert flux in nanomaggies to asinh mags, or luptitudes. 
+pro/sdss/lups2nmgy.pro: 
+    Convert asinh mags, or luptitudes, to flux in nanomaggies.
+CHANGES.txt
+    This file added to track major changes.
+
+v1.0
+---------------------------------------
+First tagged version.  2007-04-01

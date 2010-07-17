@@ -1,0 +1,146 @@
+<html><head><TITLE>LinPool</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A> template <class T>   class  LinPool  </H2><BLOCKQUOTE>
+Dynamic linear pool of objects
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Fields</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.21.10"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>increment_</B> <br>
+<I> linear growth increment</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.11"> <IMG BORDER=0 SRC=icon1.gif></A> T** </TD><TD><B>vector_</B> <br>
+<I> dynamic array of pointers</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.21.4"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>~LinPool</B> ( void )<br>
+<I>Destructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>LinPool</B> ( size_t capacity=0, size_t increment=0 )<br>
+<I>Default constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.5"> <IMG BORDER=0 SRC=icon1.gif></A> const  T*& operator </TD><TD><B>()</B> ( size_t index ) const <br>
+<I>Efficient array operator (const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.6"> <IMG BORDER=0 SRC=icon1.gif></A> T*& operator </TD><TD><B>()</B> ( size_t index )<br>
+<I>Efficient array operator (non-const version): no bounds checking</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.7"> <IMG BORDER=0 SRC=icon1.gif></A> const  T*& </TD><TD><B>operator []</B> ( size_t index ) const <br>
+<I>Bounds-checking array operator (const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.8"> <IMG BORDER=0 SRC=icon1.gif></A> T*& </TD><TD><B>operator []</B> ( size_t index )<br>
+<I>Bounds-checking array operator (non-const version): throws sxBoundsError</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.2"> <IMG BORDER=0 SRC=icon1.gif></A> T*& </TD><TD><B>use</B> ( void )<br>
+<I>Use Method</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.9"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>length</B> ( void ) const <br>
+<I>Returns current occupied length of the pool</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.21.3"> <IMG BORDER=0 SRC=icon1.gif></A> size_t </TD><TD><B>free</B> ( size_t count = 0)<br>
+<I>Declare pool objects as free for new use</I>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+Dynamic linear pool of objects.
+
+This is a template for a dynamic pool of objects.  The design is
+very similar to the dynamic array of pointers.  A pool is defined
+to be an array of pointers to preallocated default objects.
+Whenever a new object is needed, it can be accessed from the pool
+with the use() member function.  The size of the pool extends
+automatically if its initial limit is reached.  This pool is a
+linear pool, i.e. we can rely upon their index to be sequential.
+So in order to return a specific object into the pool's disposal,
+all objects having larger indices have to be free (like a reverse
+LIFO - last out first back). The free member function returns
+objects to the pool's disposal. Upon destruction, all pool objects
+are destroyed using their destructor.  It does not make sense to
+have a copy constructor or assignment op.
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="~LinPool">
+<A NAME ="DOC.21.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  ~LinPool( void )</B></TT>
+<DD>Destructor
+<DL></DL><P>
+<A NAME="LinPool">
+<A NAME ="DOC.21.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  LinPool( size_t capacity=0, size_t increment=0 )</B></TT>
+<DD>Default constructor.
+optionally specify initial capacity,
+reallocation increment, and whether the pointers are internal.
+<DL></DL><P>
+<A NAME="()">
+<A NAME ="DOC.21.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  T*& operator  ()( size_t index ) const </B></TT>
+<DD>Efficient array operator (const version): no bounds checking
+<DL></DL><P>
+<A NAME="()">
+<A NAME ="DOC.21.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T*& operator  ()( size_t index )</B></TT>
+<DD>Efficient array operator (non-const version): no bounds checking
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.21.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> const  T*&  operator []( size_t index ) const </B></TT>
+<DD>Bounds-checking array operator (const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="operator []">
+<A NAME ="DOC.21.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T*&  operator []( size_t index )</B></TT>
+<DD>Bounds-checking array operator (non-const version): throws sxBoundsError
+<DL></DL><P>
+<A NAME="use">
+<A NAME ="DOC.21.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T*&  use( void )</B></TT>
+<DD>Use Method. Bounds-adjusting operator that returns the pool
+element as an lvalue to be used by the user. It is a combination
+of append() and at() of VarVec and PtrVec.  If the bounds of the
+pool array are reached, it is extended by increment_.
+<DL></DL><P>
+<A NAME="length">
+<A NAME ="DOC.21.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  length( void ) const </B></TT>
+<DD>Returns current occupied length of the pool
+<DL></DL><P>
+<A NAME="free">
+<A NAME ="DOC.21.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  free( size_t count = 0)</B></TT>
+<DD>Declare pool objects as free for new use.
+If no argument is given, all elements are free to use again.
+Else, the number of elements specified is freed up from the end. 
+<DL></DL><P>
+<A NAME="increment_">
+<A NAME ="DOC.21.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> size_t  increment_</B></TT>
+<DD> linear growth increment
+<DL></DL><P>
+<A NAME="vector_">
+<A NAME ="DOC.21.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> T**  vector_</B></TT>
+<DD> dynamic array of pointers
+<DL></DL><P></DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>
