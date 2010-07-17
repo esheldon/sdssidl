@@ -1,8 +1,9 @@
+v1.6.1
 ---------------------------------------
 
 src/htm/*: Bug fix in htm match when maxmatch was not 1: the closest matches
     were not being returned.  Also there is no longer an upper limit on number of
-    matches.
+    matches.  Matches are now returned sorted by distance.
 
 pro/math/asinh2.pro: copied from idlutils for nmgy2lups.pro
 
