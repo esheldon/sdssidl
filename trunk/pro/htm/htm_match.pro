@@ -33,7 +33,7 @@
 ;
 ; KEYWORD PARAMETERS:
 ;  maxmatch=: The maximum number of allowed matches per point. Defaults
-;      to 100,000,000
+;      to 1.  Note the default used to be to return all matches.
 ;  depth=: the depht of the HTM tree.  Defaults to 10.
 ;  htmid2=: the htm indexes for the second list.  If not sent
 ;      they are generated internally.
