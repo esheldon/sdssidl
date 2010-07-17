@@ -1,3 +1,15 @@
+---------------------------------------
+
+src/htm/*: Bug fix in htm match when maxmatch was not 1: the closest matches
+    were not being returned.  Also there is no longer an upper limit on number of
+    matches.
+
+pro/math/asinh2.pro: copied from idlutils for nmgy2lups.pro
+
+pro/astro/spheredist.pro: Fixed bug in spheredist: theta was off by 
+    factor of r2d^2 for units=2 or units=4
+
+
 v1.6.0
 ---------------------------------------
 Major additions:  Added support for extended UPS and compiling using scons.  
