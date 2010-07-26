@@ -1750,8 +1750,9 @@ function sdss_files::psfield_read, run, camcol, field, $
 		message,'Halting'
 	endif 
 
-	file = self->filelist('psField', run, camcol, rerun=rerun, fields=field[0])
+	;file = self->filelist('psField', run, camcol, rerun=rerun, fields=field[0])
 
+    file = self->file('psField', run, camcol, rerun=rerun, fields=field[0])
 
 	if n_elements(extension) ne 0 then begin
 
