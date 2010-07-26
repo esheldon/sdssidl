@@ -72,7 +72,8 @@ pro admom_test_with_compile, recompile=recompile
 	ixx=2.0
 	ixy=0.5
 	iyy=1.0
-	im=mom2gauss(2.0,0.0,2.0,[20,20],counts=10000.)
+	;im=mom2gauss(2.0,0.0,2.0,[20,20],counts=10000.)
+	im=mom2gauss(ixx,ixy,iyy,[20,20],counts=10000.)
 	;im[*] += 5.5*randomn(seed,n_elements(im))
 	x=10.0
 	y=10.0
@@ -184,7 +185,6 @@ pro admom, $
 	rho4=ixx
 	whyflag=long(ixx)
 	
-	print,systime(1)-tm0
 
 	tm0=systime(1)
 	; ok, call admom
@@ -213,7 +213,6 @@ pro admom, $
         /show_all_output, $
 		value=[0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0])
 
-	print,systime(1)-tm0
 	; if failure, copy in the defval
 	w=where(whyflag ne 0,nw)
 	if nw ne 0 then begin
