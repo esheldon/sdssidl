@@ -1363,13 +1363,14 @@ end
 
 ;docstart::sdss_files::read
 ; NAME:
-;  read_fields()
+;  read
 ;
 ; PURPOSE:
 ;  Generic SDSS file reader. Reads asTrans, tsObj, tsField, fpObjc, psField...
-;  Atlas files have a special reader sf->atlas_read
+;  Atlas files have a special reader atlas_read
 ;  psField files are normally read the same way as tsObj, etc for extension 6 
-;  (the default).  For the other extensions use psfield_read
+;  (the default).  For the other extensions holding the psf reconstruction,
+;  use psfield_read
 ;
 ; CATEGORY:
 ;  SDSS routine.
@@ -1378,10 +1379,10 @@ end
 ;   st = sf->read(type, run [, camcol, fields, frange=, rerun=, 
 ;                 filter=, bandpass=, 
 ;                 taglist=, wstring=, ex_struct=, 
-;                 /pointers, verbose=, status=)
+;                 /pointers, verbose=)
 ;
 ;   if type is 'astrans' the extra keywords node= and inc= can also
-;   be sent
+;   be used to return those values
 ;
 ; INPUTS:
 ;   type: The file type.
@@ -1393,7 +1394,8 @@ end
 ;   fields: Field number(s) or a glob '*'.
 ;
 ; Keywords:
-;   frange: A range of fields to read; used if fields is not sent.
+;   frange: A range of fields to read; can be used instead of the
+;       fields argument.
 ;   rerun: Rerun number.  If not sent, latest is used.
 ;   bandpass:  For files that require a bandpass.
 ;   filter: synonym for bandpass
@@ -1403,8 +1405,6 @@ end
 ;     objects.  Should refer the structure as "lnew"
 ;   ex_struct: A structure that will be added to the output structure
 ;     definition.
-;   indir: Directory from which to read.  Overrides default directory.
-;   dir: Directory used for the read.  
 ;
 ;   /pointers:  Return an array of pointers rather than an array of structures.
 ;      This saves a factor of two in memory since no copy must be made.
@@ -1420,10 +1420,6 @@ end
 ;   camcol=3
 ;   fields=[35,88]
 ;   st = sdss_read('tsobj', run, camcol, fields)
-;
-;   kl=sdss_read('psfield', run, camcol, field, extension=3)
-;   psf=sdss_psfrec(kl, row, col)
-;
 ;
 ; MODIFICATION HISTORY:
 ;   Conglomeration of various read tools.  Erin Sheldon, NYU
@@ -1450,8 +1446,7 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
     common sdss_files_read_block, filetype_old, all_structdef
   
 
-    np = n_elements(filetype) + n_elements(run) + n_elements(camcol)
-    if np lt 3 then begin 
+    if n_elements(filetype) eq 0 then begin 
         on_error, 2
         print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent'
         print
@@ -1614,8 +1609,9 @@ end
 ;  extensions 1-5 correspond to the psf reconstruction information for the
 ;  u,g,r,i,z bands respectively.  The result from extensions 1-5 can be sent 
 ;  to the psf reconstruction code sdss_psfrec().  A single field is all that 
-;  can be read with this function.  See sdss_read for reading multiple fields 
-;  for extension 6. 
+;  can be read with this function.  
+;
+;  See sdss_read for efficiently reading multiple fields for extension 6. 
 ;
 ; CATEGORY:
 ;  SDSS routine.
@@ -1643,7 +1639,7 @@ end
 ;docend::sdss_files::psfield_read
 
 function sdss_files::psfield_read, run, camcol, field, $
-                   extension=extension, rerun=rerun, status=status, $
+                   rerun=rerun, extension=extension, status=status, $
 				   verbose=verbose
 
 	status = 1
@@ -1658,7 +1654,6 @@ function sdss_files::psfield_read, run, camcol, field, $
     file = self->file('psField', run, camcol, fields, rerun=rerun)
 
 	if n_elements(extension) ne 0 then begin
-
 		if keyword_set(verbose) then begin
 			print,'Reading: ',file,extension,f='(a,a," [",i0,"]")'
 		endif
