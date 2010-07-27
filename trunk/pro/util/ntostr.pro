@@ -52,7 +52,7 @@
 ;
 ;
 
-function ntostr, num, pos2, pos1, format=format, round=round
+function ntostr, num, p1, p2, format=format, round=round
 
 
   if n_elements(num) eq 0 then begin 
@@ -70,13 +70,6 @@ function ntostr, num, pos2, pos1, format=format, round=round
 
   ;; remove leading and trailing blanks
   tmp = strtrim(string(num, format=format), 2)
-
-  ;; Use of pos1,pos2,round to format string is deprecated usage
-  np1 = n_elements(pos1)
-  np2 = n_elements(pos2)
-  if np1 ne 0 or np2 ne 0 or keyword_set(round) then begin 
-      tmp = ntostr_old(tmp,pos2,pos1,format=format,round=round)
-  endif  
 
   return, tmp
 

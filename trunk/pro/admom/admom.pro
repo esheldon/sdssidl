@@ -36,6 +36,9 @@
 ;	momerr:  Error on the ellipticity.
 ;	rho4: 4th order moment.
 ;	whyflag: Flags.  Should be zero for success.
+;           #define AMFLAG_FAINT 0x200000 (2097152)
+;           #define AMFLAG_SHIFT 0x400000 (4194304)
+;           #define AMFLAG_MAXIT 0x800000 (8388608)
 ;
 ;
 ; MODIFICATION HISTORY:

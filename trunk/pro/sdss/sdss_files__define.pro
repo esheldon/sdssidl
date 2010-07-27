@@ -1168,7 +1168,7 @@ function sdss_files::get_structdef, $
         endif else begin
 
             alltags = tag_names(all_structdef)
-            keeptags = strupcase(taglist_in)
+            keeptags = strupcase(taglist)
 
             keeptags = keeptags[rem_dup(keeptags)]
 
@@ -1513,11 +1513,19 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
 
     for i=0l, nfiles-1 do begin 
         file = filelist[i]
-        if verbose gt 1 then print,'Reading file: ',file, format='(a,a)'
 
 
+        if not fexist(file) then begin
+            ; search for compressed files
+            tfile = (findfile(file+'*'))[0]
+            if not keyword_set(tfile) then begin
+                message,'No files like '+file+'* found' 
+            endif
+            file=tfile
+        endif
+
+        if verbose gt 0 then print,'Reading file: ',file, format='(a,a)'
         lnew = mrdfits(file, extension, hdr, /silent, status=rstatus)
-
 
         ; have to allow this because of empty files produced
         ; by various pipelines
@@ -1647,7 +1655,9 @@ function sdss_files::psfield_read, run, camcol, field, $
 		message,'Halting'
 	endif 
 
-    file = self->file('psField', run, camcol, fields, rerun=rerun)
+    file = self->file('psField', run, camcol, field, rerun=rerun)
+
+    if n_elements(verbose) eq 0 then vebose=1
 
 	if n_elements(extension) ne 0 then begin
 		if keyword_set(verbose) then begin
