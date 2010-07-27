@@ -266,6 +266,7 @@ function sdss_files::file2field, files
           nn = n_elements(a)
           last = a[nn-1]
           
+          ; this might fail!
           fn = long( strsplit(last, "\.fit*", /ext, /regex) )
           fields[i] = fn
       endelse 
@@ -632,9 +633,6 @@ end
 ;   exten      - Extension number for the following file types:
 ;                  asTrans, tsObj, tsFieldInfo, fpObj
 ;                Return -1 if unable to determine the extension.
-;   indx       - Array index for the following file types:
-;                  asTrans, tsFieldInfo
-;                Return -1 if unable to determine the index number.
 ;
 ; COMMENTS:
 ;
@@ -650,9 +648,10 @@ end
 ;-
 ;------------------------------------------------------------------------------
 
-FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, rerun=rerun, $
+FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, $
+        rerun=rerun, $
         filter=filter, bandpass=bandpass,  $
-        exten=exten, indx=indx, no_path=no_path
+        extension=exten, no_path=no_path, nodir=nodir
 
 
     case ftype1 of
@@ -666,14 +665,6 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, rerun=
     w=where(strlowcase(ftype) eq self.typenames_lower, nw)
     if nw eq 0 then begin
         message,'Unknown file type "'+ftype+'"'
-    endif
-
-
-    fields_isglob=0
-    fields_sent=0
-    if n_elements(fields) ne 0 then begin
-        fields_sent=1
-        fieldstring = self->field2string(fields, isglob=fields_isglob)
     endif
 
     if n_elements(bandpass) ne 0 then begin
@@ -705,149 +696,7 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, rerun=
         fullname = filepath(root=datadir, fullname)
     endif
 
-
-   ;---------------------------------------------------------------------------
-   if (ftype EQ 'asTrans' OR ftype EQ 'asTranscol') then begin
-
-       if arg_present(exten) OR (fields_sent and not fields_isglob) then begin
-
-           ; Read in the primary header to determine which XTENSION
-           ; corresponds to this field number
-           hdr = headfits(fullname, /silent, errmsg=errmsg)
-           if (size(hdr,/tname) NE 'STRING') then begin
-               exten = -1L
-               indx = -1L
-               return, fullname
-           endif
-
-
-           field0 = sxpar(hdr, 'FIELD0')
-           nfields = sxpar(hdr, 'NFIELDS')
-           camcols = sxpar(hdr, 'CAMCOLS')
-           filters = sxpar(hdr, 'FILTERS')
-           nfilter = n_elements(str_sep(filters,' '))
-           jfilter = (where(thisfilter EQ str_sep(filters,' ')))[0]
-           jcol = (where(camcol EQ str_sep(camcols,' ')))[0]
-           exten = jfilter + jcol * nfilter + 1
-       endif
-       if (fields_sent and not fields_isglob) then begin
-
-           indx = fields - field0
-           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
-           if (nbad GT 0) then indx[ibad] = -1L
-       endif
-
-   endif else if (ftype EQ 'fcPCalib') then begin
-
-       if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
-       ; Read in the primary header to determine which array element
-       ; corresponds to this field number
-
-       hdr = headfits(fullname, /silent, errmsg=errmsg)
-
-       if (errmsg ne '') then begin
-           exten = -1
-           indx = -1
-           splog,'Error reading fcPCalib file'
-           return,fullname
-       endif
-
-       if (size(hdr,/tname) NE 'STRING') then begin
-           exten = -1L
-           indx = -1L
-       endif
-       field0 = sxpar(hdr, 'FIELD0')
-       nfields = sxpar(hdr, 'NFIELDS')
-       if (fields LT field0+nfields) then begin
-           exten = 1
-           indx = fields - field0
-       endif else begin
-           splog, 'No fcPCalib file with data for fields ' + string(fields)
-           exten = -1
-           indx = -1
-           return, fullname
-       endelse
-   endif else if (ftype EQ 'hoggBB') then begin
-        if (arg_present(indx)) then begin
-            if not fields_sent then message,'fields is required when indx '+$
-                'keyword sent for ftype: '+ftype1
-            if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
-            hdr = headfits(fullname, /silent, errmsg=errmsg)
-            if (size(hdr,/tname) NE 'STRING') then begin
-                indx = -1L
-                return, fullname
-            endif
-            field0 = sxpar(hdr, 'FIELD0')
-            nfields = sxpar(hdr, 'NFIELDS')
-            indx = fields - field0
-            ibad = where(fields LT field0 OR field GE field0+nfields, nbad)
-            if (nbad GT 0) then indx[ibad] = -1L
-        endif
-   endif else if (ftype EQ 'hoggAstrom') then begin
-       if (arg_present(indx)) then begin
-
-           if not fields_sent then message,'field is required when indx '+$
-               'keyword sent for ftype: '+ftype1
-           if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
-           hdr = headfits(fullname, /silent, errmsg=errmsg)
-           if (size(hdr,/tname) NE 'STRING') then begin
-               indx = -1L
-               return, fullname
-           endif
-           field0 = sxpar(hdr, 'FIELD0')
-           nfields = sxpar(hdr, 'NFIELDS')
-           indx = fields - field0
-           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
-           if (nbad GT 0) then indx[ibad] = -1L
-       endif
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggFF') then begin
-       if (arg_present(indx)) then begin
-
-           if not fields_sent then message,'field is required when indx '+$
-               'keyword sent for ftype: '+ftype1
-           if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
-           hdr = headfits(fullname, /silent, errmsg=errmsg)
-           if (size(hdr,/tname) NE 'STRING') then begin
-               indx = -1L
-               return, fullname
-           endif
-           field0 = sxpar(hdr, 'FIELD0')
-           nfields = sxpar(hdr, 'NFIELDS')
-           indx = fields - field0
-           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
-           if (nbad GT 0) then indx[ibad] = -1L
-       endif
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psField') then begin
-
-        if arg_present(exten) or arg_present(indx) then begin
-
-            hdr = headfits(fullname, /silent, errmsg=errmsg)
-            if (size(hdr,/tname) NE 'STRING') then begin
-                exten = -1L
-                indx = -1L
-                return, fullname
-            endif
-
-            filters = sxpar(hdr, 'FILTERS')
-
-            ; Return the HDU number for the PSF of the specified filter
-            if (keyword_set(thisfilter)) then begin
-                ii = (where(thisfilter EQ str_sep(filters,' ')))[0]
-                if (ii EQ -1) then exten = -1L $
-                    else exten = ii+1
-            endif
-
-            ; Return the indx number needed for reading the bias levels,
-            ; which are all in HDU #6
-            nfilter = n_elements(str_sep(filters,' '))
-            jfilter = (where(thisfilter EQ str_sep(filters,' ')))[0]
-            indx = jfilter
-        endif
-   endif
-
-   return, fullname
+    return, fullname
 end
 
 
@@ -968,7 +817,7 @@ end
 ;
 ; CALLING SEQUENCE:
 ;   sdss_filelist(filetype, run, camcol [fields, rerun=, bandpass=, filter=,
-;                 fnums=, dir=, /silent, status=)
+;                 fnums=, dir=, /silent)
 ;
 ; INPUTS:
 ;   filetype: file type.  For a list of types do
@@ -980,8 +829,7 @@ end
 ;   fields: The fields to read. Defaults to a pattern with '*' for the 
 ;       field number.
 ; Keywords:
-;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
-;       for the run and the latest rerun is returned.
+;   rerun: SDSS rerun.  Actually required for most files.
 ;   bandpass: The bandpass in numerical or string form where
 ;       u,g,r,i,z -> 0,1,2,3,4
 ;   filter: synonym for bandpass
@@ -994,9 +842,6 @@ end
 ;   dir: The directory.
 ;   exists: 1 for yes, 0 for no
 ;
-; RESTRICTIONS:
-;   If rerun is not sent, the run must be defined in the run status structure.
-;
 ; MODIFICATION HISTORY:
 ;   Created Erin Sheldon, UChicago 
 ;
@@ -1005,11 +850,11 @@ end
 function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
         rerun=rerun, $
         bandpass=bandpass, filter=filter, $
+        extension=extension, $
         fnums=fnums, $
         indir=indir, $
         dir=dir, $
-        silent=silent, $
-        status=status
+        silent=silent
 
     common sdss_files_filelist_block, $
         filetype_old, $
@@ -1020,13 +865,12 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
         flist_old
 
 
-    status = 1
     badval=""
 
     if n_params() lt 2 then begin 
         on_error, 2
         print,'-Syntax: filedir=obj->filelist(filetype, run, camcol, '+$
-            '[fields, rerun=, bandpass=, filter=, fnums=, dir=, /silent, status=])'
+            '[fields, rerun=, bandpass=, filter=, fnums=, dir=, /silent])'
         print
         message,'Halting'
     endif 
@@ -1060,7 +904,10 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
         endif
 
 
-        file_pattern = self->file(filetype, run, camcol, fields, rerun=rerun, filter=filter)
+        file_pattern = self->file(filetype, run, camcol, fields, $
+                                  rerun=rerun, filter=filter, exten=extension)
+        ; add a glob on the end to allow for .gz files
+        file_pattern = file_pattern+'*'
         flist = self->_file_search(file_pattern, count=count)
         if count eq 0 then begin
             message,'No files matched pattern: '+file_pattern
@@ -1239,13 +1086,12 @@ end
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function sdss_files::get_all_structdef, files, status=status, $
+function sdss_files::get_all_structdef, files, $
 		extension=extension
 
-  status=1
   if n_elements(extension) eq 0 then extension=1
   
-  lnew = self->rdtable(files[0], extension, /silent, status=status)
+  lnew = self->rdtable(files[0], extension, rows=0, /silent, status=status)
   
   if status ne 0 then begin 
       ;; do ones best to find a non-empty file to make the structure
@@ -1256,7 +1102,7 @@ function sdss_files::get_all_structdef, files, status=status, $
               (findex le numbfiles-1) and $
               (status ne 0) )                do begin 
           message,'TRYING NEXT ONE',/inf
-          lnew = self->rdtable(files[findex], 1, /silent, status=status)
+          lnew = self->rdtable(files[findex], 1, rows=0, /silent, status=status)
 
           findex=findex+1	
       endwhile 
@@ -1266,7 +1112,6 @@ function sdss_files::get_all_structdef, files, status=status, $
       endif 
   endif 
 
-  status=0
   return,lnew[0]
 
 end 
@@ -1304,20 +1149,16 @@ function sdss_files::get_structdef, filetype, filelist, $
 		taglist=taglist_in, tagids=tagids,  $
 		ex_struct=ex_struct, $
 		copy=copy, deja_vu=deja_vu, $
-		verbose=verbose, status=status
+		verbose=verbose
 
     common sdss_files_read_block, filetype_old, all_structdef
   
-    status = 1
-
     if n_elements(verbose) eq 0 then verbose=1
 
     ;; Only need to get all_structdef if filetype has changed
-    if filetype ne filetype_old then begin
+    if strlowcase(filetype) ne strlowcase(filetype_old) then begin
         ;; Get struct information for these files
-        all_structdef = self->get_all_structdef(filelist, status=sstatus, $
-			extension=extension)
-        if sstatus ne 0 then return, -1
+        all_structdef = self->get_all_structdef(filelist, extension=extension)
         filetype_old = filetype
         deja_vu=1
     endif
@@ -1327,7 +1168,6 @@ function sdss_files::get_structdef, filetype, filelist, $
   
     ;; if no tags sent and no ex_struct, we just return all_structdef
     if ntags eq 0 and nextra eq 0 then begin
-        status=0
         copy=0
         structdef = all_structdef
         return, structdef
@@ -1370,12 +1210,8 @@ function sdss_files::get_structdef, filetype, filelist, $
 
             if nmatch ne 0 then begin 
                 structdef = self->make_structdef(all_structdef, tagids)
-                status = 0
             endif else begin
-                if verbose gt 0 then begin
-                    print,'No requested tags found' 
-                endif
-                return, -1  
+                message,'No requested tags found' 
             endelse
         endelse
 
@@ -1383,9 +1219,7 @@ function sdss_files::get_structdef, filetype, filelist, $
             ; we want to catch this error
             comm='structdef2 = create_struct(structdef, ex_struct)'
             if not execute(comm) then begin
-                if verbose gt 0 then begin
-                    print,'Failed to add ex_struct. Ignoring'
-                endif
+                message,'Failed to add ex_struct'
             endif else begin
                 structdef = temporary(structdef2)
             endelse
@@ -1393,7 +1227,6 @@ function sdss_files::get_structdef, filetype, filelist, $
 
     endelse
 
-    status=0
     return, structdef
 end 
 
@@ -1412,7 +1245,8 @@ end
 
 ;; for tsobj files we remove extra rows
 function sdss_files::modrow, filetype
-  if filetype eq 'tsobj' or filetype eq 'fpobjc' then return, 1 else return,0
+    ft=strlowcase(filetype)
+    if ft eq 'tsobj' or ft eq 'fpobjc' then return, 1 else return,0
 end 
 
 
@@ -1427,19 +1261,6 @@ function sdss_files::apply_where_string, lnew, wstring, nkeep
   return,keep
 end 
 
-
-function sdss_files::_extension, filetype
-  case filetype of
-      'tsobj': return,1
-      'tsfield': return,1
-      'adatc': return,1
-      'fpobjc': return,1
-      ;; Do not support other extensions here because
-      ;; they have variable length arrays
-      'psfield': return,6
-      else: return,0
-  endcase 
-end 
 
 pro sdss_files::_set_silent_verbose, silent, verbose
     ns = n_elements(silent)
@@ -1463,7 +1284,7 @@ pro sdss_files::add_rrcf, filetype, taglist=taglist, ex_struct=ex_struct, $
     addrun=addrun, addrerun=addrerun, addcamcol=addcamcol, addfield=addfield
 
 
-    if filetype eq 'fpobjc' then begin
+    if strlowcase(filetype) eq 'fpobjc' then begin
 
         addrun=1 & addrerun=1 & addcamcol=1 & addfield=1
 
@@ -1534,29 +1355,25 @@ end
 ;
 ; PURPOSE:
 ;  Generic SDSS file reader. Reads asTrans, tsObj, tsField, fpObjc, psField...
-;  Atlas files have a special reader sf->atlas_read (procedural read_atlas)
+;  Atlas files have a special reader sf->atlas_read
 ;  psField files are normally read the same way as tsObj, etc for extension 6 
-;  (the default).  For the other extensions you can send an extension and 
-;  read a single field only. 
+;  (the default).  For the other extensions use psfield_read
 ;
 ; CATEGORY:
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;   st = sf->read(type, run, camcol, [fields, frange=, rerun=, bandpass=, 
-;                 taglist=, wstring=, ex_struct=, extension=, dir=, 
+;   st = sf->read(type, run [, camcol, fields, frange=, rerun=, 
+;                 filter=, bandpass=, 
+;                 taglist=, wstring=, ex_struct=, 
 ;                 /pointers, verbose=, status=)
 ;
 ;   if type is 'astrans' the extra keywords node= and inc= can also
 ;   be sent
 ;
 ; INPUTS:
-;   type: The file type. Currently supported types are:
-;            astrans, tsobj, tsfield, fpobjc, psfield  
-;         Note: for psField, Multiple files can only be read for 
-;               extension=6 (the default)
-;
-;         Atlas files have a special reader sf->atlas read, or for the
+;   type: The file type.
+;         Atlas files have a special reader sf->atlas_read, or for the
 ;         procedural interface read_atlas.
 ;   run, camcol: SDSS id info.
 ;
@@ -1569,13 +1386,11 @@ end
 ;   bandpass:  For files that require a bandpass.
 ;   filter: synonym for bandpass
 ;
-;
 ;   taglist: List of tags to read. Default is all.
 ;   wstring: A string that can be sent to the where function to select
 ;     objects.  Should refer the structure as "lnew"
 ;   ex_struct: A structure that will be added to the output structure
 ;     definition.
-;   extension: FITS extension to read.
 ;   indir: Directory from which to read.  Overrides default directory.
 ;   dir: Directory used for the read.  
 ;
@@ -1587,9 +1402,6 @@ end
 ;
 ; OUTPUTS:
 ;   An array structure or array of pointers if /pointers is sent.
-;
-; OPTIONAL OUTPUTS:
-;   status: 0 for success, 1 for failure
 ;
 ; EXAMPLES:
 ;   run=756
@@ -1607,10 +1419,9 @@ end
 ;docend::sdss_files::read
 
 
-function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
+function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
         rerun=rerun, $
         bandpass=bandpass, filter=filter, $
-        extension=extension, $
         indir=indir, $
         dir=dir, $
         taglist=taglist, $
@@ -1626,12 +1437,11 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
 
     common sdss_files_read_block, filetype_old, all_structdef
   
-    status = 1
 
-    np = n_elements(filetype_in) + n_elements(run) + n_elements(camcol)
+    np = n_elements(filetype) + n_elements(run) + n_elements(camcol)
     if np lt 3 then begin 
         on_error, 2
-        print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, extension=, /all, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent, status='
+        print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent'
         print
         print,'For filetype=asTrans, the extra keywords node=,inc= exist'
         print,'For atlas images see isf->atlas_read() or read_atlas()'
@@ -1641,49 +1451,22 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
 
     self->_set_silent_verbose, silent, verbose
 
+    ; synonyms
+    if n_elements(bandpass) ne 0 then filter=bandpass
 
-    filetype = strlowcase(filetype_in)
     if n_elements(filetype_old) eq 0 then filetype_old = 'NONE'
 
-    if not self->filetype_supported(filetype) then begin 
-        if verbose gt 0 then begin
-            message,'Unsupported file type: '+ntostr(filetype),/inf
-        endif
-        return,-1
-    endif 
-
-    if n_elements(extension) eq 0 then begin
-		extension = self->_extension(filetype)
-	endif
-
     ; astrans are special
-    if filetype eq 'astrans' then begin
-        return, self->astrans_read(run, camcol, bandpass, rerun=rerun, $
+    if strlowcase(filetype) eq 'astrans' then begin
+        return, self->astrans_read(run, camcol, filter, rerun=rerun, $
             indir=indir, dir=dir, node=node, inc=inc, $
-            silent=silent, status=status)
-    endif
-
-    ; psfield has two read modes:
-    ;  multiple fields with extension 6
-    ;  single fields with any extension.  This is because the structures
-    ;     are not fixed for extensions 1-5 from field to field so they
-    ;  cannot be put into an array of structures.
-
-    if filetype eq 'psfield' then begin
-        if n_elements(extension) ne 0 then begin
-			if n_elements(fields) eq 0 then begin
-				print,'For psfield you must specify a field'
-				return,-1
-			endif
-			return,self->psfield_read(run, camcol, fields, rerun=rerun, $
-				extension=extension, status=status, verbose=verbose)
-        endif
+            silent=silent)
     endif
 
     ntags = n_elements(taglist)
     nextra = n_elements(ex_struct)
 
-    ;; for tsobj files we want to cut rows
+    ;; for tsobj/fpobjc files we want to cut rows
     if keyword_set(nomodrow) then modrow=0 else modrow = self->modrow(filetype)
 
     ;; get the file list.  
@@ -1691,24 +1474,27 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
     this is smart in that it only will retrieve
     ;; if fields is sent and is '*', we need to actually retrieve
     ;; the list from disk
-    run_filelist=0
+    call_filelist=0
     if n_elements(fields) ne 0 or n_elements(frange) ne 0 then begin
         if n_elements(fields) eq 1 then begin
             if strtrim(string(fields),2) eq '*' then begin
-                run_filelist=1
+                call_filelist=1
             endif
         endif
     endif
-    if run_filelist then begin
-        filelist = self->filelist($
+    if call_filelist then begin
+        ; this is the case where fields='*' and we need
+        ; to figure out what files are available
+        filelist = self->filelist( $
             filetype, run, camcol, fields, frange=frange, $
             rerun=rerun, bandpass=bandpass, filter=filter, $
-            fnums=fnums, indir=indir, dir=dir, $
-            status = fstatus)
+            extension=extension, $
+            fnums=fnums, indir=indir, dir=dir)
     endif else begin
-        filelist = self->file(
+        filelist = self->file( $
             filetype, run, camcol, fields, frange=frange, $
-            rerun=rerun, bandpass=bandpass, filter=filter)
+            rerun=rerun, bandpass=bandpass, filter=filter, 
+            extension=extension)
     endelse
 
 
@@ -1723,10 +1509,7 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
 		extension=extension, $
         taglist=taglist, tagids=tagids, $
         ex_struct=ex_struct, $
-        copy=copy, deja_vu=deja_vu, verbose=verbose, status=sstatus)
-    if sstatus ne 0 then begin
-        return, -1
-    endif
+        copy=copy, deja_vu=deja_vu, verbose=verbose)
 
     nfiles = n_elements(filelist)
 
@@ -1739,11 +1522,12 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
     endif
     for i=0l, nfiles-1 do begin 
         file = filelist[i]
-        if verbose gt 1 then print,'Reading file: ',file,extension, $
-			format='(a,a," [",i0,"]")'
+        if verbose gt 1 then print,'Reading file: ',file, format='(a,a)'
         lnew = self->rdtable(file, extension, hdr, /silent, $
-                             deja_vu=deja_vu, status=status)
-        if status eq 0 then begin 
+                             deja_vu=deja_vu, status=rstatus)
+        ; have to allow this because of empty files produced
+        ; by various pipelines
+        if rstatus eq 0 then begin 
 
             nrows = n_elements(lnew)
 
@@ -1758,7 +1542,7 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
             endelse 
 
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            ;; special tsobj cut
+            ;; special tsObj/fpObjc cut
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
             if modrow then begin 
@@ -1781,7 +1565,10 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
                 if addrun then copystruct.run = run
                 if addrerun then copystruct.rerun = rerun
                 if addcamcol then copystruct.camcol = camcol
-                if addfield then copystruct.field = fnums[i] 
+                if addfield then begin
+                    fnum = self->file2field(filelist[i])
+                    copystruct.field = fnum
+                endif
 
                 ptrlist[i] = ptr_new(copystruct, /no_copy)
             endif 
@@ -1794,10 +1581,6 @@ function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
     endif else begin 
         output = combine_ptrlist(ptrlist)
     endelse 
-
-    if size(output,/tname) eq 'STRUCT' then begin
-        status = 0
-    endif
     
     return,output
 
@@ -1859,7 +1642,7 @@ function sdss_files::psfield_read, run, camcol, field, $
 		message,'Halting'
 	endif 
 
-    file = self->file('psField', run, camcol, rerun=rerun, fields=field[0])
+    file = self->file('psField', run, camcol, fields, rerun=rerun)
 
 	if n_elements(extension) ne 0 then begin
 
@@ -1943,11 +1726,11 @@ end
 
 function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc=inc, silent=silent, indir=indir, dir=dir, file=file, status=status
 
+  on_error, 2
   nr=n_elements(run)
   nc=n_elements(camcol)
   nclr=n_elements(clr)
   IF (nr+nc+nclr) lt 3 THEN BEGIN 
-      on_error, 2
       print,'-Syntax: trans=sf->astrans_read(run, camcol, bandpass, rerun=, indir=, dir=, file=, node=, inc=, /silent, status=]'
       print,''
       print,'Use doc_method,"sdss_files::astrans_read"  for more help.'  
@@ -1960,12 +1743,11 @@ function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc
   delvarx,trans
 
   if n_elements(file) eq 0 then begin
-      file = self->filelist('astrans', run, rerun=rerun, $
+      file = self->file('asTrans', run, rerun=rerun, $
           indir=indir, dir=dir, status=flstatus)
   endif   
   if flstatus ne 0 then begin
-      if not keyword_set(silent) then message,'file not found',/inf
-      return, -1
+      message,'file not found: '+file
   endif
   hdr = headfits(file)
 
@@ -1982,8 +1764,7 @@ function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc
   
   wcam = where( camarray EQ camcol, nc)
   IF nc EQ 0 THEN BEGIN
-      if not keyword_set(silent) then print,'Camcol ',camcol,' not processed'
-      return,-1
+      message,string('Camcol ',camcol,' not processed',f='(a,i0,a)')
   ENDIF 
   if size(clr,/tname) eq 'STRING' then begin
       wclr = where(filtarray eq strlowcase(clr), nclr)
@@ -1991,25 +1772,12 @@ function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc
       wclr = where(filtarray EQ colors[clr], nclr)
   endelse
   IF nclr EQ 0 THEN BEGIN 
-      if not keyword_set(silent) then print,'Filter ',colors[clr],' not processed'
-      return, -1
+      message,string('Filter ',colors[clr],' not processed',f='(a,a,a)')
   ENDIF 
 
   ext = wcam[0]*nfils + (wclr[0] + 1)
   trans = mrdfits(file, ext, ehdr,/silent)
 
-  ccam=sxpar(ehdr, 'camcol',count=count)
-  IF count EQ 0 THEN BEGIN
-      if not keyword_set(silent) then print,'No camcol in header'
-      return, -1
-  ENDIF 
-  cfilt=sxpar(ehdr, 'filter',count=count)
-  IF count EQ 0 THEN BEGIN
-      if not keyword_set(silent) then print,'No filter in header'
-      return, -1
-  ENDIF 
-
-  status=0
   return, trans
 END 
 
