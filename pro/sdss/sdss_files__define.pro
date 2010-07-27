@@ -949,7 +949,7 @@ end
 
 
 
-function sdss_files::rdtable, file, extension, header,  silent = silent, deja_vu=deja_vu, status=status
+function sdss_files::rdtable, file, extension, header,  rows=rows, silent = silent, deja_vu=deja_vu, status=status
 
 
   common sdss_files_mrdfits_block, rsize, tab, nfld, typarr,        $ 
@@ -1144,7 +1144,53 @@ end
 ;; remove them without the resulting taglist being sorted out of the 
 ;; user's requested order.
 
-function sdss_files::get_structdef, filetype, filelist, $
+function sdss_files::get_structdef, $
+        all_structdef, $
+		taglist=taglist, $
+		ex_struct=ex_struct, $
+		copy=copy, $
+		verbose=verbose
+
+    ntags = n_elements(taglist) 
+    nextra = n_tags(ex_struct)
+  
+    ;; if no tags sent and no ex_struct, we just return all_structdef
+    if ntags eq 0 and nextra eq 0 then begin
+
+        copy=0
+        return, all_structdef
+
+    endif else begin
+
+        copy=1
+        if ntags eq 0 then begin
+            structdef = all_structdef
+        endif else begin
+
+            alltags = tag_names(all_structdef)
+            keeptags = strupcase(taglist_in)
+
+            keeptags = keeptags[rem_dup(keeptags)]
+
+            match, alltags, keeptags, mall, mkeep
+            if mkeep[0] eq -1 then message,'None of the requested tags matched'
+
+            structdef = self->make_structdef(all_structdef, mall)
+        endelse
+
+        if nextra ne 0 then begin
+            structdef2 = create_struct(structdef, ex_struct)
+            structdef = temporary(structdef2)
+        endif
+
+    endelse
+
+    return, structdef
+end 
+
+
+
+function sdss_files::get_structdef_old, filetype, filelist, $
 		extension=extension, $
 		taglist=taglist_in, tagids=tagids,  $
 		ex_struct=ex_struct, $
@@ -1280,73 +1326,39 @@ pro sdss_files::_set_silent_verbose, silent, verbose
 end
 
 ; What a pain in the ass just because fpObjc don't have the id info
-pro sdss_files::add_rrcf, filetype, taglist=taglist, ex_struct=ex_struct, $
+function sdss_files::add_rrcf, filetype, taglist=taglist, ex_struct=ex_struct, $
     addrun=addrun, addrerun=addrerun, addcamcol=addcamcol, addfield=addfield
 
 
+    ; fpObjc is the only one we do this for
     if strlowcase(filetype) eq 'fpobjc' then begin
-
-        addrun=1 & addrerun=1 & addcamcol=1 & addfield=1
-
-        ; First, did the user request them in the tags?
-        ; If tags sent but not requested, then don't add
-        if n_elements(taglist) ne 0 then begin
-            tl = strlowcase(taglist)
-
-            w=where(taglist eq 'run',nw)
-            if nw eq 0 then addrun=0
-            w=where(taglist eq 'rerun',nw)
-            if nw eq 0 then addrerun=0
-            w=where(taglist eq 'camcol',nw)
-            if nw eq 0 then addcamcol=0
-            w=where(taglist eq 'field',nw)
-            if nw eq 0 then addfield=0
-        endif
+        
+        add_ids = 1
 
         ; Now, either add to ex_struct or create ex_struct
         if n_elements(ex_struct) ne 0 then begin
             etags = tag_names(ex_struct)
-            if addrun then begin
-                w=where(etags eq 'RUN',nw)
-                if nw eq 0 then begin
-                    ex_struct=create_struct(ex_struct, 'run', 0L)
-                endif
+            if not in(etags,'RUN') then begin
+                ex_struct=create_struct(ex_struct, 'run', 0L)
             endif
-            if addrerun then begin
-                w=where(etags eq 'RERUN',nw)
-                if nw eq 0 then begin
-                    ex_struct=create_struct(ex_struct, 'rerun', 0L)
-                endif
+            if not in(etags,'RERUN') then begin
+                ex_struct=create_struct(ex_struct, 'rerun', '')
             endif
-            if addcamcol then begin
-                w=where(etags eq 'CAMCOL',nw)
-                if nw eq 0 then begin
-                    ex_struct=create_struct(ex_struct, 'camcol', 0L)
-                endif
+            if not in(etags,'CAMCOL') then begin
+                ex_struct=create_struct(ex_struct, 'camcol', 0)
             endif
-            if addfield then begin
-                w=where(etags eq 'FIELD',nw)
-                if nw eq 0 then begin
-                    ex_struct=create_struct(ex_struct, 'field', 0L)
-                endif
+            if not in(etags,'FIELD') then begin
+                ex_struct=create_struct(ex_struct, 'field', 0)
             endif
 
         endif else begin
-
-            if addrun then add_arrval, 'run', tags2add
-            if addrerun then add_arrval, 'rerun', tags2add
-            if addcamcol then add_arrval, 'camcol', tags2add
-            if addfield then add_arrval, 'field', tags2add
-
-            nadd = n_elements(tags2add)
-            if nadd gt 0 then begin
-                vals2add = replicate('0L', nadd)
-                ex_struct = mrd_struct(tags2add, vals2add, 1)
-            endif
+            ex_struct = {run:0L,rerun:'',camcol:0,field:0}
         endelse
     endif else begin
-        addrun=0 & addrerun=0 & addcamcol=0 & addfield=0
+        add_ids = 0
     endelse  
+
+    return, add_ids
 end
 
 ;docstart::sdss_files::read
@@ -1471,9 +1483,6 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
 
     ;; get the file list.  
     
-    this is smart in that it only will retrieve
-    ;; if fields is sent and is '*', we need to actually retrieve
-    ;; the list from disk
     call_filelist=0
     if n_elements(fields) ne 0 or n_elements(frange) ne 0 then begin
         if n_elements(fields) eq 1 then begin
@@ -1493,47 +1502,47 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
     endif else begin
         filelist = self->file( $
             filetype, run, camcol, fields, frange=frange, $
-            rerun=rerun, bandpass=bandpass, filter=filter, 
+            rerun=rerun, bandpass=bandpass, filter=filter, $
             extension=extension)
     endelse
 
 
-    ;; if the user wants all tags and no ex_struct then things are 
-    ;; simplified.  otherwise we will need to check struct
-    ;; definitions
+    ; determine if we need to add id info
+    ; If so, they will be put into ex_struct, creating it if necessary
+    add_ids = self->add_rrcf(filetype, ex_struct=ex_struct)
 
-    self->add_rrcf, filetype, taglist=taglist, ex_struct=ex_struct, $
-        addrun=addrun, addrerun=addrerun, addcamcol=addcamcol, addfield=addfield
-
-    structdef = self->get_structdef(filetype, filelist, $
-		extension=extension, $
-        taglist=taglist, tagids=tagids, $
-        ex_struct=ex_struct, $
-        copy=copy, deja_vu=deja_vu, verbose=verbose)
-
-    nfiles = n_elements(filelist)
 
     ;; data will be copied into this array
+    nfiles = n_elements(filelist)
     ptrlist=ptrarr(nfiles)
 
-    if verbose gt 0 then begin
-        print,'Reading '+ntostr(nfiles)+' fields from Run: '+$
-            ntostr(run)+' camcol: '+ntostr(camcol)
-    endif
     for i=0l, nfiles-1 do begin 
         file = filelist[i]
         if verbose gt 1 then print,'Reading file: ',file, format='(a,a)'
-        lnew = self->rdtable(file, extension, hdr, /silent, $
-                             deja_vu=deja_vu, status=rstatus)
+
+
+        lnew = mrdfits(file, extension, hdr, /silent, status=rstatus)
+
+
         ; have to allow this because of empty files produced
         ; by various pipelines
         if rstatus eq 0 then begin 
 
+            ; get our output structure definition, given the
+            ; data we just read and the requested subset of
+            ; tags and extra struct
+
+            if n_elements(structdef) eq 0 then begin
+                structdef = self->get_structdef( $
+                    lnew[0], $
+                    taglist=taglist, $
+                    ex_struct=ex_struct, $
+                    copy=copy)
+            endif
+
             nrows = n_elements(lnew)
 
-            ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
             ;; user defined cuts via the where string
-            ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
             if n_elements(wstring) ne 0 then begin 
                 keep = self->apply_where_string(lnew, wstring, nkeep)
@@ -1541,9 +1550,7 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
                 keep = lindgen(nrows) & nkeep = nrows
             endelse 
 
-            ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
             ;; special tsObj/fpObjc cut
-            ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
             if modrow then begin 
                 keepnew = where( lnew[keep].objc_rowc gt 64 and $
@@ -1553,24 +1560,30 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
 
             if nkeep ne 0 then begin 
                 
-                ;; if user requested certain tags we must do a copy
-                if copy then begin 
-                    copystruct = self->copytags(lnew, keep, structdef, tagids)
-                    lnew = 0
-                endif else begin 
-                    copystruct = lnew[keep]
-                    lnew = 0
-                endelse 
-
-                if addrun then copystruct.run = run
-                if addrerun then copystruct.rerun = rerun
-                if addcamcol then copystruct.camcol = camcol
-                if addfield then begin
-                    fnum = self->file2field(filelist[i])
-                    copystruct.field = fnum
+                if nkeep lt nrows then begin
+                    lnew = lnew[keep]
                 endif
 
-                ptrlist[i] = ptr_new(copystruct, /no_copy)
+                ;; if user requested certain tags we must do a copy
+                if copy then begin 
+                    struct = replicate(structdef, nkeep)
+                    struct_assign, lnew, struct, /nozero
+                    lnew = 0
+                endif else begin 
+                    struct = temporary(lnew)
+                endelse 
+
+                if add_ids then begin
+                    struct.run = run
+                    struct.rerun = rerun
+                    struct.camcol = camcol
+
+                    h=headfits(filelist[i])
+                    fnum = long(sxpar(h, 'field'))
+                    struct.field = fnum
+                endif
+
+                ptrlist[i] = ptr_new(struct, /no_copy)
             endif 
             deja_vu = 1
         endif
