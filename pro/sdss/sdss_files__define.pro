@@ -132,6 +132,8 @@
 
 
 function sdss_files::init
+    self->set_filetypes
+    self->_set_default_sameargs
     return,1
 end 
 
@@ -140,6 +142,140 @@ end
 pro sdss_files::help
   doc_library,'sdss_files__define'
 end 
+
+
+
+function sdss_files::stripe2string, stripe
+
+  if n_params() eq 0 then begin
+      on_error, 2
+      print,'-Syntax: result = obj->stripe2string(stripe)'
+      message,'Halting'
+  endif
+
+  if size(stripe,/tname) eq 'STRING' then return,stripe
+  return, string(stripe,format='(i02)')
+end 
+
+function sdss_files::run2string, run, isglob=isglob
+
+    if N_params() eq 0 then begin
+        on_error, 2
+        print,'-Syntax: result = obj->run2string(run, isglob=)'
+        message,'Halting'
+    endif
+
+    isglob=0
+    if size(run,/tname) eq 'STRING' then begin
+        if run[0] eq '*' then begin
+            isglob=1
+        endif
+        return,run
+    endif
+    return, string(run,format='(i06)')
+end 
+
+function sdss_files::field2string, field, isglob=isglob
+
+    if N_params() eq 0 then begin
+        on_error, 2
+        print,'-Syntax: result = obj->field2string(field, isglob=)'
+        message,'Halting'
+    endif
+
+    isglob=0
+    if size(field,/tname) eq 'STRING' then begin
+        if field[0] eq '*' then isglob=1
+        return,field
+    endif
+    return, string(field,format='(i04)')
+
+end 
+
+function sdss_files::camcol2string, camcol, isglob=isglob
+
+    if N_params() eq 0 then begin
+        on_error, 2
+        print,'-Syntax: result = obj->camcol2string(camcol, isglob=)'
+        message,'Halting'
+    endif
+
+    isglob=0
+    if size(camcol,/tname) eq 'STRING' then begin
+        if camcol[0] eq '*' then isglob=1
+        return,camcol
+    endif
+    return, strtrim(string(camcol,f='(i0)'),2)
+end 
+
+
+function sdss_files::id2string, id
+
+  if N_params() eq 0 then begin
+      on_error, 2
+      print,'-Syntax: result = obj->id2string(id)'
+      message,'Halting'
+  endif
+
+  if size(id,/tname) eq 'STRING' then return,id
+  return, string(id,format='(i05)')
+end 
+
+
+function sdss_files::filtername, filter, isglob=isglob
+    if n_elements(filter) eq 0 then begin
+        on_error,2
+        print, '-usage: res=obj->filtername(filter,isglob=)'
+        message,'Halting'
+    endif
+
+    isglob=0
+    if size(filter, /tname) eq 'STRING' then begin
+        if filter[0] eq '*' then isglob=1
+        return, filter
+    endif
+
+    names = ['u','g','r','i','z']
+    fil = fix(filter)
+    w=where(fil lt 0 or fil lt 4,nw)
+    if nw gt 0 then begin
+        message,'Filter must be a string or in [0,4]'
+    endif
+    return, names[fil]
+end
+
+
+function sdss_files::file2field, files
+
+  if n_elements(files) eq 0 then begin 
+      print,'-Syntax: fields = obj->file2field(files)'
+      return,-1
+  endif 
+
+  ;; assumes that the last 0000.fit represents the
+  ;; field number
+
+  n=n_elements(files)
+  if n eq 1 then fields=0 else fields = intarr(n)
+  for i=0l, n-1 do begin 
+
+      if files[i] eq '' then begin 
+          fields[i] = -1
+      endif else begin 
+          a = strsplit(files[i], '-', /extract)
+          nn = n_elements(a)
+          last = a[nn-1]
+          
+          fn = long( strsplit(last, "\.fit*", /ext, /regex) )
+          fields[i] = fn
+      endelse 
+  endfor 
+
+  return,fields
+
+end 
+
+
 
 function sdss_files::run_exists, run, reruns=reruns, info=info
 
@@ -315,225 +451,78 @@ end
 
 
 ;+
-; This file was copied from PHOTOOP when sdss_files was moved to the princeton
-; system.
-; ORIGINAL NAME:
-;   sdss_path
+; Name:
+;   dir
 ;
-; PURPOSE:
-;   Return the path name for SDSS data assuming Princeton directory structure
+; Purpose:
+;   Get the directory to the input file type.
 ;
-; CALLING SEQUENCE:
-;   datadir = sdss_path( ftype, runnum, [ camcol, rerun= ] )
+; Calling Sequence:
+;   sf = obj_new('sdss_files')
+;   dir = sf->dir(ftype, run, [ camcol, rerun= ] )
 ;
-; INPUTS:
-;   ftype      - File type
-;   run        - Run number
+; Inputs:
+;   ftype: The SDSS file type.  See the ::file method for a list of
+;       available types.
+;   run: SDSS run number.
 ;
-; OPTIONAL KEYWORDS:
-;   camcol     - CCD column number [1..6] (required for some file types)
-;   rerun      - Re-run number or name (required for some file types)
+; Optional Keywords:
+;   camcol: SDSS camcol in [1,6]
+;   rerun: SDSS rerun. 
 ;
 ; OUTPUTS:
-;   datadir    - Path name
+;   The directory.
 ;
-; COMMENTS:
-;   The top-level data path is specified by the environment variable
-;   $PHOTO_DATA, the reductions output path by $PHOTO_REDUX.
+; Requirements:
+;   Requires SDSSIDL_DIR defined and sdss_filetypes.par present in
+;   the /data subdir.  Requirs various environment variables set
+;   depending on the file type:
+;   PHOTO_SWEEP, PHOTO_REDUX, PHOTO_CALIB, PHOTO_RESOLVE
 ;
-; PROCEDURES CALLED:
-;   repstr()
-;
-; REVISION HISTORY:
-;   28-Dec-1998  Written by David Schlegel, Princeton.
+; Revision History:
+;   Based on sdss_path written by David Schlegel, Princeton.
+;   Converted to use the sdss_filetypes.par and sdss_expandvars.pro
+;   which simplified the code immensely.
+;       2010-07-26, Erin Sheldon, BNL
 ;-
 ;------------------------------------------------------------------------------
-function sdss_files::dir, ftype, runnum, camcol, rerun=rerun
+function sdss_files::dir, ftype, run, camcol, rerun=rerun
+    
+   if (n_params() LT 2) then begin
+       on_error, 2
+       print,'usage: '
+       print,'  sf=obj_new("sdss_files")'
+       print,'  dir=sf->dir(ftype, runnum, [camcol, rerun=])'
+       message,'Halting'
+    endif
+    
+    w=where(strlowcase(ftype) eq self.typenames_lower, nw)
+    if nw eq 0 then begin
+        message,'Unknown file type "'+ftype+'"'
+    endif
+    dir_pattern = self.filetypes[w[0]].dir
+    dir = sdss_expandvars(dir_pattern, run=run, rerun=rerun, camcol=camcol)
+    return, dir
 
-   if (n_params() LT 2) then $
-    message, 'Syntax - datadir = sf->dir( ftype, runnum, [ camcol, rerun= ] )'
-
-   outputdir = '$PHOTO_REDUX/$RERUN/$RUNNUM'
-
-   case ftype of
-      'apObj'         : datadir = outputdir + '/objcs/$COL'
-      'asTrans'       : datadir = outputdir + '/astrom'
-      'asTranscol'    : datadir = outputdir + '/astrom/$COL'
-      'calibImage'    : datadir = '$PHOTO_REDUX/calibimage/$RERUN/$RUNNUM/$COL'
-      'calibMatch'    : datadir = outputdir + '/nfcalib'
-      'calibObj'      : datadir = '$PHOTO_REDUX/calibobj/$RERUN/$RUNNUM/$COL'
-      'calibObj.gal'  : datadir = '$PHOTO_SWEEP/$RERUN'
-      'calibObj.galmoments'  : datadir = '$PHOTO_SWEEP/$RERUN'
-      'calibObj.sky'  : datadir = '$PHOTO_SWEEP/$RERUN'
-      'calibObj.star' : datadir = '$PHOTO_SWEEP/$RERUN'
-      'calibPhotom'   : datadir = outputdir + '/nfcalib'
-      'calibPhotomGlobal'   : datadir = '$PHOTO_CALIB/$RERUN/$RUNNUM/nfcalib'
-      'exPhotom'      : datadir = outputdir + '/photo'
-      'fakeIdR'       : datadir = '$PHOTO_DATA/$RUNNUM/fake_fields/$COL'
-      'fcPCalib'      : datadir = outputdir + '/nfcalib'
-      'fpAtlas'       : datadir = outputdir + '/objcs/$COL'
-      'fpC'           : datadir = outputdir + '/objcs/$COL'
-      'fpBIN'         : datadir = outputdir + '/objcs/$COL'
-      'fpFieldStat'   : datadir = outputdir + '/objcs/$COL'
-      'fpM'           : datadir = outputdir + '/objcs/$COL'
-      'fpObjc'        : datadir = outputdir + '/objcs/$COL'
-      'frame'         : datadir = '$BOSS_PHOTOOBJ/frames/$RERUN/$RUNNUM/$COL'
-      'framethumbjpg' : datadir = '$BOSS_PHOTOOBJ/frames/$RERUN/$RUNNUM/$COL'
-      'framejpg'      : datadir = '$BOSS_PHOTOOBJ/frames/$RERUN/$RUNNUM/$COL'
-      'hoggAstrom'    : datadir = outputdir + '/astrom'
-      'hoggAstrom.log': datadir = outputdir + '/logs'
-      'hoggBB'        : datadir = outputdir + '/calib'
-      'hoggBias.log'  : datadir = outputdir + '/logs'
-      'hoggFF'        : datadir = outputdir + '/calib'
-      'hoggFlat.log'  : datadir = outputdir + '/logs'
-      'hoggObj'       : datadir = outputdir + '/objcs/$COL'
-      'hoggObj.log'   : datadir = outputdir + '/logs'
-      'idB'           : datadir = outputdir + '/photo/calib'
-      'idFF'          : datadir = outputdir + '/objcs/$COL'
-      'idFrameLog'    : datadir = outputdir + '/logs'
-      'idR'           : datadir = '$PHOTO_DATA/$RUNNUM/fields/$COL'
-      'idRR'          : datadir = '$PHOTO_DATA/$RUNNUM/fields/$COL'
-      'idReport'      : datadir = outputdir + '/logs'
-      'koAstrom'      : datadir = outputdir + '/astrom'
-      'koCat'         : datadir = outputdir + '/ssc'
-      'koTycho2'      : datadir = outputdir + '/astrom'
-      'pcalibMatchObj': datadir = '$PHOTO_RESOLVE/$RERUN/$RUNNUM/nfcalib'
-      'pcalibTrimIndx': datadir = '$PHOTO_RESOLVE/$RERUN/$RUNNUM/nfcalib'
-      'pcalibTrimObj' : datadir = '$PHOTO_RESOLVE/$RERUN/$RUNNUM/nfcalib'
-      'photoCombine'  : datadir = '$BOSS_PHOTOOBJ/Combine/$RERUN/$RUNNUM/$COL'
-      'photoCombineCamcol'  : datadir = '$BOSS_PHOTOOBJ/Combine/$RERUN/$RUNNUM'
-      'photoField'    : datadir = '$BOSS_PHOTOOBJ/$RERUN/$RUNNUM'
-      'photoFirst'    : datadir = '$BOSS_PHOTOOBJ/external/First/$RERUN/$RUNNUM/$COL'
-      'photo2MASS'    : datadir = '$BOSS_PHOTOOBJ/external/2MASS/$RERUN/$RUNNUM/$COL'
-      'photo2MASSXSC'    : datadir = '$BOSS_PHOTOOBJ/external/2MASSXSC/$RERUN/$RUNNUM/$COL'
-      'photoUKIDSS'    : datadir = '$BOSS_PHOTOOBJ/external/UKIDSS/$RERUN/$RUNNUM/$COL'
-      'photoRC3'    : datadir = '$BOSS_PHOTOOBJ/external/RC3/$RERUN/$RUNNUM/$COL'
-      'photoROSAT'    : datadir = '$BOSS_PHOTOOBJ/external/ROSAT/$RERUN/$RUNNUM/$COL'
-      'photoObj'      : datadir = '$BOSS_PHOTOOBJ/$RERUN/$RUNNUM/$COL'
-      'photoRun'      : datadir = '$BOSS_PHOTOOBJ/$RERUN/$RUNNUM'
-      'photoUSNOB'    : datadir = '$BOSS_PHOTOOBJ/external/USNOB/$RERUN/$RUNNUM/$COL'
-      'psBB'          : datadir = outputdir + '/objcs/$COL'
-      'psCT'          : datadir = outputdir + '/photo'
-      'psFang'        : datadir = outputdir + '/psFangs/$COL'
-      'psFF'          : datadir = outputdir + '/objcs/$COL'
-      'psField'       : datadir = outputdir + '/objcs/$COL'
-      'psKO'          : datadir = outputdir + '/PS/$COL'
-      'reLocalRun'    : datadir = outputdir + '/resolve' ; (deprecated)
-      'reGlobalRun'   : datadir = outputdir + '/resolve' ; (deprecated)
-      'reObjGlobal'   : datadir = '$PHOTO_RESOLVE/$RERUN/$RUNNUM/resolve/$COL'
-      'reObjRun'      : datadir = outputdir + '/resolve/$COL'
-      'reObjTmp'      : datadir = '$PHOTO_RESOLVE/$RERUN/$RUNNUM/resolve/$COL'
-      'resolve.log'   : datadir = outputdir + '/resolve'
-      'scFang'        : datadir = outputdir + '/fangs/$COL'
-      'skyvec'        : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'skyfield'      : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky/$COL'
-      'skyframes'     : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'skymask'       : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'skymodel'      : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'skyymodel'      : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'skyweights'    : datadir = '$PHOTO_SKY/$RERUN/$RUNNUM/sky'
-      'tsObj'         : datadir = outputdir + '/calibChunks/$COL'
-      'psObj'         : datadir = outputdir + '/calibChunks/$COL'
-      'tsField'         : datadir = outputdir + '/calibChunks/$COL'
-      'wiField'       : datadir = outputdir + '/window'
-      'wiRun'         : datadir = outputdir + '/window'
-      'wiTrimRun'     : datadir = outputdir + '/window'
-      'wiRunQA'       : datadir = outputdir + '/window'
-      'wiScanline'    : datadir = outputdir + '/window'
-   endcase
-
-   if (strmatch(datadir, '*$PHOTO_DATA*')) then begin
-      path1 = getenv('PHOTO_DATA')
-      if (NOT keyword_set(path1)) then $
-       message, 'Environment variable PHOTO_DATA must be set!'
-      datadir = repstr(datadir, '$PHOTO_DATA', path1)
-   endif
-
-   if (strmatch(datadir, '*$PHOTO_REDUX*')) then begin
-      path2 = getenv('PHOTO_REDUX')
-      if (NOT keyword_set(path2)) then $
-       message, 'Environment variable PHOTO_REDUX must be set!'
-      datadir = repstr(datadir, '$PHOTO_REDUX', path2)
-   endif
-
-   if (strmatch(datadir, '*$PHOTO_RESOLVE*')) then begin
-      path3 = getenv('PHOTO_RESOLVE')
-      if (NOT keyword_set(path3)) then $
-       message, 'Environment variable PHOTO_RESOLVE must be set!'
-      datadir = repstr(datadir, '$PHOTO_RESOLVE', path3)
-   endif
-
-   if (strmatch(datadir, '*$PHOTO_CALIB*')) then begin
-      path4 = getenv('PHOTO_CALIB')
-      if (NOT keyword_set(path4)) then $
-       message, 'Environment variable PHOTO_CALIB must be set!'
-      datadir = repstr(datadir, '$PHOTO_CALIB', path4)
-   endif
-
-   if (strmatch(datadir, '*$PHOTO_SWEEP*')) then begin
-      path5 = getenv('PHOTO_SWEEP')
-      if (NOT keyword_set(path5)) then $
-       message, 'Environment variable PHOTO_SWEEP must be set!'
-      datadir = repstr(datadir, '$PHOTO_SWEEP', path5)
-   endif
-
-   if (strmatch(datadir, '*$PHOTO_SKY*')) then begin
-      path5 = getenv('PHOTO_SKY')
-      if (NOT keyword_set(path5)) then $
-       message, 'Environment variable PHOTO_SKY must be set!'
-      datadir = repstr(datadir, '$PHOTO_SKY', path5)
-   endif
-
-   if (strmatch(datadir, '*$BOSS_PHOTOOBJ*')) then begin
-      path5 = getenv('BOSS_PHOTOOBJ')
-      if (NOT keyword_set(path5)) then $
-       message, 'Environment variable BOSS_PHOTOOBJ must be set!'
-      datadir = repstr(datadir, '$BOSS_PHOTOOBJ', path5)
-   endif
-
-   if (strmatch(datadir, '*$RUNNUM*')) then begin
-      if (NOT keyword_set(runnum)) then $
-       message, 'RUN must be specified!'
-      runstring = strtrim(string(runnum),2)
-      datadir = repstr(datadir, '$RUNNUM', runstring)
-   endif
-
-   if (strmatch(datadir, '*$RERUN*')) then begin
-      if (n_elements(rerun) EQ 0) then $
-       message, 'RERUN must be specified!'
-      rrstring = strtrim(string(rerun),2)
-      datadir = repstr(datadir, '$RERUN', rrstring)
-   endif
-
-   if (strmatch(datadir, '*$COL*')) then begin
-      if (NOT keyword_set(camcol)) then $
-       message, 'CAMCOL must be specified!'
-      colstring = string(format='(i1.1)', camcol)
-      datadir = repstr(datadir, '$COL', colstring)
-   endif
-
-   return, datadir
 end
 
 
 ;+
-; This file was copied from PHOTOOP when sdss_files was moved to the princeton
-; system.
+; This function began life as a modification of the PHOTOOP sdss_name.pro
 ;
 ; Modifications:  
 ;
-;   Keyword fields instead of argument field
+;   Use sdss_filetypes.par and sdss_expandvars.pro to do most of the work.
+;   Allow fields as keyword 
 ;   although field as an argument is still supported.
-;   fields can be '*' in order to create patterns for file searching.
+;   fields, camcol, run can be '*' in order to create patterns for file searching.
 ;   filter and bandpass keywords are synonymous.
 ;   /no_path and /nodir synonyms
-;
-;   added check that field is present when required
+;   
+;   Much of the docs below are from the original.
 ;
 ; NAME:
 ;   ::file
-; ORIGINAL NAME:
-;   sdss_name
 ;
 ; PURPOSE:
 ;   Return the name for SDSS data file including path information.
@@ -623,13 +612,16 @@ end
 ;   camcol     - CCD column number [1..6]
 ;
 ; OPTIONAL INPUTS:
-;   field      - Field number
+;   fields      - Field number
+; Keywords:
+;   frange:    - A 2-element array represengin the range of fields. If fields is
+;                not sent, this keyword is examined
 ;   rerun      - Re-run number or name (required for some file types)
 ;   filter     - Color as an integer [0..4], or a string
 ;                'u', 'g', 'r', 'i', or 'z'; default to 'r'
 ;   bandpass   - synonym for filter
-;   no_path    - If set, then do not set the default path for this fil name.
-;   nodir      - synonym for no_path
+;   /no_path    - If set, then do not set the default path for this fil name.
+;   /nodir      - synonym for no_path
 ;
 ; OUTPUTS:
 ;   fullname   - Full file name (which may not actually exist on disk)
@@ -653,17 +645,15 @@ end
 ;   splog
 ;
 ; REVISION HISTORY:
-;   29-Dec-1998  Written by David Schlegel, Princeton.
+;   Copied and heavily modified based on sdss_name() written by David Schlegel, Princeton.
+;   2010-07-26, Erin Sheldon, BNL
 ;-
 ;------------------------------------------------------------------------------
-FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=filter, rerun=rerun, $
- exten=exten, indx=indx, no_path=no_path
 
-    runstring = self->run2string(runnum)
+FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, rerun=rerun, $
+        filter=filter, bandpass=bandpass,  $
+        exten=exten, indx=indx, no_path=no_path
 
-
-    cname = ['u', 'g', 'r', 'i', 'z']
-    camrow = [3, 5, 1, 2, 4]
 
     case ftype1 of
        'reObj' : begin
@@ -673,36 +663,17 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
         else : ftype = ftype1
     endcase
 
-    camcol_sent=0
-    if n_elements(camcol) ne 0 then begin
-        camcol_sent=1
-        camcolstring=self->camcol2string(camcol)
+    w=where(strlowcase(ftype) eq self.typenames_lower, nw)
+    if nw eq 0 then begin
+        message,'Unknown file type "'+ftype+'"'
     endif
 
-    ; allow field arg and fields keyword to be synonymous
-    ; with the keyword overriding
+
+    fields_isglob=0
+    fields_sent=0
     if n_elements(fields) ne 0 then begin
-        field=fields
-    endif
-
-    field_is_pattern=0
-    field_sent=0
-    if n_elements(field) ne 0 then begin
-        field_sent=1
-        if size(field,/tname) eq 'STRING' then begin
-            if field ne '*' then begin
-                message,'field list can only be a string if set to "*"'
-            endif
-            field_is_pattern=1
-        endif
-        fieldstring = self->field2string(field)
-    endif
-
-    if (n_elements(rerun) GT 0) then begin
-        rerunstring = strtrim(string(rerun),2)
-    endif
-    if (NOT keyword_set(no_path) and not keyword_set(nodir)) then begin
-        datadir = self->dir(ftype, runnum, camcol, rerun=rerun)
+        fields_sent=1
+        fieldstring = self->field2string(fields, isglob=fields_isglob)
     endif
 
     if n_elements(bandpass) ne 0 then begin
@@ -714,122 +685,61 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
         thisfilter = (self->filtername(filter))[0] ; Recaste this as a scalar
     endelse
 
+
+    ; get the file name
+    fpattern = self.filetypes[w[0]].name
+    if self.filetypes[w[0]].ext ne -1 then begin
+        exten=self.filetypes[w[0]].ext
+    endif
+    fullname = sdss_expandvars(fpattern, $
+                               run=runnum, $
+                               camcol=camcol, $
+                               fields=fields, $
+                               frange=frange, $
+                               rerun=rerun, $
+                               filter=filter)
+
+    ; add the directory if requested
+    if not keyword_set(no_path) and not keyword_set(nodir) then begin
+        datadir = self->dir(ftype, runnum, camcol, rerun=rerun)
+        fullname = filepath(root=datadir, fullname)
+    endif
+
+
    ;---------------------------------------------------------------------------
    if (ftype EQ 'asTrans' OR ftype EQ 'asTranscol') then begin
-       fname = 'asTrans' $
-           + '-' + runstring $
-           + '.fit'
-      fullname = filepath(fname, root_dir=datadir)
-      ; Read in the primary header to determine which XTENSION
-      ; corresponds to this field number
-      hdr = headfits(fullname, /silent, errmsg=errmsg)
-      if (size(hdr,/tname) NE 'STRING') then begin
-         exten = -1L
-         indx = -1L
-         return, fullname
-      endif
-      if arg_present(exten) OR (field_sent and not field_is_pattern) then begin
-         field0 = sxpar(hdr, 'FIELD0')
-         nfields = sxpar(hdr, 'NFIELDS')
-         camcols = sxpar(hdr, 'CAMCOLS')
-         filters = sxpar(hdr, 'FILTERS')
-         nfilter = n_elements(str_sep(filters,' '))
-         jfilter = (where(thisfilter EQ str_sep(filters,' ')))[0]
-         jcol = (where(camcol EQ str_sep(camcols,' ')))[0]
-         exten = jfilter + jcol * nfilter + 1
-      endif
-      if (field_sent and not field_is_pattern) then begin
-         indx = field - field0
-         ibad = where(field LT field0 OR field GE field0+nfields, nbad)
-         if (nbad GT 0) then indx[ibad] = -1L
-      endif
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'apObj') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'apObj' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '-' + string(format='(i4.4)', field) $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibImage') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = ftype $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '-' + fieldstring  $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibMatch' OR ftype EQ 'calibPhotom' $
-    OR ftype EQ 'calibPhotomGlobal') then begin
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibObj') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = ftype $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + fieldstring $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibObj.gal') then begin
-       fname = 'calibObj' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-gal.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibObj.galmoments') then begin
-       fname = 'calibObj' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-galmoments.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibObj.sky') then begin
-       fname = 'calibObj' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-sky.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-       ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'calibObj.star') then begin
-       fname = 'calibObj' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-star.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'exPhotom') then begin
-       fname = ftype $
-           + '-' + camcolstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
+
+       if arg_present(exten) OR (fields_sent and not fields_isglob) then begin
+
+           ; Read in the primary header to determine which XTENSION
+           ; corresponds to this field number
+           hdr = headfits(fullname, /silent, errmsg=errmsg)
+           if (size(hdr,/tname) NE 'STRING') then begin
+               exten = -1L
+               indx = -1L
+               return, fullname
+           endif
+
+
+           field0 = sxpar(hdr, 'FIELD0')
+           nfields = sxpar(hdr, 'NFIELDS')
+           camcols = sxpar(hdr, 'CAMCOLS')
+           filters = sxpar(hdr, 'FILTERS')
+           nfilter = n_elements(str_sep(filters,' '))
+           jfilter = (where(thisfilter EQ str_sep(filters,' ')))[0]
+           jcol = (where(camcol EQ str_sep(camcols,' ')))[0]
+           exten = jfilter + jcol * nfilter + 1
+       endif
+       if (fields_sent and not fields_isglob) then begin
+
+           indx = fields - field0
+           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
+           if (nbad GT 0) then indx[ibad] = -1L
+       endif
+
    endif else if (ftype EQ 'fcPCalib') then begin
 
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       if field_is_pattern then message,'cannot use pattern for field for ftype: '+ftype1
-       fname = 'fcPCalib' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
+       if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
        ; Read in the primary header to determine which array element
        ; corresponds to this field number
 
@@ -848,115 +758,20 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
        endif
        field0 = sxpar(hdr, 'FIELD0')
        nfields = sxpar(hdr, 'NFIELDS')
-       if (field LT field0+nfields) then begin
+       if (fields LT field0+nfields) then begin
            exten = 1
-           indx = field - field0
+           indx = fields - field0
        endif else begin
-           splog, 'No fcPCalib file with data for field ' + string(field)
+           splog, 'No fcPCalib file with data for fields ' + string(fields)
            exten = -1
            indx = -1
            return, fullname
        endelse
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpAtlas') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'fpAtlas' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + fieldstring  $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpBIN') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'fpBIN' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '-' + fieldstring  $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpC') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'fpC' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '-' + fieldstring  $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpFieldStat') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'fpFieldStat' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring  $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpM') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'fpM' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '-' + fieldstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'fpObjc') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'fpObjc' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-      fullname = filepath(fname, root_dir=datadir)
-      exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'frame') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'frame' $
-            + '-' + self->filtername(filter) $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-      exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'framethumbjpg') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'frame-thumb' $
-            + '-' + filter $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.jpg'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'framejpg') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'frame' $
-            + '-' + filter $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.jpg'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
    endif else if (ftype EQ 'hoggBB') then begin
-        fname = 'hoggBB' $
-            + '-' + runstring $
-            + '-' + thisfilter + camcolstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 0
         if (arg_present(indx)) then begin
-            if not field_sent then message,'field is required when indx '+$
+            if not fields_sent then message,'fields is required when indx '+$
                 'keyword sent for ftype: '+ftype1
-            if field_is_pattern then message,'cannot use pattern for field for ftype: '+ftype1
+            if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
             hdr = headfits(fullname, /silent, errmsg=errmsg)
             if (size(hdr,/tname) NE 'STRING') then begin
                 indx = -1L
@@ -964,23 +779,16 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
             endif
             field0 = sxpar(hdr, 'FIELD0')
             nfields = sxpar(hdr, 'NFIELDS')
-            indx = field - field0
-            ibad = where(field LT field0 OR field GE field0+nfields, nbad)
+            indx = fields - field0
+            ibad = where(fields LT field0 OR field GE field0+nfields, nbad)
             if (nbad GT 0) then indx[ibad] = -1L
         endif
-   ;---------------------------------------------------------------------------
    endif else if (ftype EQ 'hoggAstrom') then begin
-       fname = 'hoggAstrom' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
        if (arg_present(indx)) then begin
 
-           if not field_sent then message,'field is required when indx '+$
+           if not fields_sent then message,'field is required when indx '+$
                'keyword sent for ftype: '+ftype1
-           if field_is_pattern then message,'cannot use pattern for field for ftype: '+ftype1
+           if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
            hdr = headfits(fullname, /silent, errmsg=errmsg)
            if (size(hdr,/tname) NE 'STRING') then begin
                indx = -1L
@@ -988,37 +796,17 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
            endif
            field0 = sxpar(hdr, 'FIELD0')
            nfields = sxpar(hdr, 'NFIELDS')
-           indx = field - field0
-           ibad = where(field LT field0 OR field GE field0+nfields, nbad)
+           indx = fields - field0
+           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
            if (nbad GT 0) then indx[ibad] = -1L
        endif
-       ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggAstrom.log') then begin
-       fname = 'hoggAstrom' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.log'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggBias.log') then begin
-       fname = 'hoggBias' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.log'
-       fullname = filepath(fname, root_dir=datadir)
    ;---------------------------------------------------------------------------
    endif else if (ftype EQ 'hoggFF') then begin
-       fname = 'hoggFF' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 0
        if (arg_present(indx)) then begin
 
-           if not field_sent then message,'field is required when indx '+$
+           if not fields_sent then message,'field is required when indx '+$
                'keyword sent for ftype: '+ftype1
-           if field_is_pattern then message,'cannot use pattern for field for ftype: '+ftype1
+           if fields_isglob then message,'cannot use pattern for fields for ftype: '+ftype1
            hdr = headfits(fullname, /silent, errmsg=errmsg)
            if (size(hdr,/tname) NE 'STRING') then begin
                indx = -1L
@@ -1026,173 +814,12 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
            endif
            field0 = sxpar(hdr, 'FIELD0')
            nfields = sxpar(hdr, 'NFIELDS')
-           indx = field - field0
-           ibad = where(field LT field0 OR field GE field0+nfields, nbad)
+           indx = fields - field0
+           ibad = where(fields LT field0 OR fields GE field0+nfields, nbad)
            if (nbad GT 0) then indx[ibad] = -1L
        endif
    ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggFlat.log') then begin
-       fname = 'hoggFlat' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.log'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggObj') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'hoggObj' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'hoggObj.log') then begin
-       fname = 'hoggObj' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.log'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'idB') then begin
-       fname = 'idB' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'idFF') then begin
-       fname = 'idFF' $
-           + '-' + runstring $
-           + '-' + thisfilter + camcolstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'idR' OR ftype EQ 'idRR' $
-    OR ftype EQ 'fakeIdR') then begin
-
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        ftype_use= ftype
-        if (ftype EQ 'fakeIdR') then ftype='idR'
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + thisfilter + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'koAstrom') then begin
-      fname = 'koAstrom' $
-          + '-' + runstring $
-          + '.fit'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'koCat') then begin
-       fname = 'koCat' $
-           + '-' + runstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'koTycho2') then begin
-      fname = 'koTycho2' $
-          + '-' + runstring $
-          + '.fit'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'pcalibMatchObj' OR ftype EQ 'pcalibTrimIndx' $
-    OR ftype EQ 'pcalibTrimObj') then begin
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'photoField') then begin
-       fname = ftype $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'photoObj' OR $
-                  ftype EQ 'photoCombine' OR $
-                  ftype EQ 'photoFirst' OR $
-                  ftype EQ 'photoUKIDSS' OR $
-                  ftype EQ 'photoRC3' OR $
-                  ftype EQ 'photoROSAT' OR $
-                  ftype EQ 'photo2MASS' OR $
-                  ftype EQ 'photo2MASSXSC' OR $
-                  ftype EQ 'photoUSNOB') then begin
-
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'photoCombineCamcol' OR $
-                  ftype EQ 'photoFirstCamcol' OR $
-                  ftype EQ 'photoUSNOBCamcol') then begin
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'photoRun') then begin
-      fname = ftype $
-          + '-' + runstring $
-          + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-      exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psBB') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'psBB' $
-            + '-' + runstring $
-            + '-' + thisfilter + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psCT') then begin
-       fname = 'psCT' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psFang') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'psFang' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + fieldstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psFF') then begin
-      fname = 'psFF' $
-          + '-' + runstring $
-          + '-' + thisfilter + camcolstring $
-          + '.fit'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
    endif else if (ftype EQ 'psField') then begin
-       if not field_sent then message,'field is required for ftype: '+ftype1
-       fname = 'psField' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + fieldstring $
-           + '.fit'
-       fullname = filepath(fname, root_dir=datadir)
 
         if arg_present(exten) or arg_present(indx) then begin
 
@@ -1218,501 +845,13 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, field, fields=fields, filter=
             jfilter = (where(thisfilter EQ str_sep(filters,' ')))[0]
             indx = jfilter
         endif
-    ;---------------------------------------------------------------------------
-    endif else if (ftype EQ 'psKO') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'psKO' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-    ;---------------------------------------------------------------------------
-    endif else if (strmatch(ftype,'reLocalRun')) then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-    ;---------------------------------------------------------------------------
-    endif else if (strmatch(ftype,'reGlobalRun')) then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (strmatch(ftype,'reObjGlobal') $
-    OR strmatch(ftype,'reObjRun') OR strmatch(ftype,'reObjTmp')) then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = ftype $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (strmatch(ftype,'resolve.log')) then begin
-       fname = 'resolve' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '.log'
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'scFang') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'scFang' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skyfield') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'skyfield' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + string(format='(i4.4)', field) $
-            + '-' + fieldstring $
-            + '.fits'
-        fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skyframes') then begin
-       fname = 'skyframes' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + string(thisfilter) $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skymask') then begin
-       fname = 'skymask' $
-           + '-' + runstring $
-           + '-' + camcolstring $
-           + '-' + string(thisfilter) $
-           + '.fits'
-       fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skymodel') then begin
-      fname = 'skymodel' $
-          + '-' + runstring $
-          + '-' + string(thisfilter) $
-          + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skyvec') then begin
-      fname = 'skyvec' $
-          + '-' + runstring $
-          + '-' + string(thisfilter) $
-          + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skyweights') then begin
-      fname = 'skyweights' $
-          + '-' + runstring $
-          + '-' + string(thisfilter) $
-          + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'skyymodel') then begin
-      fname = 'skyymodel' $
-          + '-' + runstring $
-          + '-' + string(thisfilter) $
-          + '.fits'
-      fullname = filepath(fname, root_dir=datadir)
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'tsField') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'tsField' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + rerunstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'tsFieldInfo') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'tsFieldInfo' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'tsObj') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'tsObj' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + rerunstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-   ;---------------------------------------------------------------------------
-   endif else if (ftype EQ 'psObj') then begin
-        if not field_sent then message,'field is required for ftype: '+ftype1
-        fname = 'psObj' $
-            + '-' + runstring $
-            + '-' + camcolstring $
-            + '-' + rerunstring $
-            + '-' + fieldstring $
-            + '.fit'
-        fullname = filepath(fname, root_dir=datadir)
-        exten = 1
-
-   ;---------------------------------------------------------------------------
-   endif else if (strmatch(ftype,'wi*')) then begin
-       if(ftype eq 'wiRunQA') then $
-         suffix='.ps' $
-       else $
-         suffix=+ '-' + camcolstring + $
-         '.fits'
-       fname = ftype $
-           + '-' + runstring $
-           + suffix
-       fullname = filepath(fname, root_dir=datadir)
-       exten = 1
-   ;---------------------------------------------------------------------------
-   endif else begin
-      message, 'Unknown FTYPE=' + ftype
-   endelse
+   endif
 
    return, fullname
 end
 
 
 
-function sdss_files::file2field, files
-
-  if n_elements(files) eq 0 then begin 
-      print,'-Syntax: fields = obj->file2field(files)'
-      return,-1
-  endif 
-
-  ;; assumes that the last 0000.fit represents the
-  ;; field number
-
-  n=n_elements(files)
-  if n eq 1 then fields=0 else fields = intarr(n)
-  for i=0l, n-1 do begin 
-
-      if files[i] eq '' then begin 
-          fields[i] = -1
-      endif else begin 
-          a = strsplit(files[i], '-', /extract)
-          nn = n_elements(a)
-          last = a[nn-1]
-          
-          fn = long( strsplit(last, "\.fit*", /ext, /regex) )
-          fields[i] = fn
-      endelse 
-  endfor 
-
-  return,fields
-
-end 
-
-function sdss_files::stripe2string, stripe
-
-  if n_params() eq 0 then begin
-      on_error, 2
-      print,'-Syntax: result = obj->stripe2string(stripe)'
-      message,'Halting'
-  endif
-
-  if size(stripe,/tname) eq 'STRING' then return,stripe
-  return, strtrim(string(stripe,format='(i20.2)'),2)
-end 
-
-function sdss_files::run2string, run
-
-  if N_params() eq 0 then begin
-      on_error, 2
-      print,'-Syntax: result = obj->run2string(run)'
-      message,'Halting'
-  endif
-
-  if size(run,/tname) eq 'STRING' then return,run
-  return, strtrim(string(run,format='(I20.6)'),2)
-end 
-
-function sdss_files::field2string, field
-
-  if N_params() eq 0 then begin
-      on_error, 2
-      print,'-Syntax: result = obj->field2string(field)'
-      message,'Halting'
-  endif
-
-  if size(field,/tname) eq 'STRING' then return,field
-  return, strtrim(string(field,format='(I20.4)'),2)
-
-end 
-
-function sdss_files::id2string, id
-
-  if N_params() eq 0 then begin
-      on_error, 2
-      print,'-Syntax: result = obj->id2string(id)'
-      message,'Halting'
-  endif
-
-  if size(id,/tname) eq 'STRING' then return,id
-  return, strtrim(string(id,format='(I20.5)'),2)
-end 
-
-function sdss_files::camcol2string, camcol
-
-  if N_params() eq 0 then begin
-      on_error, 2
-      print,'-Syntax: result = obj->camcol2string(camcol)'
-      message,'Halting'
-  endif
-
-  if size(camcol,/tname) eq 'STRING' then return,camcol
-  return, strtrim(string(camcol,f='(i0)'),2)
-end 
-
-
-function sdss_files::filtername, filter
-    if size(filter, /tname) eq 'STRING' then begin
-        return, filter
-    endif
-
-    names = ['u','g','r','i','z']
-    fil = fix(filter)
-    w=where(fil lt 0 or fil lt 4,nw)
-    if nw gt 0 then begin
-        message,'Filter must be a string or in [0,4]'
-    endif
-    return, names[fil]
-end
-
-
-;------------------------------------------------------------------------------
-
-;docstart::sdss_files::file
-; NAME:
-;  sdss_file()
-;
-; PURPOSE:
-;  Return an SDSS file name for the input filetype, and id information.
-;
-; CATEGORY:
-;  SDSS specific
-;
-; CALLING SEQUENCE:
-;   file=sf->file(type, run, camcol, rerun=, bandpass=, fields=, 
-;                  dir=, /nodir, /stuffdb, exists=)
-;  
-;
-; INPUTS:
-;   type: file type.  For a list of types do
-;     print,!sdss->supported_filetypes()
-;   run: The sdss run.
-;   camcol: The camcol.  This is optional for some file types.
-;
-; OPTIONAL INPUTS:
-;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
-;       for the run and the latest rerun is returned.
-;   bandpass: The bandpass in numerical of string form where
-;       u,g,r,i,z -> 0,1,2,3,4
-;   fields: The fields to read. Defaults to a pattern with '*' for the 
-;       field number.
-;   indir: The directory to use for the file.
-;   /nodir: Do not prepend the directory.
-;   /stuffdb:  Filenames for db stuffing.
-;
-; OUTPUTS:
-;   The file name.
-;
-; OPTIONAL OUTPUTS:
-;   dir: The directory.
-;   exists: 1 for yes, 0 for no
-;
-; RESTRICTIONS:
-;   If rerun is not sent, the run must be defined in the run status structure.
-;
-; MODIFICATION HISTORY:
-;   Created Erin Sheldon, UChicago 
-;
-;docend::sdss_files::file
-
-function sdss_files::file_old, type_in, run, camcol, fields=fields, rerun=rerun, bandpass=bandpass, indir=indir, dir=dir, nodir=nodir, stuffdb=stuffdb, exists=exists
-
-  ntype=n_elements(type_in)
-  nrun=n_elements(run)
-  if ntype eq 0 or nrun eq 0 then begin 
-      on_error, 2
-      print,'-Syntax: file = obj->file(type, run, [camcol, rerun=, bandpass=, fields=, indir=, dir=, /nodir, /stuffdb, exists=])'
-      print,'optional bandpass can be index or color string (e.g. 2 or "r")'
-      print,'fields can be an array'
-      print
-      message,'Halting'
-  endif 
-
-  type = strlowcase(type_in[0])
-
-  runstr = self->run2string(run[0])
-  if n_elements(camcol) eq 0 then begin 
-      if type ne 'astrans' then begin 
-          message,'You must enter camcol to generate a '+type_in+' file',/inf
-          exists=0
-          return,''
-      endif 
-  endif else begin 
-      camcolstr = ntostr(long(camcol[0]))
-  endelse 
-
-  if n_elements(rerun) eq 0 then begin 
-      rerun = self->rerun(run, exist=rexist)
-      if not rexist then begin
-          exists=0
-          return,''
-      endif
-  endif 
-  rerunstr = ntostr(long(rerun))
-
-  if n_elements(fields) eq 0 then begin 
-      fieldstr = '*'
-  endif else begin 
-      fieldstr = self->field2string(fields)
-  endelse 
-
-  if n_elements(bandpass) ne 0 then begin 
-      bt = size(bandpass,/tname)
-      if bt eq 'STRING' then begin 
-          bpstr = bandpass[0]
-      endif else begin 
-          colors = ['u','g','r','i','z']
-          bpstr = colors[long(bandpass[0])]
-      endelse 
-  endif else begin 
-      ;; match up to those that require bandpass to be entered
-      match, type, ['fpm','fpbin','psbb'], mtype, mbptype
-      if mtype[0] ne -1 then begin 
-          message,$
-            'You must enter bandpass= to get generate a '+type_in[0]+' file',$
-            /inf
-          exists=0
-          return,''
-      endif 
-  endelse 
-
-  if not keyword_set(nodir) then dodir = 1 else dodir = 0
-
-  case type of 
-      'astrans': begin 
-          file = 'asTrans-'+runstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('astrom',run,rerun=rerun)
-          endif 
-      end 
-      'tsobj': begin 
-          file = $
-            'tsObj-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'tsfield': begin 
-          file = $
-            'tsField-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'fpobjc': begin 
-          file = $
-            'fpObjc-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'fpatlas': begin 
-          file = $
-            'fpAtlas-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'fpm': begin           
-          file = $
-            'fpM-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'fpbin': begin 
-          file = $
-            'fpBIN-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end
-      'fpfieldstat': begin 
-          file = $
-            'fpFieldStat-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'psfield': begin 
-          file = $
-            'psField-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end 
-      'psbb': begin 
-          file = $
-            'psBB-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
-          endif 
-      end
-
-      ;; Corrected
-      'adatc': begin 
-          file = $
-            'adatc-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
-          if dodir then begin 
-              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol,$
-                                  /corrected)
-          endif 
-      end 
-
-      else: begin 
-          message,'Unsupported file type: '+type,/inf
-          exists=0
-          return,''
-      end 
-  endcase 
-
-  if n_elements(indir) ne 0 then begin
-      dir = indir
-  endif
-  if dodir then file = concat_dir(dir, file)
-
-  if arg_present(exists) then exists=fexist(file)
-
-  return,file
-
-end 
 
 
 
@@ -1730,53 +869,53 @@ end
 
 ;; See if the same args as last time were sent. If so, return the
 ;; old file list
-function sdss_files::_filelist_sameargs, filetype, run, camcol, rerun=rerun
 
-  common sdss_files_filelist_block, $
-    filetype_old, $
-    run_old, $
-    camcol_old, $
-    rerun_sent, rerun_old, $
-    allfiles_old, allfnums
-
-  if n_elements(filetype_old) eq 0 then begin 
-      filetype_old = 'NONE'
-      return,0
-  endif 
-
-  if n_elements(run_old) eq 0 then runold = -1l
+pro sdss_files::_set_default_sameargs
+    common sdss_files_filelist_block, $
+        filetype_old, $
+        run_old, $
+        camcol_old, $
+        fields_old, $
+        rerun_old, $
+        flist_old
 
 
-  if n_elements(rerun_sent) eq 0 then rerun_sent = 0
-  if n_elements(rerun_old) eq 0 then rerunold = -1l
+    filetype_old = ''
+    run_old = -1l
+    rerun_sent = 0
+    rerun_old = ''
+    filter_old = ''
+    camcol_old = -1L
+    fields_old = -1L
+end
+function sdss_files::_filelist_sameargs, filetype, run, camcol, fields, rerun=rerun, filter=filter
 
-  if n_elements(camcol_old) eq 0 then camcolold = -1l
+    common sdss_files_filelist_block, $
+        filetype_old, $
+        run_old, $
+        camcol_old, $
+        fields_old, $
+        rerun_old, $
+        flist_old
 
-  notmatched = 0
 
-  if filetype[0] ne filetype_old then return,0
-  if run[0] ne run_old then return,0
-  if camcol[0] ne camcol_old then return,0
+    if filetype[0] ne filetype_old then return,0
+    if run[0] ne run_old then return,0
+    if camcol[0] ne camcol_old then return,0
 
-  ;; these were optional, so might not need to check them
-  if rerun_sent then begin 
-      if n_elements(rerun) ne 0 then begin 
-          if rerun[0] ne rerun_old then return,0
-      endif 
-  endif 
+    if n_elements(rerun) ne 0 then begin 
+        rr = strtrim(string(rerun),2)
+        if rr ne rerun_old then return,0
+    endif 
 
-  ;; if we get here, they match the old arguments
-  ;; now set the old arguments to the new arguments
-  filetype_old = filetype[0]
-  run_old = run[0]
-  camcol_old = camcol[0]
+    if n_elements(fields) ne n_elements(fields_old) then begin
+        return, 0
+    endif
+    ; fields are the same length, need to match up
+    w=where(fields ne fields_old, nmiss)
+    if nmiss ne 0 then return, 0
 
-  if n_elements(rerun) ne 0 then begin 
-      rerun_old = rerun[0]
-      rerun_sent = 1
-  endif 
-
-  return,1
+    return,1
 
 end 
 
@@ -1828,7 +967,7 @@ end
 ;   SDSS specifie.
 ;
 ; CALLING SEQUENCE:
-;   sdss_filelist(filetype, run, camcol, rerun=, bandpass=, fields=, 
+;   sdss_filelist(filetype, run, camcol [fields, rerun=, bandpass=, filter=,
 ;                 fnums=, dir=, /silent, status=)
 ;
 ; INPUTS:
@@ -1838,12 +977,14 @@ end
 ;   camcol: The camcol.  This is optional for some file types.
 ;
 ; OPTIONAL INPUTS:
-;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
-;       for the run and the latest rerun is returned.
-;   bandpass: The bandpass in numerical of string form where
-;       u,g,r,i,z -> 0,1,2,3,4
 ;   fields: The fields to read. Defaults to a pattern with '*' for the 
 ;       field number.
+; Keywords:
+;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
+;       for the run and the latest rerun is returned.
+;   bandpass: The bandpass in numerical or string form where
+;       u,g,r,i,z -> 0,1,2,3,4
+;   filter: synonym for bandpass
 ;   /silent:
 ;
 ; OUTPUTS:
@@ -1861,14 +1002,23 @@ end
 ;
 ;docend::sdss_files::filelist
 
-function sdss_files::filelist, filetype_in, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, fnums=fnums, indir=indir, dir=dir, silent=silent, status=status
+function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
+        rerun=rerun, $
+        bandpass=bandpass, filter=filter, $
+        fnums=fnums, $
+        indir=indir, $
+        dir=dir, $
+        silent=silent, $
+        status=status
 
     common sdss_files_filelist_block, $
         filetype_old, $
         run_old, $
         camcol_old, $
-        rerun_sent, rerun_old, $
-        allfiles_old, allfnums
+        fields_old, $
+        rerun_old, $
+        flist_old
+
 
     status = 1
     badval=""
@@ -1876,95 +1026,55 @@ function sdss_files::filelist, filetype_in, run, camcol, rerun=rerun, bandpass=b
     if n_params() lt 2 then begin 
         on_error, 2
         print,'-Syntax: filedir=obj->filelist(filetype, run, camcol, '+$
-            'rerun=, bandpass=, fields=, fnums=, dir=, /silent, status=)'
+            '[fields, rerun=, bandpass=, filter=, fnums=, dir=, /silent, status=])'
         print
         message,'Halting'
     endif 
 
-    filetype = strlowcase(filetype_in[0])
+    if n_elements(bandpass) ne 0 then begin
+        filter=bandpass
+    endif
+    if n_elements(fields) eq 0 then begin
+        if n_elements(frange) ne 2 then begin
+            message,'frange must be a 2 element array'
+        endif
+        if frange[0] gt frange[1] then message,'FRANGE[0] must <= FRANGE[1]'
+        if frange[0] eq frange[1] then begin
+            fields=frange[1]
+        endif else begin
+            nf = frange[1]-frange[0]+1
+            fields = frange[0] + lindgen(nf)
+        endelse
+    endif
 
-    if not self->_filelist_sameargs(filetype, run, camcol, rerun=rerun) then begin 
-
-        ;; see what file type is requested
-        case strlowcase(filetype[0]) of
-            ;; astrom
-            'astrans': file_pattern = $
-                self->file('astrans', run, rerun=rerun, indir=indir, dir=dir)
-            ;; calibChunks directory
-            'tsobj': file_pattern = $
-                self->file('tsObj', run, camcol, rerun=rerun, indir=indir,  dir=dir)
-            'tsfield': file_pattern = $
-                self->file('tsField', run, camcol, rerun=rerun, indir=indir, dir=dir)
-          
-            ;; objcs directory
-            'fpobjc': file_pattern = $
-                self->file('fpobjc', run, camcol, rerun=rerun, indir=indir, dir=dir)
-            'fpatlas': file_pattern = $
-                self->file('fpAtlas', run, camcol, rerun=rerun, indir=indir, dir=dir)
-            'fpm': file_pattern = $
-                self->file('fpM', run, camcol, rerun=rerun,bandpass=bandpass, indir=indir, dir=dir)
-            'fpbin': file_pattern = $
-                self->file('fpBIN', run, camcol,rerun=rerun,bandpass=bandpass, indir=indir, dir=dir)
-            'fpfieldstat': file_pattern = $
-                self->file('fpFieldStat', run, camcol,rerun=rerun, indir=indir, dir=dir)
-            'psfield': file_pattern = $
-                self->file('psField', run, camcol, rerun=rerun, indir=indir, dir=dir)
-            'psbb': file_pattern = $
-                self->file('psBB', run, camcol,rerun=rerun,bandpass=bandpass, indir=indir, dir=dir)
-
-          
-            ;; Corrected files
-            'adatc': file_pattern = $
-                self->file('adatc', run, camcol, rerun=rerun, indir=indir, dir=dir)
-          
-            else: begin 
-                message,'Unknown file type: '+filetype,/inf
-                return,badval
-            end 
-        endcase 
-
-        if n_elements(dir) eq 0 then return, badval
-        if not fexist(dir) then return,badval
-        allfiles = self->_file_search(file_pattern, count=count)
-        if n_elements(allfiles) eq 1 then allfiles = allfiles[0]
-
-        allfiles_old = allfiles
-        if count eq 0 then begin 
-            return,badval
-        endif 
-
-        allfnums = self->file2field(allfiles)
-
-    endif else begin 
-        allfiles = allfiles_old
-    endelse 
-
-    if n_elements(fields) ne 0 then begin 
-
-        if size(fields[0],/tname) eq 'STRING' then begin
-            if fields[0] eq '*' then begin
-                status=0
-                fnums=allfnums
-                return, allfiles 
-            endif else begin
-                print,'Cannot interpret fields keyword: ',fields
-                return,badval
-            endelse
+    if not self->_filelist_sameargs(filetype, $
+                                    run, camcol, fields, $
+                                    rerun=rerun, filter=filter) then begin 
+        ; we have new arguments
+        if n_elements(run) ne 0 then run_old=run
+        if n_elements(filter) ne 0 then filter_old=filter
+        if n_elements(camcol) ne 0 then camcol_old=camcol
+        if n_elements(fields) ne 0 then fields_old=fields
+        if n_elements(rerun) ne 0 then begin
+            rerun_old=strtrim(string(rerun),2)
         endif
 
-        files = self->extract_fields(allfiles, allfnums, fields, $
-                                    goodfnums=fnums, $
-                                    status=extstatus)
-        if extstatus ne 0 then begin 
-            return,badval
-        endif 
-        status = 0
-        return,files
+
+        file_pattern = self->file(filetype, run, camcol, fields, rerun=rerun, filter=filter)
+        flist = self->_file_search(file_pattern, count=count)
+        if count eq 0 then begin
+            message,'No files matched pattern: '+file_pattern
+        endif
+
+        if n_elements(flist) eq 1 then flist = flist[0]
+
+        flist_old = flist
+
     endif else begin 
-        status = 0
-        fnums = allfnums
-        return,allfiles
+        flist = flist_old
     endelse 
+
+    return, flist
 
 
 end 
@@ -2420,7 +1530,7 @@ end
 
 ;docstart::sdss_files::read
 ; NAME:
-;  read()
+;  read_fields()
 ;
 ; PURPOSE:
 ;  Generic SDSS file reader. Reads asTrans, tsObj, tsField, fpObjc, psField...
@@ -2433,11 +1543,12 @@ end
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;   st = sf->read(type, run, camcol, rerun=, bandpass=, fields=, /all,
+;   st = sf->read(type, run, camcol, [fields, frange=, rerun=, bandpass=, 
 ;                 taglist=, wstring=, ex_struct=, extension=, dir=, 
 ;                 /pointers, verbose=, status=)
 ;
-;   if type is 'astrans' the extra keywords node= and inc= exist.
+;   if type is 'astrans' the extra keywords node= and inc= can also
+;   be sent
 ;
 ; INPUTS:
 ;   type: The file type. Currently supported types are:
@@ -2450,10 +1561,15 @@ end
 ;   run, camcol: SDSS id info.
 ;
 ; OPTIONAL INPUTS:
+;   fields: Field number(s) or a glob '*'.
+;
+; Keywords:
+;   frange: A range of fields to read; used if fields is not sent.
 ;   rerun: Rerun number.  If not sent, latest is used.
 ;   bandpass:  For files that require a bandpass.
-;   fields: Field number(s).  If not sent, the first is read.
-;   /all: read all fields.
+;   filter: synonym for bandpass
+;
+;
 ;   taglist: List of tags to read. Default is all.
 ;   wstring: A string that can be sent to the where function to select
 ;     objects.  Should refer the structure as "lnew"
@@ -2479,9 +1595,9 @@ end
 ;   run=756
 ;   camcol=3
 ;   fields=[35,88]
-;   st = sdss_read('tsobj', run, camcol, fields=fields)
+;   st = sdss_read('tsobj', run, camcol, fields)
 ;
-;   kl=sdss_read('psfield', run, camcol, field=field, extension=3)
+;   kl=sdss_read('psfield', run, camcol, field, extension=3)
 ;   psf=sdss_psfrec(kl, row, col)
 ;
 ;
@@ -2491,7 +1607,22 @@ end
 ;docend::sdss_files::read
 
 
-function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, verbose=verbose, silent=silent, status=status
+function sdss_files::read, filetype_in, run, camcol, fields, frange=frange, $
+        rerun=rerun, $
+        bandpass=bandpass, filter=filter, $
+        extension=extension, $
+        indir=indir, $
+        dir=dir, $
+        taglist=taglist, $
+        ex_struct=ex_struct, $
+        wstring=wstring, $
+        nomodrow=nomodrow, $
+        node=node, $
+        inc=inc, $
+        pointers=pointers, $
+        verbose=verbose, $
+        silent=silent, $
+        status=status
 
     common sdss_files_read_block, filetype_old, all_structdef
   
@@ -2500,9 +1631,7 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
     np = n_elements(filetype_in) + n_elements(run) + n_elements(camcol)
     if np lt 3 then begin 
         on_error, 2
-        print,'-Syntax: sdss->read(filetype, run, camcol, rerun=, bandpass=, extension=, fields=, /all, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent, status='
-        print,'Supported types: '
-        print,'  astrans, tsobj, tsfield, fpobjc, psfield'
+        print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, extension=, /all, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent, status='
         print
         print,'For filetype=asTrans, the extra keywords node=,inc= exist'
         print,'For atlas images see isf->atlas_read() or read_atlas()'
@@ -2557,22 +1686,31 @@ function sdss_files::read, filetype_in, run, camcol, rerun=rerun, bandpass=bandp
     ;; for tsobj files we want to cut rows
     if keyword_set(nomodrow) then modrow=0 else modrow = self->modrow(filetype)
 
-    ;; get the file list.  this is smart in that it only will retrieve
-    ;; the file list from disk if the arguments have changed.
-    filelist = self->filelist(filetype, run, camcol, $
-        rerun=rerun, bandpass=bandpass, $
-        fields=fields, fnums=fnums, indir=indir, dir=dir, $
-        status = fstatus)
-
-    if fstatus ne 0 then begin 
-        if verbose gt 0 then message,'Files not found',/inf
-        return,-1
-    endif 
-
-    ; if no info sent about field selection, just grab the first one
-    if n_elements(fields) eq 0 and not keyword_set(all) then begin
-        filelist=filelist[0]
+    ;; get the file list.  
+    
+    this is smart in that it only will retrieve
+    ;; if fields is sent and is '*', we need to actually retrieve
+    ;; the list from disk
+    run_filelist=0
+    if n_elements(fields) ne 0 or n_elements(frange) ne 0 then begin
+        if n_elements(fields) eq 1 then begin
+            if strtrim(string(fields),2) eq '*' then begin
+                run_filelist=1
+            endif
+        endif
     endif
+    if run_filelist then begin
+        filelist = self->filelist($
+            filetype, run, camcol, fields, frange=frange, $
+            rerun=rerun, bandpass=bandpass, filter=filter, $
+            fnums=fnums, indir=indir, dir=dir, $
+            status = fstatus)
+    endif else begin
+        filelist = self->file(
+            filetype, run, camcol, fields, frange=frange, $
+            rerun=rerun, bandpass=bandpass, filter=filter)
+    endelse
+
 
     ;; if the user wants all tags and no ex_struct then things are 
     ;; simplified.  otherwise we will need to check struct
@@ -2720,8 +1858,6 @@ function sdss_files::psfield_read, run, camcol, field, $
 		print
 		message,'Halting'
 	endif 
-
-	;file = self->filelist('psField', run, camcol, rerun=rerun, fields=field[0])
 
     file = self->file('psField', run, camcol, rerun=rerun, fields=field[0])
 
@@ -4312,16 +3448,262 @@ function sdss_files::filedir, subdir, run, rerun=rerun, camcol=camcol, corrected
 end 
 
 
+
+;obsolete
+;------------------------------------------------------------------------------
+
+;docstart::sdss_files::file
+; NAME:
+;  sdss_file()
+;
+; PURPOSE:
+;  Return an SDSS file name for the input filetype, and id information.
+;
+; CATEGORY:
+;  SDSS specific
+;
+; CALLING SEQUENCE:
+;   file=sf->file(type, run, camcol, rerun=, bandpass=, fields=, 
+;                  dir=, /nodir, /stuffdb, exists=)
+;  
+;
+; INPUTS:
+;   type: file type.  For a list of types do
+;     print,!sdss->supported_filetypes()
+;   run: The sdss run.
+;   camcol: The camcol.  This is optional for some file types.
+;
+; OPTIONAL INPUTS:
+;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
+;       for the run and the latest rerun is returned.
+;   bandpass: The bandpass in numerical of string form where
+;       u,g,r,i,z -> 0,1,2,3,4
+;   fields: The fields to read. Defaults to a pattern with '*' for the 
+;       field number.
+;   indir: The directory to use for the file.
+;   /nodir: Do not prepend the directory.
+;   /stuffdb:  Filenames for db stuffing.
+;
+; OUTPUTS:
+;   The file name.
+;
+; OPTIONAL OUTPUTS:
+;   dir: The directory.
+;   exists: 1 for yes, 0 for no
+;
+; RESTRICTIONS:
+;   If rerun is not sent, the run must be defined in the run status structure.
+;
+; MODIFICATION HISTORY:
+;   Created Erin Sheldon, UChicago 
+;
+;docend::sdss_files::file
+
+function sdss_files::file_old, type_in, run, camcol, fields=fields, rerun=rerun, bandpass=bandpass, indir=indir, dir=dir, nodir=nodir, stuffdb=stuffdb, exists=exists
+
+  ntype=n_elements(type_in)
+  nrun=n_elements(run)
+  if ntype eq 0 or nrun eq 0 then begin 
+      on_error, 2
+      print,'-Syntax: file = obj->file(type, run, [camcol, rerun=, bandpass=, fields=, indir=, dir=, /nodir, /stuffdb, exists=])'
+      print,'optional bandpass can be index or color string (e.g. 2 or "r")'
+      print,'fields can be an array'
+      print
+      message,'Halting'
+  endif 
+
+  type = strlowcase(type_in[0])
+
+  runstr = self->run2string(run[0])
+
+  if n_elements(camcol) eq 0 then begin 
+      if type ne 'astrans' then begin 
+          message,'You must enter camcol to generate a '+type_in+' file',/inf
+          exists=0
+          return,''
+      endif 
+  endif else begin 
+      camcolstr = ntostr(long(camcol[0]))
+  endelse 
+
+  if n_elements(rerun) eq 0 then begin 
+      rerun = self->rerun(run, exist=rexist)
+      if not rexist then begin
+          exists=0
+          return,''
+      endif
+  endif 
+  rerunstr = ntostr(long(rerun))
+
+  if n_elements(fields) eq 0 then begin 
+      fieldstr = '*'
+  endif else begin 
+      fieldstr = self->field2string(fields)
+  endelse 
+
+  if n_elements(bandpass) ne 0 then begin 
+      bt = size(bandpass,/tname)
+      if bt eq 'STRING' then begin 
+          bpstr = bandpass[0]
+      endif else begin 
+          colors = ['u','g','r','i','z']
+          bpstr = colors[long(bandpass[0])]
+      endelse 
+  endif else begin 
+      ;; match up to those that require bandpass to be entered
+      match, type, ['fpm','fpbin','psbb'], mtype, mbptype
+      if mtype[0] ne -1 then begin 
+          message,$
+            'You must enter bandpass= to get generate a '+type_in[0]+' file',$
+            /inf
+          exists=0
+          return,''
+      endif 
+  endelse 
+
+  if not keyword_set(nodir) then dodir = 1 else dodir = 0
+
+  case type of 
+      'astrans': begin 
+          file = 'asTrans-'+runstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('astrom',run,rerun=rerun)
+          endif 
+      end 
+      'tsobj': begin 
+          file = $
+            'tsObj-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'tsfield': begin 
+          file = $
+            'tsField-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'fpobjc': begin 
+          file = $
+            'fpObjc-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'fpatlas': begin 
+          file = $
+            'fpAtlas-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'fpm': begin           
+          file = $
+            'fpM-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'fpbin': begin 
+          file = $
+            'fpBIN-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end
+      'fpfieldstat': begin 
+          file = $
+            'fpFieldStat-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'psfield': begin 
+          file = $
+            'psField-'+runstr+'-'+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end 
+      'psbb': begin 
+          file = $
+            'psBB-'+runstr+'-'+bpstr+camcolstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('objcs',run,rerun=rerun,camcol=camcol)
+          endif 
+      end
+
+      ;; Corrected
+      'adatc': begin 
+          file = $
+            'adatc-'+runstr+'-'+camcolstr+'-'+rerunstr+'-'+fieldstr+'.fit'
+          if dodir then begin 
+              dir = self->filedir('calibChunks',run,rerun=rerun,camcol=camcol,$
+                                  /corrected)
+          endif 
+      end 
+
+      else: begin 
+          message,'Unsupported file type: '+type,/inf
+          exists=0
+          return,''
+      end 
+  endcase 
+
+  if n_elements(indir) ne 0 then begin
+      dir = indir
+  endif
+  if dodir then file = concat_dir(dir, file)
+
+  if arg_present(exists) then exists=fexist(file)
+
+  return,file
+
+end 
+
+
+
+
+
 function sdss_files::cleanup
   return,1
 end 
 
+function _sdss_files_filetype_struct
+    sdssidl_dir = getenv('SDSSIDL_DIR')
+    if sdssidl_dir eq '' then message,'SDSSIDL_DIR environment variable must be set'
+
+    file=filepath(root=sdssidl_dir, sub='data', 'sdss_filetypes.par')
+    if not file_test(file) then begin
+        message,'filetypes file not found: '+file
+    endif
+
+    st = yanny_readone(file)
+    return, st
+end
+pro sdss_files::set_filetypes
+    filetypes = _sdss_files_filetype_struct()
+    ftypes_lower = strlowcase(filetypes.ftype)
+    self.filetypes = filetypes
+    self.typenames_lower = ftypes_lower
+end
+function sdss_files::filetypes
+    return, self.filetypes
+end
+
 
 pro sdss_files__define
 
-  struct = {$
-             sdss_files, $
-             inherits mrdfits $
-           }
+    ; note the values in the struct will not pass through, this
+    ; is just to define it.  We'll have to copy it in later
+    filetype_struct = _sdss_files_filetype_struct()
+    ftypes_lower = strlowcase(filetype_struct.ftype)
+    struct = {$
+        sdss_files, $
+        filetypes: filetype_struct, $
+        typenames_lower: ftypes_lower, $
+        inherits mrdfits $
+        }
 
 end 
