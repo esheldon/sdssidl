@@ -38,8 +38,7 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 
 	det = ixx*iyy - ixy^2
 	if det eq 0.0 then begin
-		print,'Error:  determinant is zero.  Returning nothing'
-		return, -1
+		message,'Error:  determinant is zero'
 	endif
 
 	sx=long(imsize[0])
