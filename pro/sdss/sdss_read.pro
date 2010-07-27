@@ -1,46 +1,47 @@
 ;+
 ; NAME:
-;  sdss_read()
+;  read
 ;
 ; PURPOSE:
 ;  Generic SDSS file reader. Reads asTrans, tsObj, tsField, fpObjc, psField...
-;  Atlas files have a special reader read_atlas.  psField files are normally
-;  read the same way as tsObj, etc for extension 6 (the default).  For the
-;  other extensions you can send an extension and read a single field only. 
+;  Atlas files have a special reader atlas_read
+;  psField files are normally read the same way as tsObj, etc for extension 6 
+;  (the default).  For the other extensions holding the psf reconstruction,
+;  use psfield_read
 ;
 ; CATEGORY:
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;   st = sdss_read(type, run, camcol, rerun=, bandpass=, fields=, /all,
-;                  taglist=, wstring=, ex_struct=, extension=, dir=, 
-;                  /pointers, verbose=, status=)
+;   st = sf->read(type, run [, camcol, fields, frange=, rerun=, 
+;                 filter=, bandpass=, 
+;                 taglist=, wstring=, ex_struct=, 
+;                 /pointers, verbose=)
 ;
-;   if type is 'astrans' the extra keywords node= and inc= exist.
+;   if type is 'astrans' the extra keywords node= and inc= can also
+;   be used to return those values
 ;
 ; INPUTS:
-;   type: The file type. Currently supported types are:
-;            astrans, tsobj, tsfield, fpobjc, psfield  
-;         Note: for psField, Multiple files can only be read for 
-;               extension=6 (the default)
-;
-;         Atlas files have a special reader sf->atlas read, or for the
+;   type: The file type.
+;         Atlas files have a special reader sf->atlas_read, or for the
 ;         procedural interface read_atlas.
 ;   run, camcol: SDSS id info.
 ;
 ; OPTIONAL INPUTS:
+;   fields: Field number(s) or a glob '*'.
+;
+; Keywords:
+;   frange: A range of fields to read; can be used instead of the
+;       fields argument.
 ;   rerun: Rerun number.  If not sent, latest is used.
 ;   bandpass:  For files that require a bandpass.
-;   fields: Field number(s).  If not sent, the first is read.
-;   /all: read all fields.
+;   filter: synonym for bandpass
+;
 ;   taglist: List of tags to read. Default is all.
 ;   wstring: A string that can be sent to the where function to select
 ;     objects.  Should refer the structure as "lnew"
 ;   ex_struct: A structure that will be added to the output structure
 ;     definition.
-;   extension: FITS extension to read.
-;   indir: Directory from which to read.  Overrides default directory.
-;   dir: Directory used for the read.  
 ;
 ;   /pointers:  Return an array of pointers rather than an array of structures.
 ;      This saves a factor of two in memory since no copy must be made.
@@ -51,17 +52,11 @@
 ; OUTPUTS:
 ;   An array structure or array of pointers if /pointers is sent.
 ;
-; OPTIONAL OUTPUTS:
-;   status: 0 for success, 1 for failure
-;
 ; EXAMPLES:
 ;   run=756
 ;   camcol=3
 ;   fields=[35,88]
-;   st = sdss_read('tsobj', run, camcol, fields=fields)
-;
-;   kl=sdss_read('psfield', run, camcol, field=field, extension=3)
-;   psf=sdss_psfrec(kl, row, col)
+;   st = sdss_read('tsobj', run, camcol, fields)
 ;
 ; MODIFICATION HISTORY:
 ;   Conglomeration of various read tools.  Erin Sheldon, NYU
@@ -86,9 +81,9 @@
 ;
 ;
 
-function sdss_read, filetype, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status
+function sdss_read, filetype, run, camcol, fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status
 
     sdssidl_setup
-    return, !sdss->read(filetype, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status)
+    return, !sdss->read(filetype, run, camcol, fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status)
 
 end
