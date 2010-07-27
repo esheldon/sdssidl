@@ -1617,7 +1617,7 @@ end
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;  psp = sf->psfield_read(run, camcol, field, rerun=, extension=, status=)
+;  psp = sf->psfield_read(run, camcol, field, rerun=, extension=)
 ;
 ; INPUTS:
 ;  run, camcol, field: sdss id info.
@@ -1630,22 +1630,18 @@ end
 ; OUTPUTS:
 ;  pointer array with extensions 1-6, or the requested extension.
 ;
-; OPTIONAL OUTPUTS:
-;  status: 0 for success 1 for failure.
-;   
 ; MODIFICATION HISTORY:
 ;  Some time in 2002.  Dave Johnston, Erin Sheldon NYU.
 ;
 ;docend::sdss_files::psfield_read
 
 function sdss_files::psfield_read, run, camcol, field, $
-                   rerun=rerun, extension=extension, status=status, $
+                   rerun=rerun, extension=extension, $
 				   verbose=verbose
 
-	status = 1
 	if n_params() lt 3 then begin 
 		print,$
-			'-Syntax: ps = sf->psfield_read(run, camcol, field, rerun=, extension=, status=]'
+			'-Syntax: ps = sf->psfield_read(run, camcol, field, rerun=, extension=]'
 		print,' Default is all extensions in a pointer array'
 		print
 		message,'Halting'
@@ -1657,7 +1653,10 @@ function sdss_files::psfield_read, run, camcol, field, $
 		if keyword_set(verbose) then begin
 			print,'Reading: ',file,extension,f='(a,a," [",i0,"]")'
 		endif
-		return, mrdfits(file, extension, status=status,/silent)
+		data = mrdfits(file, extension, status=status,/silent)
+        if status ne 0 then message,'Failed to read ext=6 from file: '+file
+
+        return, data
 	endif
 
 
@@ -1668,14 +1667,12 @@ function sdss_files::psfield_read, run, camcol, field, $
 	for ext=1,6 do begin 
 		tmp = mrdfits(file, ext, status=rstatus,/silent)
 		if rstatus ne 0 then begin 
-			message,'Could not read extension '+strn(ext),/inf
 			ptr_free, psp
-			return,-1
+			message,'Could not read extension '+strn(ext)
 		endif 
 
 		psp[ext-1] = ptr_new( tmp, /no_copy )
 	endfor 
-	status = 0
 	return,psp
 
 end 
@@ -1716,7 +1713,6 @@ end
 ;    inc: Inclination of this stripe. 
 ;       node and inc required by rowcol2munu.pro, and gc2eq.pro or
 ;       gc2survey.pro
-;   status: 0 for success, 1 for failure
 ;
 ; PROCEDURE: 
 ;    asTrans files conain info for each camcol/field/bandpass for a given
@@ -1732,21 +1728,20 @@ end
 ;docstart::sdss_files::astrans_read
 
 
-function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc=inc, silent=silent, indir=indir, dir=dir, file=file, status=status
+function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc=inc, silent=silent, indir=indir, dir=dir, file=file
 
   on_error, 2
   nr=n_elements(run)
   nc=n_elements(camcol)
   nclr=n_elements(clr)
   IF (nr+nc+nclr) lt 3 THEN BEGIN 
-      print,'-Syntax: trans=sf->astrans_read(run, camcol, bandpass, rerun=, indir=, dir=, file=, node=, inc=, /silent, status=]'
+      print,'-Syntax: trans=sf->astrans_read(run, camcol, bandpass, rerun=, indir=, dir=, file=, node=, inc=, /silent]'
       print,''
       print,'Use doc_method,"sdss_files::astrans_read"  for more help.'  
       print
       message,'Halting'
   ENDIF 
 
-  status = 1
   colors = ['u','g','r','i','z']
   delvarx,trans
 
