@@ -1,11 +1,11 @@
-pro mom2seeing, mom, seeing, pixscale=pixscale
+function mom2fwhm, mom, pixscale=pixscale
 
 ;+
 ; Name:
-;    mom2seeing
+;    mom2fwhm
 ;
 ; Calling Sequence:
-;   mom2seeing, mom, seeing, pixscale=0.4
+;   fwhm = mom2fwhm(mom, pixscale=0.4)
 ;
 ; PURPOSE:
 ;   Take the "mom" ixx+iyy adaptive moments and convert this 
@@ -17,6 +17,8 @@ pro mom2seeing, mom, seeing, pixscale=pixscale
 ; Keywords:
 ;   pixscale: The pixel scale in arcsec, default 0.4
 ;
+; MODIFICATION HISTORY:
+;    Creation:  ??-??-?? Dave Johnston, UofChicago
 ;
 ;-
 ;
@@ -40,7 +42,16 @@ pro mom2seeing, mom, seeing, pixscale=pixscale
 ;
 ;
 
-    seeing=mom2fwhm(mom, pixscale=pixscale)
 
+    if n_elements(mom) eq 0 then begin
+        on_error, 2
+        message,'-syntax: fwhm=mom2fwhm(mom, pixscale=0.4)'
+    endif
+
+    if n_elements(pixscale) eq 0 then pixscale=0.4
+
+    fwhm=2.35*pixscale*sqrt ( mom/2.0 > 0.0)
+
+    return, fwhm
 end
 
