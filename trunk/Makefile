@@ -29,3 +29,13 @@ default : all
 
 all clean linux irix osf:
 	@cd ${SRC_DIR}; echo Making ${SRC_DIR}; ${MAKE} $@
+
+copy :
+	@echo "rsyncing to $(SDSSIDL_DIR)"
+	@if [ ! -e $(SDSSIDL_DIR) ]; then \
+		echo Creating directory $(SDSSIDL_DIR); \
+		mkdir -p $(SDSSIDL_DIR); \
+	fi
+	rsync -av --exclude "*svn*" --exclude "*swp" ./ $(SDSSIDL_DIR)/
+
+
