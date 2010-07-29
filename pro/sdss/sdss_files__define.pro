@@ -1657,7 +1657,7 @@ function sdss_files::psfield_read, run, camcol, field, $
 
     file = self->file('psField', run, camcol, field, rerun=rerun)
 
-    if n_elements(verbose) eq 0 then vebose=1
+    if n_elements(verbose) eq 0 then verbose=1
 
 	if n_elements(extension) ne 0 then begin
 		if keyword_set(verbose) then begin
@@ -2153,7 +2153,7 @@ pro sdss_files::atlas_read, run_OR_struct, camcol, field, id, rerun=rerun, $
       return
   ENDIF 
 
-  fname = self->file('fpatlas', run, camcol, rerun=rerun, fields=field)
+  fname = self->file('fpatlas', run, camcol, field, rerun=rerun)
   if not fexist(fname) then begin
       if not keyword_set(silent) then print,'Atlas file not found: '+fname
       return
