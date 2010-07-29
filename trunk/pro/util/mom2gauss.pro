@@ -11,7 +11,7 @@
 ;
 ; INPUTS:
 ;	Ixx, Ixy, Iyy: Moments of the distribution. These could be the moments
-;		returned by adaptive moments for example.
+;		returned by adaptive moments for example. Should be in pixels^2.
 ;	imsize: Size of the image in the x and y directions [sx, sy]
 ;
 ; OPTIONAL INPUTS:
