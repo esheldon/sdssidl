@@ -1,22 +1,27 @@
-pro mom2seeing, mom, seeing, pixscale=pixscale
+function fwhm2mom, fwhm, pixscale=pixscale
 
 ;+
-; Name:
-;    mom2seeing
-;
-; Calling Sequence:
-;   mom2seeing, mom, seeing, pixscale=0.4
+; NAME:
+;   fwhm2mom 
 ;
 ; PURPOSE:
-;   Take the "mom" ixx+iyy adaptive moments and convert this 
-;   to "seeing" value as a FWHM. This assumes Gaussianity
+;   Take a FWHM in arcsec and convert to ixx+iyy in pixels^2
+;   assuming gaussianity.
+;
+; CALLING SEQUENCE:
+;   mom = fwhm2mom(fwhm, pixscale=0.4)
 ;
 ; Inputs:
-;   mom: ixx+iyy in pixels^2
+;   fwhm: The full width half max in arcseconds.
 ;
 ; Keywords:
-;   pixscale: The pixel scale in arcsec, default 0.4
+;   pixscale: The pixel scale in arcsec.  Default 0.4
 ;
+; Output:
+;   "mom", the ixx+iyy in pixels^2
+;
+; MODIFICATION HISTORY:
+;    Creation:  ??-??-?? Dave Johnston, UofChicago
 ;
 ;-
 ;
@@ -40,7 +45,16 @@ pro mom2seeing, mom, seeing, pixscale=pixscale
 ;
 ;
 
-    seeing=mom2fwhm(mom, pixscale=pixscale)
 
+    if n_elements(fwhm) eq 0 then begin
+        on_error, 2
+        message,'-syntax: mom=fwhm2mom(fwhm, pixscale=0.4)'
+    endif
+
+    if n_elements(pixscale) eq 0 then pixscale=0.4
+
+    mom = 2*(fwhm/2.35/pixscale)^2
+    
+    return, mom
 end
 
