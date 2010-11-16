@@ -28,9 +28,9 @@
 ;   distmod(z, omega_m=, omega_l=, omega_k=, flat=, h=, npts=)
 ;       distance modulus. mag = absmag + distmod
 ;   velement(z, omega_m=, omega_l=, omega_k=, flat=, h=, npts=, /comoving)
-;       volume element, optionally comoving in (Mpc/h)^3
+;       volume element in (Mpc/h)^3 *per steradian*
 ;   volume(zmin, zmax, omega_m=, omega_l=, omega_k=, flat=, h=, npts=, vnpts=, /comoving)
-;       volume between zmin,zmax optionally comoving in (Mpc/h)^3
+;       volume between zmin,zmax in (Mpc/h)^3 *per steradian*
 ;
 ;   genrandz(nrand, zmin, zmax, omega_m=, omega_l=, omega_k=, flat=, h=, npts=, /comoving)
 ;       Generate random redshifts uniformly in a volume specified by zmin, zmax
@@ -377,7 +377,7 @@ function cosmology::distmod, z, omega_m=omega_m, omega_l=omega_l, omega_k=omega_
 end
 
 
-;; volume element
+;  volume element in (Mpc/h)^3 *per steradian*
 function cosmology::velement, $
                   z, omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat,$
                   h=h, npts=npts, $
@@ -386,7 +386,7 @@ function cosmology::velement, $
     if n_elements(z) eq 0 then begin 
         print,'-Syntax: dV = cosmo->velement(z, omega_m=, omega_l=, omega_k=, flat=,'
         print,'                              h=, npts=, /comoving)'
-        print,'Returns volume element in (Mpc/h)^2'
+        print,'Returns volume element in (Mpc/h)^2 *per steradian*'
         self->print_defaults
         on_error, 2
         message,'Halting'
@@ -412,7 +412,7 @@ function cosmology::velement, $
   return,dV
 end 
 
-;; Total volume between zmin and zmax
+;; Total volume between zmin and zmax in (Mpc/h)^3 *per steradian*
 function cosmology::volume, $
                   zmin, zmax, $
                   omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat, h=h, $
@@ -423,7 +423,7 @@ function cosmology::volume, $
     if n1 eq 0 or n2 eq 0 then begin 
         print,'-Syntax: v = cosmo->volume(z1, z2, omega_m=, omega_l=, omega_k=, flat=,'
         print,'                           h=, npts=, vnpts=, /comoving)'
-        print,'Returns volume in (Mpc/h)^3'
+        print,'Returns volume in (Mpc/h)^3 *per steradian*'
         self->print_defaults
         on_error, 2
         message,'Halting'
