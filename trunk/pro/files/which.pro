@@ -18,8 +18,8 @@
 ;
 ; OPTIONAL INPUT:
 ;   name - Character string giving the name of the IDL procedure or 
-;       function.  Do not give an extension.   If omitted, 
-;       the program will prompt
+;       function.  Can also be a glob pattern, such as 'name*'.  
+;       If omitted, the program will prompt
 ;	/dlm: Search !DLM_PATH for dynamically loaded modules instead
 ;       of !PATH for .pro files
 ;   /show: if set, will display the first file found
@@ -42,6 +42,9 @@
 ;           /home/products/Linux/idlutils/v5_4_21/goddard/pro/fits/mrdfits.pro
 ;       Also found:
 ;           /home/products/Linux/idl/v7_0/lib/pro/mrdfits.pro
+;   
+;   Globs also work:
+;       IDL> which,'*fits*'
 ;
 ; REVISION HISTORY:
 ;   29-MAY-94  Modified from getpro.pro by E. Deutsch
@@ -57,8 +60,83 @@
 ;       Dropped VMS support.  ESS, BNL
 ;-
 
-function _which_find_file, name, dlm=dlm, show=show, silent=silent
+pro _which_display_results, name, files, funcfound, profound, isglob=isglob, show=show
+
     pname = "'"+name+"'"
+
+    n_intrinsic = n_elements(funcfound) + n_elements(profound)
+    if files[0] eq '' and n_intrinsic eq 0 then begin
+        if isglob then begin
+            print,'No files or intrinsic procedures matched pattern '+pname
+        endif else begin
+            print,'No files or intrinsic procedures matched '+pname
+        endelse
+    endif else begin
+        _which_display_files, name, files, isglob=isglob, show=show
+        _which_display_intrinsic, name, funcfound, profound
+    endelse
+
+end
+
+pro _which_display_files, name, files, isglob=isglob, show=show
+    if files[0] eq '' then return
+    
+    nf = n_elements(files)
+    if nf eq 1 then begin
+        print,files
+    endif else begin
+
+        pname = "'"+name+"'"
+
+        for i=0L, nf-1 do begin
+            if i eq 0 then begin
+                if isglob then print,'Files matching pattern '+pname+':' else print,'Using:'
+                print,'    '+files[i]
+            endif else begin
+                if i eq 1 and not isglob then print,'Also found:'
+                print,'    '+files[i]
+            endelse
+        endfor
+    endelse
+
+    if keyword_set(show) then spawn,'more '+files[0]
+end
+
+pro _which_display_intrinsic, name, funcfound, profound
+    nf = n_elements(funcfound)
+    np = n_elements(profound)
+
+    pname = "'"+name+"'"
+
+    if nf gt 0 then begin
+        print,'Intrinsic IDL functions matching '+pname+':'
+        for i=0L, nf-1 do begin
+            print,'    '+funcfound[i]
+        endfor
+    endif
+    if np gt 0 then begin
+        print,'Intrinsic IDL procedures matching '+pname+':'
+        for i=0L, np-1 do begin
+            print,'    '+profound[i]
+        endfor
+    endif
+
+end
+
+
+function _which_extract_globbed, globbed_files, count=count
+    for i=0L, n_elements(globbed_files)-1 do begin
+        f = file_search(globbed_files[i])
+        if f[0] ne '' then begin
+            add_arrval, f, files
+        endif
+    endfor
+    count = n_elements(files)
+    if count eq 0 then files=''
+    return, files
+end
+
+function _which_find_file, name, dlm=dlm, isglob=isglob
 
     ; Get current IDL path of directories
     if keyword_set(dlm) then begin 
@@ -75,30 +153,18 @@ function _which_find_file, name, dlm=dlm, show=show, silent=silent
 
     w = where( file_test(files), nfound ) 
     if nfound gt 0 then begin
-        files = files[w]
-        if not keyword_set(silent) then begin
-            for i=0L, nfound-1 do begin
-                if nfound eq 1 then begin
-                    print,files[i]
-                endif else if i eq 0 then begin
-                    print,'Using:'
-                    print,'    '+files[i]
-                endif else begin
-                    print,'Also found:'
-                    print,'    '+files[i]
-                endelse
-            endfor
+        files=files[w]
+        if isglob then begin
+            files = _which_extract_globbed(files, count=nfound)
         endif
-
-        if keyword_set(show) then spawn,'more '+files[0]
     endif else begin
-        files=['']
+        files=''
     endelse
 
     return, files
 end
 
-pro _which_find_intrinsic, name, silent=silent
+pro _which_find_intrinsic, name, funcfound, profound, isglob=isglob
 
     common which_intrinsic_block, funcnames, pronames
     if n_elements(funcnames) eq 0 then begin 
@@ -106,32 +172,22 @@ pro _which_find_intrinsic, name, silent=silent
         funcNames = routine_info(/system,/func)
     endif 
 
-
     uname = strupcase(name)
-    functest = where (funcnames eq uname, fcount)
-    protest  = where (pronames  eq uname, pcount)
-  
-    pname = "'"+name+"'"
-    if (fcount eq 0) and (pcount eq 0) then begin
 
-        ;; not found
-        if not keyword_set(silent) then begin 
-            print, pname+' is not in the !PATH directory and is not inrinsic'
-        endif 
+    if isglob then begin
+        wfunc = where(strmatch(funcnames,uname), fcount)
+        wpro = where(strmatch(pronames,uname), pcount)
+    endif else begin
+        wfunc = where(funcnames eq uname, fcount)
+        wpro  = where(pronames  eq uname, pcount)
+    endelse
 
-    endif else begin 
-        files = 'INTRINSIC'
-
-        ;; Its either a built in function or procedure
-        if not keyword_set(silent) then begin 
-            if fcount ne 0 then begin 
-                print, pname + ' is an intrinsic IDL Function.'
-            endif else begin 
-                print, pname + ' is an intrinsic IDL procedure.'
-            endelse 
-        endif 
-
-    endelse 
+    if fcount gt 0 then begin
+        funcfound = funcnames[wfunc]
+    endif
+    if pcount gt 0 then begin
+        profound = pronames[wpro]
+    endif
 
 end
 
@@ -139,6 +195,7 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
 
     if keyword_set(help) then begin
         print,'-syntax: which, proc_name, files=files, /dlm, /show, /help, /silent'
+        print,'name can be a glob, e.g. "str*"'
         return
     endif 
 
@@ -155,9 +212,16 @@ pro which,proc_name,files=files,show=show,help=help, dlm=dlm, silent=silent
     fdecomp, proc_name, disk, dir, name      
     name = strtrim( name, 2 )  
 
-    files = _which_find_file(name, show=show, dlm=dlm, silent=silent)
-    if files[0] eq '' then begin
-        _which_find_intrinsic, name, silent=silent
+    isglob=0
+    if strpos(name,'*') ne -1 then isglob=1
+
+    files = _which_find_file(name, dlm=dlm, isglob=isglob)
+    if files[0] eq '' or isglob then begin
+        _which_find_intrinsic, name, funcfound, profound, isglob=isglob
+    endif
+
+    if not keyword_set(silent) then begin
+        _which_display_results, name, files, funcfound, profound, isglob=isglob, show=show
     endif
 
 end 
