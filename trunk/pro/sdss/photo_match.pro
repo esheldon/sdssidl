@@ -100,8 +100,8 @@ PRO photo_match,run1,rerun1,camcol1,field1,id1,$
   ENDIF
 
   ;; create super index for each set
-  super1 = photoid(run1,rerun1,camcol1,field1,id1)
-  super2 = photoid(run2,rerun2,camcol2,field2,id2)
+  super1 = sdss_photoid(run1,rerun1,camcol1,field1,id1)
+  super2 = sdss_photoid(run2,rerun2,camcol2,field2,id2)
   
   ;; remove duplicates
   m1tmp = rem_dup(super1)
