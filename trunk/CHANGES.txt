@@ -1,3 +1,8 @@
+NOTE:  The default for htm_match is maxmatch=1.  It used to be maxmatch=0,
+which means return all matches.  This backwards incompatiblity was not written
+ito the CHANGES.txt
+
+
 v1.6.1
 ---------------------------------------
 
