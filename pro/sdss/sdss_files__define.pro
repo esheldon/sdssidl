@@ -654,11 +654,13 @@ pro sdss_files::_file_usage
     print,'                     filter=, bandpass=, exten=, indx=, /no_path, /nodir] )'
     message,'halting'
 end
-FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, $
+FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, fieldskey=fieldskey, frange=frange, $
         rerun=rerun, $
         filter=filter, bandpass=bandpass,  $
         extension=exten, no_path=no_path, nodir=nodir, $
         _extra=_extra
+
+    if n_elements(fields) eq 0 and n_elements(fieldskey) ne 0 then fields=fieldskey
 
     if n_elements(ftype1) eq 0 then self->_file_usage
     case ftype1 of
@@ -1967,8 +1969,7 @@ end
 ;    the user's $IDL_DLM_PATH.  Also, the directory configuration variable
 ;        DATA_DIR
 ;    must be set and the runs must be visible from there with the usual
-;    directory structure.  If not, then the directory can be sent with the
-;    dir=dir keyword.
+;    directory structure. 
 ;
 ; EXAMPLE:
 ;  - Read an r-band atlas image into memory
