@@ -162,7 +162,9 @@ function mrdfits_multi, infiles, $
 		for i=0l, nfiles-1 do begin 
 
 			if numlist[i] ne 0 then begin 
-				print,'Reading File: ',files[i],extstr,form='(a,a,a)'
+                if not keyword_set(silent) then begin
+                    print,'Reading File: ',files[i],extstr,form='(a,a,a)'
+                endif
 				t = mrdfits(files[i], extension, $
 					columns=columns, $
 					unsigned=unsigned, $
@@ -209,7 +211,9 @@ function mrdfits_multi, infiles, $
 		for i=0l, nfiles-1 do begin 
 
 			if numlist[i] ne 0 then begin 
-				print,'Reading File: ',files[i],form='(a,a)'
+                if not keyword_set(silent) then begin
+                    print,'Reading File: ',files[i],form='(a,a)'
+                endif
 
 				t = mrdfits(files[i], extension, $
 					columns=columns, $
