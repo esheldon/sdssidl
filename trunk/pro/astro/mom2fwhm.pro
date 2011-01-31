@@ -50,7 +50,8 @@ function mom2fwhm, mom, pixscale=pixscale
 
     if n_elements(pixscale) eq 0 then pixscale=0.4
 
-    fwhm=2.35*pixscale*sqrt ( mom/2.0 > 0.0)
+    fac = 2*sqrt(2*alog(2))
+    fwhm=fac*pixscale*sqrt ( mom/2.0 > 0.0)
 
     return, fwhm
 end

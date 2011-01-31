@@ -648,12 +648,19 @@ end
 ;-
 ;------------------------------------------------------------------------------
 
+pro sdss_files::_file_usage
+    on_error,2
+    print,'fullname = file( ftype, runnum, [camcol, field, fields=, rerun=, '
+    print,'                     filter=, bandpass=, exten=, indx=, /no_path, /nodir] )'
+    message,'halting'
+end
 FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, frange=frange, $
         rerun=rerun, $
         filter=filter, bandpass=bandpass,  $
-        extension=exten, no_path=no_path, nodir=nodir
+        extension=exten, no_path=no_path, nodir=nodir, $
+        _extra=_extra
 
-
+    if n_elements(ftype1) eq 0 then self->_file_usage
     case ftype1 of
        'reObj' : begin
             if (keyword_set(getenv('PHOTO_RESOLVE'))) then ftype = 'reObjGlobal' $
@@ -852,9 +859,8 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
         bandpass=bandpass, filter=filter, $
         extension=extension, $
         fnums=fnums, $
-        indir=indir, $
-        dir=dir, $
-        silent=silent
+        silent=silent, $
+        _extra=_extra
 
     common sdss_files_filelist_block, $
         filetype_old, $
@@ -870,7 +876,7 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
     if n_params() lt 2 then begin 
         on_error, 2
         print,'-Syntax: filedir=obj->filelist(filetype, run, camcol, '+$
-            '[fields, rerun=, bandpass=, filter=, fnums=, dir=, /silent])'
+            '[fields, rerun=, bandpass=, filter=, extension=, fnums=, /silent])'
         print
         message,'Halting'
     endif 
@@ -1445,7 +1451,7 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
 
     common sdss_files_read_block, filetype_old, all_structdef
   
-
+    status=1
     if n_elements(filetype) eq 0 then begin 
         on_error, 2
         print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent'
@@ -1466,8 +1472,8 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
     ; astrans are special
     if strlowcase(filetype) eq 'astrans' then begin
         return, self->astrans_read(run, camcol, filter, rerun=rerun, $
-            indir=indir, dir=dir, node=node, inc=inc, $
-            silent=silent)
+            node=node, inc=inc, $
+            silent=silent, status=status)
     endif
 
     ntags = n_elements(taglist)
@@ -1598,6 +1604,9 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
         output = combine_ptrlist(ptrlist)
     endelse 
     
+    if n_tags(output) eq 0 then begin
+        status=0
+    endif
     return,output
 
 end 
@@ -1700,7 +1709,7 @@ end
 ;
 ; CALLING SEQUENCE:
 ;    st = sf->astrans_read(run, camcol, bandpass, rerun=, 
-;                          indir=, dir=, file=, node=, inc=)
+;                          file=, node=, inc=)
 ;    
 ; INPUTS: 
 ;    run, camcol: run and camcol numbers.
@@ -1708,8 +1717,6 @@ end
 ;
 ; OPTIONAL INPUTS:
 ;    rerun: SDSS rerun.
-;    indir: Directory from which to read.  Overrides default directory.
-;    dir: Directory used for the read.  
 ;    file: the astrans file to read.
 ;
 ; KEYWORD PARAMETERS:
@@ -1738,14 +1745,14 @@ end
 ;docstart::sdss_files::astrans_read
 
 
-function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc=inc, silent=silent, indir=indir, dir=dir, file=file
+function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc=inc, silent=silent, file=file, status=status, _extra=_extra
 
   on_error, 2
   nr=n_elements(run)
   nc=n_elements(camcol)
   nclr=n_elements(clr)
   IF (nr+nc+nclr) lt 3 THEN BEGIN 
-      print,'-Syntax: trans=sf->astrans_read(run, camcol, bandpass, rerun=, indir=, dir=, file=, node=, inc=, /silent]'
+      print,'-Syntax: trans=sf->astrans_read(run, camcol, bandpass, rerun=, file=, node=, inc=, /silent]'
       print,''
       print,'Use doc_method,"sdss_files::astrans_read"  for more help.'  
       print
@@ -1756,10 +1763,9 @@ function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc
   delvarx,trans
 
   if n_elements(file) eq 0 then begin
-      file = self->file('asTrans', run, rerun=rerun, $
-          indir=indir, dir=dir, status=flstatus)
+      file = self->file('asTrans', run, rerun=rerun)
   endif   
-  if flstatus ne 0 then begin
+  if not file_test(file) then begin
       message,'file not found: '+file
   endif
   hdr = headfits(file)
@@ -1789,7 +1795,7 @@ function sdss_files::astrans_read, run, camcol, clr, rerun=rerun, node=node, inc
   ENDIF 
 
   ext = wcam[0]*nfils + (wclr[0] + 1)
-  trans = mrdfits(file, ext, ehdr,/silent)
+  trans = mrdfits(file, ext, ehdr,/silent, status=status)
 
   return, trans
 END 
