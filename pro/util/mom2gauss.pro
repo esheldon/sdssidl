@@ -48,6 +48,7 @@ function mom2gauss, ixx, ixy, iyy, imsize, $
 	if n_elements(cen) eq 0 then begin
 		cx = (sx-1.)/2.
 		cy = (sy-1.)/2.
+        cen = [cx,cy]
 	endif else begin
 		cx=cen[0]
 		cy=cen[1]
