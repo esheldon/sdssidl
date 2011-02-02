@@ -22,6 +22,9 @@
 # Build all routines
 #
 
+# by default we install to the esidl_dir, but := means we can set this
+# on the command line
+PREFIX := $(SDSSIDL_DIR)
 
 SRC_DIR	= src
 
@@ -31,11 +34,11 @@ all clean linux irix osf:
 	@cd ${SRC_DIR}; echo Making ${SRC_DIR}; ${MAKE} $@
 
 copy :
-	@echo "rsyncing to $(SDSSIDL_DIR)"
-	@if [ ! -e $(SDSSIDL_DIR) ]; then \
-		echo Creating directory $(SDSSIDL_DIR); \
-		mkdir -p $(SDSSIDL_DIR); \
+	@echo "rsyncing to $(PREFIX)"
+	@if [ ! -e $(PREFIX) ]; then \
+		echo Creating directory $(PREFIX); \
+		mkdir -p $(PREFIX); \
 	fi
-	rsync -av --exclude "*svn*" --exclude "*swp" ./ $(SDSSIDL_DIR)/
+	rsync -av --exclude "*svn*" --exclude "*swp" ./ $(PREFIX)/
 
 
