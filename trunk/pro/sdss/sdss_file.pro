@@ -34,7 +34,6 @@
 ;
 ; OPTIONAL OUTPUTS:
 ;   dir: The directory.
-;   exists: 1 for yes, 0 for no
 ;
 ; RESTRICTIONS:
 ;   If rerun is not sent, the run must be defined in the run status structure.
@@ -44,17 +43,10 @@
 ;
 ;-
 
-function sdss_file, type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, stuffdb=stuffdb, exists=exists
+function sdss_file, type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, _extra=_extra
 
     sdssidl_setup
-
-    ; only include the exists keyword if necessary. Can be slow especially
-    ; over nfs
-    comm = 'file = !sdss->file(type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, stuffdb=stuffdb'
-    if arg_present(exists) then comm = comm+', exists=exists'
-    comm = comm + ')'
-
-    if not execute(comm) then return, ''
+    file = !sdss->file(type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, _extra=_extra)
     return, file
 
 end
