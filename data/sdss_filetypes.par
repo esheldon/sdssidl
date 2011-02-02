@@ -17,6 +17,7 @@ typedef struct {
     int  ext;
 } FILETYPE;
 
+FILETYPE runList                $PHOTO_REDUX                                            runList.par                                     -1
 FILETYPE apObj                  $PHOTO_REDUX/$RERUN/$RUNNUM/objcs/$COL                  apObj-$RUNSTR-$FILTER$COL-$FIELDSTR.fit         -1
 FILETYPE asTrans                $PHOTO_REDUX/$RERUN/$RUNNUM/astrom                      asTrans-$RUNSTR.fit                             -1
 FILETYPE asTranscol             $PHOTO_REDUX/$RERUN/$RUNNUM/astrom/$COL                 asTrans-$RUNSTR.fit                             -1

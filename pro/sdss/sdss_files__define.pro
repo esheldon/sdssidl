@@ -279,28 +279,18 @@ end
 
 
 function sdss_files::run_exists, run, reruns=reruns, info=info
+    ; reruns plural is left over from fermi days
+    common _sdss_runlist_block, runlist
+    self->cache_runlist
 
-  if n_params() lt 1 then begin 
-      print,'-syntax: if obj->run_exists(run, reruns=, info=) then ....'
-      return,-1
-  endif 
-  
-  reruns=-1
-
-  run_status = sdss_runstatus(exists=exists)
-  if not exists then return, 0
-
-  ;; check if run exists on disk
-  w=where(run_status.run eq run[0], nw)
-  if nw eq 0 then return,0
-  
-
-  reruns = run_status[w].rerun
-  if nw eq 1 then reruns=reruns[0]
-
-  if arg_present(info) then info=run_status[w]
-
-  return,1
+    w=where(runlist.run eq run[0], nw)
+    if nw eq 0 then begin
+        reruns=-1
+        return, 0 
+    endif else begin
+        reruns = runlist[w[0]].rerun
+        return, 1
+    endelse
 
 end 
 
@@ -311,11 +301,8 @@ function sdss_files::rerun_exists, run, rerun
       return,-1
   endif 
 
-  exists=0
-
-  if self->run_exists(run, reruns=reruns) then begin 
-      w=where(reruns eq rerun, nw)
-      if nw ne 0 then return,1 else return,0
+  if self->run_exists(run, rerun=trerun) then begin 
+      if trerun eq rerun then return, 1 else return, 0
   endif else begin 
       return, 0
   endelse 
@@ -325,67 +312,35 @@ end
 
 function sdss_files::rerun, runs, min=min, exists=exists
 
-  if n_params() lt 1 then begin 
-      print,'-syntax: reruns = obj->rerun(runs, /min, exists=)'
-      print,' run can be an array'
-      print,' /min to get min rather than max rerun'
-      return,-1
-  endif 
+    if n_params() lt 1 then begin 
+        print,'-syntax: reruns = obj->rerun(runs, exists=)'
+        print,' run can be an array'
+        print,' /min to get min rather than max rerun'
+        return,-1
+    endif 
 
-  exists=0
-  nrun = n_elements(runs)
-  if nrun eq 1 then begin 
-      if not self->run_exists(runs, reruns=treruns) then begin 
-          return,-1
-      endif
+    exists=0
+    nrun = n_elements(runs)
+    if nrun eq 1 then begin 
+        exists = self->run_exists(runs, rerun=reruns)
+    endif else begin 
 
-      exists=1
-      if keyword_set(min) then return,min(treruns) $
-      else return, max(treruns)
+      reruns=strarr(nrun)
+      exists=intarr(nrun)
 
-  endif else begin 
+      for i=0L, nrun-1 do begin
+          exists[i] = self->run_exists(runs[i], rerun=rerun)
+          reruns[i] = rerun
+      endfor
 
-      ;; for large arrays, sdss_run_exists is too slow, we will do something a
-      ;; little more clever
-
-      reruns=replicate(-1, nrun)
-
-      ;; histogram them runs, there can't be more than a few hundred
-      h=histogram(runs, rev=runrev)
-      nh = n_elements(h)
-
-      ;; loop and only check the unique runs
-      for i=0l, nh-1 do begin 
-
-          ;; any runs in this bin?
-          if runrev[i] ne runrev[i+1] then begin 
-          
-              ;; get the indices for these runs
-              wr = runrev[ runrev[i]:runrev[i+1] -1 ]
-              
-              trun = runs[wr[0]]
-              
-              if not self->run_exists(trun, rerun=treruns) then begin 
-;                  message,$
-;                    'run '+strtrim(string(trun),2)+$
-;                    ' is unknown: not in run status file',/inf
-              endif else begin 
-                  if keyword_set(min) then reruns[wr] = min(treruns) $
-                  else reruns[wr] = max(treruns)
-              endelse 
-
-          endif 
-
-      endfor 
   endelse 
 
-  exists=1
   return,reruns
-
 
 end 
 
 function sdss_files::stripe, runs
+    message,'Not currently implemented'
 
   if n_params() lt 1 then begin 
       print,'-Syntax: stripes = obj->stripe(runs)'
@@ -408,7 +363,7 @@ function sdss_files::stripe, runs
 
 end 
 function sdss_files::strip, runs
-
+    message,'Not currently implemented'
   if n_params() lt 1 then begin 
       print,'-Syntax: strips = obj->strip(runs)'
       print,' run can be an array'
@@ -433,21 +388,24 @@ function sdss_files::strip, runs
 
 end 
 
-function sdss_files::runs
-    run_status = sdss_runstatus(exists=exists)
-    if not exists then return, -1
-    runs = run_status[rem_dup(run_status.run)].run
-    return,runs
+function sdss_files::runs, rerun=rerun
+    common _sdss_runlist_block, runlist
+    self->cache_runlist
+    if n_elements(rerun) ne 0 then begin
+        w=where(runlist.rerun eq rerun[0], nw)
+        if nw eq 0 then message,'No runs have rerun: '+string(rerun)
+        runs = runlist[w].run
+    endif else begin
+        runs = runlist.run
+    endelse
+    return, runs
 end 
 
 pro sdss_files::runs_reruns, runs, reruns
-    runs=-1
-    reruns=-1
-    run_status = sdss_runstatus(exists=exists)
-    if not exists then return
-    
-    runs = run_status.run
-    reruns = run_status.rerun
+    common _sdss_runlist_block, runlist
+    self->cache_runlist
+    runs = runlist.run
+    reruns = runlist.rerun
 end 
 
 
@@ -663,19 +621,20 @@ FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, fieldskey=fieldskey, 
     if n_elements(fields) eq 0 and n_elements(fieldskey) ne 0 then fields=fieldskey
 
     if n_elements(ftype1) eq 0 then self->_file_usage
-    case ftype1 of
-       'reObj' : begin
+    case strlowcase(ftype1) of
+        'reobj' : begin
             if (keyword_set(getenv('PHOTO_RESOLVE'))) then ftype = 'reObjGlobal' $
                 else ftype = 'reObjRun'
         end
         else : ftype = ftype1
     endcase
 
-    w=where(strlowcase(ftype) eq self.typenames_lower, nw)
+    ftype_low = strlowcase(ftype)
+
+    w=where(ftype_low eq self.typenames_lower, nw)
     if nw eq 0 then begin
         message,'Unknown file type "'+ftype+'"'
     endif
-
     if n_elements(bandpass) ne 0 then begin
         filter = bandpass
     endif
@@ -1471,12 +1430,19 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
 
     if n_elements(filetype_old) eq 0 then filetype_old = 'NONE'
 
-    ; astrans are special
-    if strlowcase(filetype) eq 'astrans' then begin
-        return, self->astrans_read(run, camcol, filter, rerun=rerun, $
-            node=node, inc=inc, $
-            silent=silent, status=status)
-    endif
+    ftype_low = strlowcase(filetype)
+
+    case ftype_low of
+        'astrans': begin
+            return, self->astrans_read(run, camcol, filter, rerun=rerun, $
+                                       node=node, inc=inc, $
+                                       silent=silent, status=status)
+        end
+        'runlist': begin
+            return, self->read_runlist()
+        end
+        else:
+    endcase
 
     ntags = n_elements(taglist)
     nextra = n_elements(ex_struct)
@@ -3450,8 +3416,21 @@ function sdss_files::file_old, type_in, run, camcol, fields=fields, rerun=rerun,
 
 end 
 
+pro sdss_files::cache_runlist, reload=reload
+    common _sdss_runlist_block, runlist
+    if n_elements(runlist) eq 0 or keyword_set(reload) then begin
+        file = self->file('runList')
+        if not file_test(file) then message,'Runlist file not found: '+file
+        runlist = yanny_readone(file)
+    endif
+end
 
 
+function sdss_files::read_runlist
+    common _sdss_runlist_block, runlist
+    self->cache_runlist
+    return, runlist
+end
 
 
 function sdss_files::cleanup

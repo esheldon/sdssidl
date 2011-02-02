@@ -29,7 +29,8 @@
 ;
 ; EXAMPLE:
 ;  ; read r-band kl psf decomposition in extension 3
-;  kl=sdss_read('psfield',run, camcol, field=field, extension=3)
+;   sf = obj_new('sdss_files')
+;  kl=sf->psfield_read(run, camcol, field=field, extension=3)
 ;  ; reconstruct the image
 ;  psf=sdss_psfrec(kl, row, col, counts=1000)
 ;
