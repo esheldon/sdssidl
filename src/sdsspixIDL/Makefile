@@ -60,7 +60,9 @@ applyPixelMaskIDL.so: ${APPLY_PIXEL_MASK_OBJ}
 
 # apps
 jackknife_stripe: jackknife_stripe.o
+	gcc -o jackknife_stripe $(LDLIBS) jackknife_stripe.o 
 calculate_area: calculate_area.o
+	gcc -o calculate_area $(LDLIBS) calculate_area.o 
 
 clean:
 	- ${RM} ${SOFILES} ${OBJFILES} ${EXEC_OBJS} ${EXECUTABLES} *.os
