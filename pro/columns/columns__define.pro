@@ -45,11 +45,15 @@ function columns::colinfo
     endelse
 end
 
-function columns::read, colnames, rows=rows, verbose=verbose
+function columns::read, colnames, rows=rows, all=all, verbose=verbose
     ncol = n_elements(colnames)
-    if ncol eq 0 then begin
+    if ncol eq 0 and not keyword_set(all) then begin
         on_error, 2
-        message,'usage: c->read(colnames, rows=all, verbose=false)'
+        print,'usage: c->read(colnames, rows=, /all, /verbose)'
+        print,'  use /all to read all columns'
+    endif
+    if ncol eq 0 and keyword_set(all) then begin
+        colnames = (*self.colinfo).name
     endif
 
     verbose = keyword_set(verbose)
