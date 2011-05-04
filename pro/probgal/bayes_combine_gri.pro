@@ -74,8 +74,6 @@ PRO bayes_combine_gri,cat,probflags,mag,see,c,ivarsum,mag_psf,gweight,iweight,$
 ;  off=.15
 ;  power=.2
 
-  off=0.2
-  power=0.4
 
   n_cat = n_elements(cat)
 
@@ -218,6 +216,9 @@ PRO bayes_combine_gri,cat,probflags,mag,see,c,ivarsum,mag_psf,gweight,iweight,$
   mag_exp=mag_exp+boloff
 
   con=mag_psf-mag_exp
+
+  off=0.2
+  power=0.4
 
   c=(((con+off) > 0)^power)-off^power
   c=c<1.5

@@ -67,11 +67,11 @@ function read_recheader, filename, noshell=noshell, status=status
 	if not keyword_set(noshell) then begin
 		command='python '+pyfile+' '+filename
 		spawn, command, res, err
-		if err ne '' then message,'Command failed: "'+command+'"'
+		if err[0] ne '' then message,'Command failed: "'+command+'"'
 	endif else begin
 		command=['python',pyfile,filename]
 		spawn, command, res, err, /noshell
-		if err ne '' then message,'Command failed: "'+command+'"'
+		if err[0] ne '' then message,'Command failed: "'+command+'"'
 	endelse
 
 
