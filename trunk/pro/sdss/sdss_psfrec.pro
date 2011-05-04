@@ -58,7 +58,7 @@
 ;
 ;
 
-function sdss_psfrec, pstruct, row, col, counts=counts, trim=trim
+function sdss_psfrec, pstruct, row, col, counts=counts, trim=trim, coeffs=coeffs, ecoeffs=ecoeff
 
 	np = $
 		(n_elements(pstruct) gt 0) $

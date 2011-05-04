@@ -159,44 +159,44 @@ shRegNew(const char *name,		/* NOTUSED */
 	 int ncol,
 	 int type)
 {
-   int i;
-   REGION *reg = shMalloc(sizeof(REGION));
-   
-   reg->type = type;
-   reg->nrow = nrow; reg->ncol = ncol;
+    int i;
+    REGION *reg = shMalloc(sizeof(REGION));
 
-   reg->rows_u8 = NULL; reg->rows_s8 = NULL;
-   reg->rows = reg->rows_u16 = NULL; reg->rows_s16 = NULL;
-   reg->rows_u32 = NULL; reg->rows_s32 = NULL;
-   reg->rows_fl32 = NULL;
-   reg->mask = NULL;
-   reg->row0 = reg->col0 = 0;
-   
-   switch (reg->type) {
-    case TYPE_U16:
-      reg->rows = reg->rows_u16 = shMalloc(nrow*sizeof(U16 *));
-      reg->rows[0] = shMalloc(nrow*ncol*sizeof(U16));
+    reg->type = type;
+    reg->nrow = nrow; reg->ncol = ncol;
 
-      for(i = 1; i < nrow; i++) {
-	 reg->rows[i] = reg->rows[i - 1] + ncol;
-      }
-      
-      break;
-    case TYPE_FL32:
-      reg->rows_fl32 = shMalloc(nrow*sizeof(FL32 *));
-      reg->rows_fl32[0] = shMalloc(nrow*ncol*sizeof(FL32));
+    reg->rows_u8 = NULL; reg->rows_s8 = NULL;
+    reg->rows = reg->rows_u16 = NULL; reg->rows_s16 = NULL;
+    reg->rows_u32 = NULL; reg->rows_s32 = NULL;
+    reg->rows_fl32 = NULL;
+    reg->mask = NULL;
+    reg->row0 = reg->col0 = 0;
 
-      for(i = 1; i < nrow; i++) {
-	 reg->rows_fl32[i] = reg->rows_fl32[i - 1] + ncol;
-      }
-      
-      break;
-    default:
-      shFatal("Impossible type of REGION: %d", reg->type);
-      break;				/* NOTREACHED */
-   }
-   
-   return(reg);
+    switch (reg->type) {
+        case TYPE_U16:
+            reg->rows = reg->rows_u16 = shMalloc(nrow*sizeof(U16 *));
+            reg->rows[0] = shMalloc(nrow*ncol*sizeof(U16));
+
+            for(i = 1; i < nrow; i++) {
+                reg->rows[i] = reg->rows[i - 1] + ncol;
+            }
+
+            break;
+        case TYPE_FL32:
+            reg->rows_fl32 = shMalloc(nrow*sizeof(FL32 *));
+            reg->rows_fl32[0] = shMalloc(nrow*ncol*sizeof(FL32));
+
+            for(i = 1; i < nrow; i++) {
+                reg->rows_fl32[i] = reg->rows_fl32[i - 1] + ncol;
+            }
+
+            break;
+        default:
+            shFatal("Impossible type of REGION: %d", reg->type);
+            break;				/* NOTREACHED */
+    }
+
+    return(reg);
 }
 
 void
