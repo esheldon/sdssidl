@@ -118,7 +118,7 @@ end
 
 pro columns::load_columns
 
-    ptr_free, self.colinfo
+    self->_free_colinfo
 
     recfiles = file_search(self.dir, '*.rec')    
     colfiles = file_search(self.dir, '*.col')    
@@ -235,16 +235,22 @@ function columns::_extract_name, file
     return, name 
 end
 
-
-function columns::cleanup
+pro columns::_free_colinfo
     if ptr_valid(self.colinfo) then begin
         for i=0L, n_elements(*self.colinfo)-1 do begin
             ptr_free, (*self.colinfo)[i].datatype_actual
         endfor
         ptr_free, self.colinfo
     endif
+end
+
+
+function columns::cleanup
+    self->_free_colinfo
     return, 1
 end
+
+
 pro columns__define
 
     struct = {              $ 
