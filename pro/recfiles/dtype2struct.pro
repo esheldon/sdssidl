@@ -57,7 +57,10 @@ function _descr2value, descr_input, endian=endian
 	; numbers
 	case strlowcase(descr) of
 		'u1': return,0b
-		'i1': message,'IDL does not support signed byte types'
+		'i1': begin
+            message,'WARNING: IDL does not support signed byte types',/inf
+            return, 0b
+        end
 
 		'u2': return,0u
 		'i2': return,0
