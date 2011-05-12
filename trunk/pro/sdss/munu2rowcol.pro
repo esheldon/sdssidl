@@ -64,8 +64,9 @@ pro munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinea
 		message,'Halting'
 	endif 
 
-    sdssidl_setup
-    !sdss->munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinear, status=status
+    trans=obj_new('sdss_transform')
+    trans->munu2rowcol, trans, field, mu_in, nu_in, row, col, ri=ri, nonlinear=nonlinear, status=status
+    obj_destroy, trans
 
 end 
 

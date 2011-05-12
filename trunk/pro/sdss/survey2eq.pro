@@ -62,7 +62,8 @@ pro survey2eq, lambda, eta, ra, dec
         message,'Halting'
     endif 
 
-    sdssidl_setup
-    !sdss->survey2eq, lambda, eta, ra, dec
+    trans=obj_new('sdss_transform')
+    trans->survey2eq, lambda, eta, ra, dec
+    obj_destroy, trans
 
 end

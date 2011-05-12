@@ -42,8 +42,10 @@ function read_objmask, run, camcol, field ,$
 
     sdssidl_setup
 
-    struct = !sdss->objmask_read(run, camcol, field, $
+    sf = obj_new('sdss_files')
+    struct = sf->objmask_read(run, camcol, field, $
         rerun=rerun, idlist=idlist, status=status)
 
+    obj_destroy, sf
     return, struct
 END 

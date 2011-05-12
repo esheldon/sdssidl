@@ -137,7 +137,8 @@ PRO view_atlas, p1, p2, p3, p4, p5, rerun=rerunin, $
         if n_elements(p1) ne 0 then ros = p1        
     endelse
 
-    comm = '!sdss->atlas_view, ros, camcol, field, id, rerun=rerun, '
+    sf = obj_new('sdss_files')
+    comm = 'sf->atlas_view, ros, camcol, field, id, rerun=rerun, '
     comm = comm + 'clr=clr, '
     comm = comm + 'dir=dir, '
     comm = comm + 'index=index, '
@@ -162,8 +163,9 @@ PRO view_atlas, p1, p2, p3, p4, p5, rerun=rerunin, $
 
     if not execute(comm) then begin
         on_error, 2
-        message,'Could not run !sdss->atlas_read'
+        message,'Could not run sdss_files->atlas_read'
     endif
+    obj_destroy, sf
     return
 
 END 

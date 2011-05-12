@@ -52,7 +52,8 @@ pro gc2csurvey, mu, nu, node, inc, clambda, ceta
         message,'Halting'
     endif 
 
-    sdssidl_setup
-    !sdss->gc2csurvey, mu, nu, node, inc, clambda, ceta
+    trans=obj_new('sdss_transform')
+    trans->gc2csurvey, mu, nu, node, inc, clambda, ceta
+    obj_destroy, trans
 
 end 
