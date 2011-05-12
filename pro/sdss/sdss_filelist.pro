@@ -4,13 +4,15 @@
 ;
 ; PURPOSE:
 ;   Return a list of files for the input filetype and SDSS id info.
+;   This differs from sdss_file in that only files that actually 
+;   exist on the file system are returned.
 ;
 ; CATEGORY:
 ;   SDSS specifie.
 ;
 ; CALLING SEQUENCE:
-;   sdss_filelist(filetype, run, camcol, rerun=, bandpass=, fields=, 
-;                 fnums=, dir=, /silent, status=)
+;   sdss_filelist(filetype, run, camcol, rerun=, bandpass=, fields=, frange=, 
+;                 dir=, /silent, status=)
 ;
 ; INPUTS:
 ;   filetype: file type.  For a list of types do
@@ -25,10 +27,11 @@
 ;       u,g,r,i,z -> 0,1,2,3,4
 ;   fields: The fields to read. Defaults to a pattern with '*' for the 
 ;       field number.
+;   frange: A 2-element range of fields, inclusive.
 ;   /silent:
 ;
 ; OUTPUTS:
-;   The file name.
+;   The file list.
 ;
 ; OPTIONAL OUTPUTS:
 ;   dir: The directory.
@@ -40,10 +43,12 @@
 ; MODIFICATION HISTORY:
 ;   Created Erin Sheldon, UChicago 
 
-function sdss_filelist, filetype, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, fnums=fnums, indir=indir, dir=dir, silent=silent, status=status
+function sdss_filelist, filetype, run, camcol, fnums, rerun=rerun, bandpass=bandpass, fields=fields, frange=frange, indir=indir, dir=dir, silent=silent, status=status
 
-    sdssidl_setup
-    return, !sdss->filelist(filetype, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, fnums=fnums, indir=indir, dir=dir, silent=silent, status=status)
+    s = obj_new('sdss_files')
+    flist=s->filelist(filetype, run, camcol, fnums, fields=fields, rerun=rerun, bandpass=bandpass, frange=frange, indir=indir, dir=dir, silent=silent, status=status)
+    obj_destroy, s
+    return, flist
 
 end
 

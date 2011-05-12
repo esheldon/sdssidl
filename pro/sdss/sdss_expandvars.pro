@@ -72,16 +72,7 @@ function sdss_expandvars, str_input, run=run, rerun=rerun, camcol=camcol, fields
 
     if (strmatch(str[0], '*$RERUN*')) then begin
         if n_elements(rerun) EQ 0 then begin
-            if n_elements(run) ne 0 then begin
-                ; try to get the rerun
-                rerun = sdss_rerun(run, exists=exists)
-                if not exists then begin
-                    message,'RERUN not found for run: '+string(run),/inf
-                    message,'Perhaps try sending it explicitly'
-                endif
-            endif else begin
-                message, 'RERUN must be specified!'
-            endelse
+            message, 'RERUN must be specified!'
         endif
         rrstring = strtrim(string(rerun),2)
         str = repstr(str, '$RERUN', rrstring)
