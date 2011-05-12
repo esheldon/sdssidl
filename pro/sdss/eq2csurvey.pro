@@ -57,11 +57,11 @@ pro eq2csurvey, ra, dec, clambda, ceta
         print,'-Syntax: eq2csurvey, ra, dec, clambda, ceta'
         print,' ra, dec in degrees'
         return
-;        print
-;        message,'Halting'
+		message,'Halting'
     endif 
  
-    sdssidl_setup
-    !sdss->eq2csurvey, ra, dec, clambda, ceta
+    trans=obj_new('sdss_transform')
+    trans->eq2csurvey, ra, dec, clambda, ceta
+    obj_destroy, trans
 
 end

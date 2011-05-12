@@ -3470,6 +3470,990 @@ function sdss_files::filetypes
 end
 
 
+
+;+
+; NAME:
+;   Originaly this was sdss_readobj from photoop.
+;
+; PURPOSE:
+;   Read one or multiple SDSS fpObj files into a single data structure,
+;   and add calibrated astrometric and photometric fields.
+;
+; CALLING SEQUENCE:
+;   tdat = sdss_readobj( runnum, camcol, [ fieldnum, objid, ] rerun=, $
+;    [ fieldrange=, ftype=, /no_fieldnum, /no_psp, /no_calib, /no_resolve, $
+;    /no_coord, /no_extinct, naper=, catalog=, phdr=, $
+;    hdr=, except_tags=, select_tags=, maxmem=, /silent, outfile=, /ascii, $
+;    /old_fpobjc, /oldcalib,/panstarrs ] )
+;
+; INPUTS:
+;   runnum     - Run number(s)
+;   camcol     - CCD column number(s) [1..6]
+;
+; OPTIONAL INPUTS:
+;   fieldnum   - Field number(s); default to all fields for this RERUN
+;   objid      - Object ID numbers to read; if specified, then the same IDs
+;                are read for all fields.  If you need to read different
+;                objects IDs from each field, then use SDSS_READOBJLIST().
+;
+; REQUIRED KEYWORDS:
+;   rerun      - Re-run number(s) or name(s)
+;
+; OPTIONAL KEYWORDS:
+;   fieldrange - Field range expressed as a 2-element array with a starting
+;                and ending field number.  If it contains only 1 element, then
+;                only that field is read.
+;   ftype      - File type to read.  The options are:
+;                  'fpObjc': fpObjc files (default)
+;                  'tsObj': tsObj files
+;                  'hoggObj': hoggObj files
+;   no_fieldnum- If set, then do not add RUN, RERUN, CAMCOL, FIELD.
+;   no_psp     - If set, then do not add PSP_STATUS from the psField files.
+;   no_calib   - If set, then do not add photometric calibrations: SKYFLUX,
+;                PSFFLUX, FIBERFLUX, FIBER2FLUX, PETROFLUX, MODELFLUX, 
+;                DEVFLUX, EXPFLUX, APERFLUX as well as those same fields +_IVAR
+;                (ie., PSFFLUX_IVAR) and NMGYPERCOUNT,NMGYPERCOUNT_IVAR,
+;                and CLOUDCAM (which should be 1 for photometric data).
+;   no_resolve - If set, do not add resolution.  If $PHOTO_RESOLVE is set,
+;                then include the following from the global resolve files:
+;                RESOLVE_STATUS, THING_ID, IFIELD, BALKAN_ID, NOBSERVE,
+;                NDETECT, NEDGE.
+;                Otherwise, only add the local resolve bits in RESOLVE_STATUS.
+;   no_coord   - If set, then do not add astrometric calibrations:
+;                PIXSCALE[5], RA, DEC, OFFSETRA[5], OFFSETDEC[5],
+;                PHI_OFFSET[5], PHI_ISO_DEG[5],
+;                PHI_DEV_DEG[5], PHI_EXP_DEG[5], PSF_FWHM[5]
+;   no_extinct - If set, then do not add Galactic extinction values:
+;                EXTINCTION[5].
+;   naper      - Number of apertures to keep for aperture magnitudes, between
+;                1 and 15; default to 8, which goes out to a radius of
+;                11.306 arcsec.
+;   catalog    - External catalog names to match against; default to none;
+;                setting with /CATALOG is equivalent to ['2MASS','FIRST','USNO']
+;   phdr       - Primary header array from the first data file
+;   hdr        - Header array from the first data file
+;   except_tags- Option string array of column names to not return.
+;                This defaults to a list of uncalibrated quantities that
+;                would rarely be used.
+;                This can contain wildcards, such as '*FLUX*'.
+;                Set to ' ' to not exclude any tags.
+;   select_tags- Option string array of column names to return, which
+;                takes priority over EXCEPT_TAGS.
+;   maxmem     - If set, then fail to return any objects if the memory
+;                allocation would exceed this many megabytes; default to 0,
+;                which imposes no such limit.
+;   silent     - Suppress any informational message.
+;   outfile    - Optional name for output FITS (or ASCII) file. 
+;   ascii      - If OUTFILE is specified and this keyword is set,
+;                then write an ASCII file rather than FITS.
+;   old_fpobjc - Adds to EXCEPT_TAGS a list of tags used only in v5_3
+;                and later
+;   oldcalib   - If set, then force using the old PT-based photometric
+;                calibrations even if the $PHOTO_CALIB environment is set.
+;   panstarrs -  If set, return additional photometry columns from the Pan-STARRS pipeline
+;
+; OUTPUTS:
+;   tdat       - Structure containing all data
+;
+; OPTIONAL OUTPUTS:
+;   phdr       - String array containing the primary header for the first file
+;   hdr        - String array containing the FITS header for the first file
+;
+; COMMENTS:
+;   If $PHOTO_RESOLVE environment variable is specified, then the global
+;   resolve files are used.  This includes extra bits in RESOLVE_STATUS, and
+;   adds the following fields: THING_ID, IFIELD, BALKAN_ID, NOBSERVE,
+;   NDETECT, and NEDGE.
+;   Note that if any of these global resolve files are missing, we revert
+;   to the local resolve files and set THING_ID=-1, IFIELD=-1, BALKAN_ID=-1,
+;   NOBSERVE=0, NDETECT=0, NEDGE=0.
+;
+;   If $PHOTO_CALIB environment variable is specified (and /OLDCALIB is not
+;   set), then the global flux-calibration files are used.
+;   This effects all fields *FLUX*.  The PROFMEAN,PROFERR fields are not
+;   effected, since those are always in units of raw counts and must be
+;   multiplied to NMGYPERCOUNT to be useful.
+;
+; EXAMPLES:
+;   Read in all objects for run 259, column 3, fields 11 through 20:
+;     objs = sdss_readobj( 259, 3, 11+indgen(10) )
+;
+;   Read only a subset of columns, but append to the data structure the
+;   run, column and field numbers for each object.  Also, convert the
+;   counts to magnitudes for "fpObj" files:
+;     objs = sdss_readobj( 259, 3, 11+indgen(10), $
+;      select_tags=['ID', 'PARENT', 'OBJC_*', '*FLUX*', 'RA', 'DEC']
+;
+;   Uses SDSS_ERR2IVAR to deal with negative flux errors (setting ivar
+;   to zero, basically).
+;
+;   The timestamp (TAI) and airmass are computed for the mean time of
+;   integration for the object center in each filter.  Note that r-band
+;   is observed first, followed by i,u,z,g.
+;
+; BUGS:
+;   Should ignore columns which can't be determined due to missing
+;     files, and blow away corresponding columns in the outputs
+;     (unless the field has no objects at all)
+;   Verify that all inputs are valid ???
+;   How to convert Q,U and the adaptive moments into measures on the sky???
+;   Some fields are useless, like STAR_L, since STAR_LNL is the
+;     value that actually has dynamic range.  Also, PSPCOUNTS, etc,
+;     aren't really useful once you have PSFFLUX.
+;   The color terms are currently not being applied to the RA,DEC.
+;
+; PROCEDURES CALLED:
+;   astrom_pixscale()
+;   astrom_xyad
+;   dust_getval()
+;   euler
+;   headfits()
+;   mrdfits()
+;   mwrfits()
+;   sdss_calib()
+;   sdss_name()
+;   sdss_err2ivar()
+;   sdss_xy2eq
+;   struct_selecttags()
+;   tai2airmass()
+;
+; REVISION HISTORY:
+;   28-Jan-2003  Written by David Schlegel, Princeton.
+;                Based upon the old RDSS_OBJ in the "hoggpt" product.
+;
+;   26-Oct-2006  Updated by Yogesh Wadadekar, Princeton.
+;                Added calibration of Pan-STARRS pipeline outputs
+;------------------------------------------------------------------------------
+FUNCTION sdss_files::read_fpobjc, runnum, camcol, field, objid, fieldrange=fieldrange, $
+ rerun=rerun, ftype=ftypesav, no_fieldnum=no_fieldnum, panstarrs=panstarrs, $
+ no_psp=no_psp, no_calib=no_calib, no_coord=no_coord, $
+ no_resolve=no_resolve, no_extinct=no_extinct, $
+ naper=naper1, catalog=catalog, phdr=phdr, hdr=hdr, $
+ except_tags=except_tags, select_tags=select_tags, maxmem=maxmem, $
+ silent=silent, outfile=outfile, ascii=ascii, old_fpobjc=old_fpobjc, $
+ oldcalib=oldcalib, usecterm=usecterm, _EXTRA=KeywordsForMRDFITS
+
+   common com_rdobj, RDOBJstruct_ct
+
+   ; Copy ftype
+   if (keyword_set(ftypesav)) then $
+     ftype=ftypesav
+
+   if (NOT keyword_set(ftype)) then ftype = 'fpObjc'
+   if (n_params() LT 2 OR n_elements(rerun) EQ 0) then begin
+      print, 'Must set RUN, CAMCOL, [FIELD or FIELDRANGE], RERUN'
+      return, 0
+   endif
+
+   if (NOT keyword_set(field)) then begin
+      if (keyword_set(fieldrange)) then begin
+         if (n_elements(field) EQ 1) then field = fieldrange[0] $
+         else $
+          field = fieldrange[0] + lindgen(fieldrange[1] - fieldrange[0] + 1)
+      endif else begin
+         runlist = sdss_runlist(runnum, rerun=rerun)
+         if (NOT keyword_set(runlist)) then return, 0 ; Data not found
+         field = runlist.startfield $
+          + lindgen(runlist.endfield - runlist.startfield + 1)
+      endelse
+   endif
+
+   ;----------
+   ; Set default values
+
+   if (keyword_set(naper1)) then naper = (long(naper1) > 1) < 15 $
+    else naper = 8
+   apnum = lindgen(naper)
+
+   if (NOT keyword_set(except_tags)) then begin
+      except_tags = [ 'CATID','TEXTURE', $
+                      'STAR_L','EXP_L','DEV_L', $
+                      'SKY','SKYERR','PSFCOUNTS','FIBERCOUNTS', $
+                      'FIBER2COUNTS', 'PETROCOUNTS', $
+                      'COUNTS_DEV','COUNTS_EXP','COUNTS_MODEL', $
+                      'PROFMEAN','PROFERR', 'ISO_PHI','ISO_PHIERR', $
+                      'PHI_DEV','PHI_DEVERR','PHI_EXP','PHI_EXPERR' ]
+   endif
+
+   ;;;;;;;;;;;;;;;
+   ; Don't include newish fpObjc tags
+   if (keyword_set(old_fpobjc)) then $
+    except_tags=[ except_tags, $
+                  'M_E1', $
+                  'M_E2', $
+                  'M_E1E1ERR', $
+                  'M_E1E2ERR', $
+                  'M_E2E2ERR', $
+                  'M_RR_CC', $
+                  'M_RR_CCERR', $
+                  'M_CR4', $
+                  'M_E1_PSF', $
+                  'M_E2_PSF', $
+                  'M_RR_CC_PSF', $
+                  'M_CR4_PSF', $
+                  'PSF_FWHM']
+
+   ;----------
+   ; Generate unique structure names that will not conflict with
+   ; any previous calls to this function.
+
+   if (NOT keyword_set(RDOBJstruct_ct)) then RDOBJstruct_ct = 1L $
+    else RDOBJstruct_ct = RDOBJstruct_ct + 1L
+   RDOBJstruct_nm1 = strcompress( /remove_all, $
+    'RDOBJ'+string(RDOBJstruct_ct) )
+
+   ;----------
+   ; Construct the run,rerun,camcol,field as matching vectors
+
+   nrun = n_elements(runnum)
+   nrrun = n_elements(rerun)
+   ncol = n_elements(camcol)
+   nfield = n_elements(field)
+   nfile = nrun > nrrun > ncol > nfield
+
+   if (nrun EQ 1) then runvec = replicate(runnum[0], nfile) $
+    else if (nrun EQ nfile) then runvec = runnum $
+    else message, 'Invalid number of elements for RUNNUM'
+
+   if (nrrun EQ 1) then rrunvec = replicate(rerun[0], nfile) $
+    else if (nrrun EQ nfile) then rrunvec = rerun $
+    else message, 'Invalid number of elements for RERUN'
+
+   if (ncol EQ 1) then colvec = replicate(camcol[0], nfile) $
+    else if (ncol EQ nfile) then colvec = camcol $
+    else message, 'Invalid number of elements for CAMCOL'
+
+   if (nfield EQ 1) then fieldvec = replicate(field[0], nfile) $
+    else if (nfield EQ nfile) then fieldvec = field $
+    else message, 'Invalid number of elements for FIELD'
+
+   ;----------
+   ; Construct the list of file names and extension numbers
+
+   filename = strarr(nfile)
+   filexten = intarr(nfile)
+   for ifile=0L, nfile-1 do begin
+      filename[ifile] = sdss_name(ftype, runvec[ifile], colvec[ifile], $
+       fieldvec[ifile], rerun=rrunvec[ifile], exten=exten)
+      filexten[ifile] = exten
+   endfor
+
+   ; Check to see any of these exist
+   fexists=file_test(filename)
+   w = where(fexists GT 0,nexist)
+   ; If the filetype is fpObjc and none of these exist
+   ; then attempt to read calibObj files
+   if (ftype EQ 'fpObjc' AND nexist EQ 0) then begin
+       splog, 'Could not find fpObjc files : Attempting calibObj files'
+       ftype='calibObj'
+       for ifile=0L, nfile-1 do begin
+           filename[ifile] = sdss_name(ftype, runvec[ifile], colvec[ifile], $
+                                       fieldvec[ifile], rerun=rrunvec[ifile], exten=exten)
+           filexten[ifile] = exten
+       endfor
+   endif
+   
+   ;----------
+   ; Set PHDR to primary header of first file
+
+   if (arg_present(phdr)) then phdr = headfits(filename[0])
+
+   ;----------
+   ; Find length of final structure, and create a template for
+   ; the output structure
+
+   if (keyword_set(objid)) then begin
+      nobj = nfile * n_elements(objid)
+      ifile = 0L
+      tdat1 = 0
+      while (NOT keyword_set(tdat1) AND ifile LT nfile) do begin
+         hdr = headfits(filename[ifile], exten=filexten[ifile], /silent)
+         if (size(hdr,/tname) EQ 'STRING') then begin
+            nrow = sxpar(hdr, 'NAXIS2')
+            if (nrow GT 0) then $
+             tdat1 = mrdfits(filename[ifile], filexten[ifile], hdr, $
+              structyp=RDOBJstruct_nm1, _EXTRA=KeywordsForMRDFITS, $
+              range=[1], /silent)
+         endif
+         ifile = ifile + 1
+      endwhile
+   endif else begin
+      nobj = 0L
+      for ifile=0L, nfile-1 do begin
+         hdr = headfits(filename[ifile], exten=filexten[ifile], /silent)
+         if (size(hdr,/tname) EQ 'STRING') then begin
+            nrow = sxpar(hdr, 'NAXIS2')
+            nobj = nobj + nrow
+            ; Create an empty structure array, using data from the first
+            ; good file as the template.
+            if (NOT keyword_set(tdat1) AND nrow GT 0) then begin
+               tdat1 = mrdfits(filename[ifile], filexten[ifile], hdr, $
+                structyp=RDOBJstruct_nm1, _EXTRA=KeywordsForMRDFITS, $
+                range=[1], /silent)
+            endif
+            nrow = 0
+         endif
+      endfor
+   endelse
+
+   if (nobj EQ 0) then begin 
+      if keyword_set(outfile) then mwrfits, 0, outfile, /create
+      return, 0
+   endif 
+
+   ;----------
+   ; Create the output structure
+
+   if (NOT keyword_set(silent)) then $
+    splog, 'Creating array for ', nobj, ' objects'
+
+   
+   ; Always include TAI in the output structure
+   ; except in the case of the ftype EQ 'calibObj'
+   ; in which case it already exists
+   if (ftype NE 'calibObj') then $
+   tdat1 = create_struct( $
+    tdat1, $
+    'TAI'         , dblarr(5) )
+
+   if (ftype EQ 'fpObjc' AND keyword_set(no_fieldnum) EQ 0) then begin
+      tdat1 = create_struct( $
+       'RUN'      , 0L, $
+       'RERUN'    , '', $
+       'CAMCOL'   , 0L, $
+       'FIELD'    , 0L, $
+       tdat1 )
+   endif
+
+   
+   if (ftype EQ 'fpObjc' AND keyword_set(no_psp) EQ 0) then begin
+      tdat1 = create_struct(tdat1, $
+                            'PSP_STATUS' , lonarr(5))
+   endif
+
+   if (keyword_set(panstarrs)) then begin
+      tdat1 = create_struct(tdat1, $
+                            'PSPSFCOUNTS', fltarr(5), $
+                            'PSPSFCOUNTSERR', fltarr(5))
+      if (keyword_set(no_calib) EQ 0) then begin
+         tdat1 = create_struct(tdat1, $
+                               'PSPSFFLUX' , fltarr(5),$
+                               'PSPSFFLUX_IVAR' , fltarr(5))
+      endif
+   endif
+
+   if (ftype EQ 'fpObjc' AND keyword_set(no_coord) EQ 0) then begin
+      tdat1 = create_struct(tdat1, $
+       'PIXSCALE'   , fltarr(5), $
+       'RA'         , 0.d, $
+       'DEC'        , 0.d, $
+       'OFFSETRA'   , fltarr(5), $
+       'OFFSETDEC'  , fltarr(5), $
+       'PSF_FWHM'   , fltarr(5), $
+       'MJD'        , 0L, $
+       'AIRMASS'    , fltarr(5), $
+       'PHI_OFFSET' , fltarr(5), $
+       'PHI_ISO_DEG', fltarr(5), $
+       'PHI_DEV_DEG', fltarr(5), $
+       'PHI_EXP_DEG', fltarr(5) )
+   endif
+
+   if (keyword_set(no_extinct) EQ 0 AND ftype NE 'calibObj') then begin
+      tdat1 = create_struct(tdat1, 'EXTINCTION', fltarr(5) )
+   endif
+
+   if (ftype EQ 'fpObjc' AND keyword_set(no_calib) EQ 0) then begin
+      tdat1 = create_struct(tdat1, $
+       'SKYFLUX'        , fltarr(5), $
+       'SKYFLUX_IVAR'   , fltarr(5), $
+       'PSFFLUX'        , fltarr(5), $
+       'PSFFLUX_IVAR'   , fltarr(5), $
+       'FIBERFLUX'      , fltarr(5), $
+       'FIBERFLUX_IVAR' , fltarr(5), $
+       'FIBER2FLUX'      , fltarr(5), $
+       'FIBER2FLUX_IVAR' , fltarr(5), $
+       'MODELFLUX'      , fltarr(5), $
+       'MODELFLUX_IVAR' , fltarr(5), $
+       'PETROFLUX'      , fltarr(5), $
+       'PETROFLUX_IVAR' , fltarr(5), $
+       'DEVFLUX'        , fltarr(5), $
+       'DEVFLUX_IVAR'   , fltarr(5), $
+       'EXPFLUX'        , fltarr(5), $
+       'EXPFLUX_IVAR'   , fltarr(5), $
+       'APERFLUX'       , fltarr(naper,5), $
+       'APERFLUX_IVAR'  , fltarr(naper,5), $
+       'CLOUDCAM'         , intarr(5), $
+       'CALIB_STATUS'     , intarr(5), $
+       'NMGYPERCOUNT'     , fltarr(5), $
+       'NMGYPERCOUNT_IVAR', fltarr(5) )
+   endif
+
+   if (ftype EQ 'fpObjc' AND keyword_set(catalog)) then begin
+      tdat1 = create_struct(tdat1, $
+       sdss_catmatch(catalog=catalog) )
+   endif
+
+   if (ftype EQ 'fpObjc' AND keyword_set(no_resolve) EQ 0) then begin
+      ; This condition should be the same as that in SDSS_NAME() which
+      ; sets the reObj name to the globally resolved value.
+       if (keyword_set(getenv('PHOTO_RESOLVE'))) then begin
+          tdat1 = create_struct(tdat1, $
+           'RESOLVE_STATUS', 0 , $
+           'THING_ID'      , -1L, $
+           'IFIELD'        , -1L, $
+           'BALKAN_ID'     , -1L, $
+           'NOBSERVE'      , 0 , $
+           'NDETECT'       , 0 , $
+           'NEDGE'         , 0   )
+       endif else begin
+          tdat1 = create_struct(tdat1, $
+           'RESOLVE_STATUS', 0)
+       endelse
+   endif
+
+   ;----------
+   ; Trim to only selected tag names
+
+   if (keyword_set(except_tags) OR keyword_set(select_tags)) then $
+    tdat1 = struct_selecttags(tdat1, select_tags=select_tags, $
+     except_tags=except_tags)
+
+   q_tai = tag_exist(tdat1,'TAI')
+   q_run = tag_exist(tdat1,'RUN')
+   q_rerun = tag_exist(tdat1,'RERUN')
+   q_camcol = tag_exist(tdat1,'CAMCOL')
+   q_field = tag_exist(tdat1,'FIELD')
+   q_psp_status = tag_exist(tdat1,'PSP_STATUS')
+   q_mjd = tag_exist(tdat1,'MJD')
+   q_airmass = tag_exist(tdat1,'AIRMASS')
+   q_ra = tag_exist(tdat1,'RA') OR keyword_set(catalog)
+   q_dec = tag_exist(tdat1,'DEC') OR keyword_set(catalog)
+   q_pixscale = tag_exist(tdat1,'PIXSCALE')
+   q_offsetra = tag_exist(tdat1,'OFFSETRA')
+   q_offsetdec = tag_exist(tdat1,'OFFSETDEC')
+   q_phi_offset = tag_exist(tdat1,'PHI_OFFSET')
+   q_phi_iso_deg = tag_exist(tdat1,'PHI_ISO_DEG')
+   q_phi_dev_deg = tag_exist(tdat1,'PHI_DEV_DEG')
+   q_phi_exp_deg = tag_exist(tdat1,'PHI_EXP_DEG')
+   q_extinction = tag_exist(tdat1,'EXTINCTION')
+;   q_cloudcam = tag_exist(tdat1,'CLOUDCAM')
+   q_nmgypercount = tag_exist(tdat1,'NMGYPERCOUNT')
+   q_nmgypercount_ivar = tag_exist(tdat1,'NMGYPERCOUNT_IVAR')
+   q_calib_status = tag_exist(tdat1,'CALIB_STATUS')
+   q_resolve_status = tag_exist(tdat1,'RESOLVE_STATUS')
+   q_thing_id = tag_exist(tdat1,'THING_ID')
+   q_ifield = tag_exist(tdat1,'IFIELD')
+   q_balkan_id = tag_exist(tdat1,'BALKAN_ID')
+   q_nobserve = tag_exist(tdat1,'NOBSERVE')
+   q_ndetect = tag_exist(tdat1,'NDETECT')
+   q_nedge = tag_exist(tdat1,'NEDGE')
+   q_skyflux = tag_exist(tdat1,'SKYFLUX')
+   q_skyflux_ivar = tag_exist(tdat1,'SKYFLUX_IVAR')
+   q_psfflux = tag_exist(tdat1,'PSFFLUX')
+   q_psfflux_ivar = tag_exist(tdat1,'PSFFLUX_IVAR')
+   q_pspsfflux = tag_exist(tdat1,'PSPSFFLUX')
+   q_pspsfflux_ivar = tag_exist(tdat1,'PSPSFFLUX_IVAR')
+   q_petroflux = tag_exist(tdat1,'PETROFLUX')
+   q_petroflux_ivar = tag_exist(tdat1,'PETROFLUX_IVAR')
+   q_fiberflux = tag_exist(tdat1,'FIBERFLUX')
+   q_fiberflux_ivar = tag_exist(tdat1,'FIBERFLUX_IVAR')
+   q_fiber2flux = tag_exist(tdat1,'FIBER2FLUX')
+   q_fiber2flux_ivar = tag_exist(tdat1,'FIBER2FLUX_IVAR')
+   q_modelflux = tag_exist(tdat1,'MODELFLUX')
+   q_modelflux_ivar = tag_exist(tdat1,'MODELFLUX_IVAR')
+   q_devflux = tag_exist(tdat1,'DEVFLUX')
+   q_devflux_ivar = tag_exist(tdat1,'DEVFLUX_IVAR')
+   q_expflux = tag_exist(tdat1,'EXPFLUX')
+   q_expflux_ivar = tag_exist(tdat1,'EXPFLUX_IVAR')
+   q_aperflux = tag_exist(tdat1,'APERFLUX')
+   q_aperflux_ivar = tag_exist(tdat1,'APERFLUX_IVAR')
+   q_psf_fwhm = tag_exist(tdat1,'PSF_FWHM')
+
+   ;----------
+   ; Decide if we'll be allocating too much memory
+   ; If so, then return with no objects
+
+   memsz = n_tags(tdat1, /length) * nobj / 1.e6 ; in megabytes
+   if (keyword_set(maxmem)) then begin
+      if (memsz GT maxmem) then begin
+         if (NOT keyword_set(silent)) then $
+          splog, 'WARNING: Exceeding memory limit: ', memsz, ' > ', maxmem, ' Mb'
+         if keyword_set(outfile) then mwrfits, 0, outfile, /create
+         return, 0
+      endif 
+   endif 
+
+   ;----------
+   ; Generate the large output structure
+
+   tdat = replicate(tdat1, nobj)
+
+   ;----------
+   ; Read objects into structure one file at a time
+
+   if (keyword_set(objid)) then rows = objid - 1L
+
+   nobj = 0L
+   for ifile=0L, nfile-1 do begin
+
+      if (NOT keyword_set(silent)) then $
+       splog, 'Reading ', filename[ifile], ' EXTEN=', filexten[ifile]
+      thisdat = mrdfits(filename[ifile], filexten[ifile], $
+                        structyp=RDOBJstruct_nm1, /silent, rows=rows, $
+                        _EXTRA=KeywordsForMRDFITS)
+
+      if (keyword_set(thisdat)) then nrow = n_elements(thisdat) $
+       else nrow = 0
+
+      ; Only append if there is data
+      if (nrow GT 0) then begin
+
+         ; Copy most data into big structure
+         for irow=0L, nrow-1 do begin
+            ; Use /nozero flag to keep the -1 default values
+            ; for thing_id,balkan_id
+            struct_assign, thisdat[irow], tdat1, /nozero
+            tdat[nobj+irow] = tdat1
+         endfor
+
+         ; Add the Pan-STARRS photometry
+         if (keyword_set(panstarrs)) then begin
+            psmagic = -666.0
+            psphotom = replicate(create_struct( $
+                       'PSPSFCOUNTS', fltarr(5)+psmagic, $
+                       'PSPSFCOUNTSERR', fltarr(5)+psmagic), nrow)
+
+            ivalid = where(thisdat.catid NE 0, nvalid)
+            if (nvalid GT 0) then begin
+               psfilename = sdss_name('psKO', runvec[ifile], colvec[ifile], $
+                fieldvec[ifile], rerun=rrunvec[ifile], exten=psfileexten)
+               psthisdat = mrdfits(psfilename, psfileexten, $
+                structyp=RDOBJstruct_nm2, /silent, $
+                _EXTRA=KeywordsForMRDFITS)
+               if not keyword_set(psthisdat) then begin
+                  splog, "WARNING: psKO file cannot be read, Pan-STARRS values will be blank: "+psfilename
+                  psphotom.pspsfcounts = -9999
+                  psphotom.pspsfcountserr = -9999
+               end else begin
+                  psid = long(psthisdat.id)
+                  psindex = lonarr(nvalid)
+                  tmpindex = lonarr(max(psid)+1)
+                  tmpindex[psid] = lindgen(n_elements(psid))
+                  psindex = tmpindex[thisdat[ivalid].catid]
+                  
+                  ;; pysphot (psKO files) started off only providing
+                  ;; "magnitudes". This was fixed in 20070731_1, after
+                  ;; which we prefer to (and have to) use the counts. Why
+                  ;; the _filter names were kept is beyond me.
+                  q_pspsfcounts = tag_exist(psthisdat, "PSFCOUNTS_R")
+                  if (keyword_set(q_pspsfcounts)) then begin
+                     psphotom[ivalid].pspsfcounts[0] = psthisdat[psindex].psfCounts_u
+                     psphotom[ivalid].pspsfcounts[1] = psthisdat[psindex].psfCounts_g
+                     psphotom[ivalid].pspsfcounts[2] = psthisdat[psindex].psfCounts_r
+                     psphotom[ivalid].pspsfcounts[3] = psthisdat[psindex].psfCounts_i
+                     psphotom[ivalid].pspsfcounts[4] = psthisdat[psindex].psfCounts_z
+                     
+                     psphotom[ivalid].pspsfcountserr[0] = psthisdat[psindex].psfCountsErr_u
+                     psphotom[ivalid].pspsfcountserr[1] = psthisdat[psindex].psfCountsErr_g
+                     psphotom[ivalid].pspsfcountserr[2] = psthisdat[psindex].psfCountsErr_r
+                     psphotom[ivalid].pspsfcountserr[3] = psthisdat[psindex].psfCountsErr_i
+                     psphotom[ivalid].pspsfcountserr[4] = psthisdat[psindex].psfCountsErr_z
+                     
+                     ;; Convert PS magic numbers to SDSS magic numbers.
+                     for ifilt=0, 4 do begin
+                        magic = where(psphotom.pspsfcounts[ifilt] eq psmagic, cnt)
+                        if cnt gt 0 then begin
+                           psphotom[magic].pspsfcounts[ifilt] = -9999
+                           psphotom[magic].pspsfcountserr[ifilt] = -9999
+                        end
+                        magic = where(psphotom.pspsfcountserr[ifilt] eq psmagic, cnt)
+                        if cnt gt 0 then $
+                           psphotom[magic].pspsfcountserr[ifilt] = -9999
+                     endfor
+                  endif else begin
+                                ; This branch should only get run for old test data.
+                     ps_zero = [ 27.382, 28.600, 28.281, 27.918, 26.169 ]
+                     
+                     psphotom[ivalid].pspsfcounts[0] = $
+                        10^(-(psthisdat[psindex].psfmag_u - ps_zero[0])/2.5)
+                     psphotom[ivalid].pspsfcounts[1] = $
+                        10^(-(psthisdat[psindex].psfmag_g - ps_zero[1])/2.5)
+                     psphotom[ivalid].pspsfcounts[2] = $
+                        10^(-(psthisdat[psindex].psfmag_r - ps_zero[2])/2.5)
+                     psphotom[ivalid].pspsfcounts[3] = $
+                        10^(-(psthisdat[psindex].psfmag_i - ps_zero[3])/2.5)
+                     psphotom[ivalid].pspsfcounts[4] = $
+                        10^(-(psthisdat[psindex].psfmag_z - ps_zero[4])/2.5)
+                     
+                     psphotom[ivalid].pspsfcountserr[0] = $
+                        (1.-10^(-(psthisdat[psindex].psfmagerr_u)/2.5)) *  psphotom[ivalid].pspsfcounts[0]
+                     psphotom[ivalid].pspsfcountserr[1] = $
+                        (1.-10^(-(psthisdat[psindex].psfmagerr_g)/2.5)) *  psphotom[ivalid].pspsfcounts[1]
+                     psphotom[ivalid].pspsfcountserr[2] = $
+                        (1.-10^(-(psthisdat[psindex].psfmagerr_r)/2.5)) *  psphotom[ivalid].pspsfcounts[2]
+                     psphotom[ivalid].pspsfcountserr[3] = $
+                        (1.-10^(-(psthisdat[psindex].psfmagerr_i)/2.5)) *  psphotom[ivalid].pspsfcounts[3]
+                     psphotom[ivalid].pspsfcountserr[4] = $
+                        (1.-10^(-(psthisdat[psindex].psfmagerr_z)/2.5)) *  psphotom[ivalid].pspsfcounts[4]
+                  endelse
+               endelse
+               tdat[nobj:nobj+nrow-1].pspsfcounts = psphotom.pspsfcounts
+               tdat[nobj:nobj+nrow-1].pspsfcountserr = psphotom.pspsfcountserr
+            endif
+         endif
+
+         ; Add TAI.  Compute the mean time of observation for the object center
+         ; in each of the filters.  Note that r-band is first, followed by
+         ; i,u,z,g.
+
+         if (q_tai OR q_airmass) then begin
+            tai_time = dblarr(5,nrow)
+            if (ftype EQ 'hoggObj') then begin
+               for ifilt=0, 4 do $
+                tai_time[ifilt,*] = sdss_run2tai(runvec[ifile], $
+                 fieldvec[ifile], thisdat.xpos[ifilt], filter=ifilt)
+            endif else begin
+               for ifilt=0, 4 do $
+                tai_time[ifilt,*] = sdss_run2tai(runvec[ifile], $
+                 fieldvec[ifile], thisdat.rowc[ifilt]-0.5, filter=ifilt)
+            endelse
+         endif
+
+         if (q_tai) then begin
+            tdat[nobj:nobj+nrow-1].tai = tai_time
+         endif
+
+         ; Add RUN, RERUN, CAMCOL, FIELD
+         if (keyword_set(no_fieldnum) EQ 0 AND ftype EQ 'fpObjc' $
+          AND nrow GT 0) then begin
+            if (q_run) then $
+             tdat[nobj:nobj+nrow-1].run = runvec[ifile]
+            if (q_rerun) then $
+             tdat[nobj:nobj+nrow-1].rerun = strtrim(string(rrunvec[ifile]),2)
+            if (q_camcol) then $
+             tdat[nobj:nobj+nrow-1].camcol = colvec[ifile]
+            if (q_field) then $
+             tdat[nobj:nobj+nrow-1].field = fieldvec[ifile]
+         endif
+
+         ; Add PSP_STATUS
+         if (keyword_set(no_psp) EQ 0 AND ftype EQ 'fpObjc' $
+          AND nrow GT 0) then begin
+             if (q_psp_status) then begin
+                 pspfile = sdss_name('psField', runvec[ifile], colvec[ifile], $
+                                     fieldvec[ifile], rerun=rrunvec[ifile])
+                 psfield = mrdfits(pspfile+'*', 6, /silent)
+                 tdat[nobj:nobj+nrow-1].psp_status = $
+                   psfield.status # (lonarr(nrow)+1)
+             endif
+         endif
+
+         ; Compute RA,DEC if either coordinates or Galactic extinction
+         ; should be returned.
+         if ((keyword_set(no_coord) EQ 0 OR keyword_set(no_extinct) EQ 0) $
+          AND ftype EQ 'fpObjc' AND nrow GT 0) then begin
+            ; First, do r-band...
+            astrans = sdss_astrom(runvec[ifile], colvec[ifile], $
+             fieldvec[ifile], rerun=rrunvec[ifile], filter=2)
+; Need to use the color terms -- and should we use OBJC_COLC,OBJC_ROWC !!!???
+            astrom_xyad, astrans, $
+             thisdat.colc[2]-0.5, thisdat.rowc[2]-0.5, $
+             ra=ra_ref, dec=dec_ref, mjd=mjd
+         endif
+
+         ; Get the resolve status if desired
+         if ((keyword_set(no_resolve) EQ 0) $
+          AND ftype EQ 'fpObjc' AND nrow GT 0) then begin
+             resolve_file = sdss_name('reObj', runvec[ifile], $
+              colvec[ifile],fieldvec[ifile], rerun=rrunvec[ifile])
+             ; First search for the file so that MRDFITS does not report an err
+             if (keyword_set(findfile(resolve_file))) then $
+              rdat = mrdfits(resolve_file+'*', 1, rows=rows, /silent) $
+             else $
+              rdat = 0
+
+             ; If a global resolve file was not found, then revert back
+             ; to reading the local resolve file.
+             if (NOT keyword_set(rdat)) then begin
+                tmpfile = sdss_name('reObjRun', runvec[ifile], $
+                 colvec[ifile],fieldvec[ifile], rerun=rrunvec[ifile])
+                if (tmpfile NE resolve_file) then begin
+                   resolve_file = tmpfile
+                   rdat = mrdfits(resolve_file+'*', 1, rows=rows, /silent)
+                endif
+             endif
+
+             if (keyword_set(rdat)) then begin
+               if (q_resolve_status AND tag_exist(rdat,'RESOLVE_STATUS')) then $
+                tdat[nobj:nobj+nrow-1].resolve_status = rdat.resolve_status
+               if (q_thing_id AND tag_exist(rdat,'THING_ID')) then $
+                tdat[nobj:nobj+nrow-1].thing_id = rdat.thing_id
+               if (q_ifield AND tag_exist(rdat,'IFIELD')) then $
+                tdat[nobj:nobj+nrow-1].ifield = rdat.ifield
+               if (q_balkan_id AND tag_exist(rdat,'BALKAN_ID')) then $
+                tdat[nobj:nobj+nrow-1].balkan_id = rdat.balkan_id
+               if (q_nobserve AND tag_exist(rdat,'NOBSERVE')) then $
+                tdat[nobj:nobj+nrow-1].nobserve = rdat.nobserve
+               if (q_ndetect AND tag_exist(rdat,'NDETECT')) then $
+                tdat[nobj:nobj+nrow-1].ndetect = rdat.ndetect
+               if (q_nedge AND tag_exist(rdat,'NEDGE')) then $
+                tdat[nobj:nobj+nrow-1].nedge = rdat.nedge
+            endif else begin
+               splog, 'Warning: File not found: '+resolve_file
+            endelse
+         endif
+
+         ; Add astrometric solution
+         if (keyword_set(no_coord) EQ 0 $
+          AND ftype EQ 'fpObjc' AND nrow GT 0) then begin
+            if (q_mjd) then tdat[nobj:nobj+nrow-1].mjd = mjd
+            if (q_ra) then tdat[nobj:nobj+nrow-1].ra = ra_ref
+            if (q_dec) then tdat[nobj:nobj+nrow-1].dec = dec_ref
+
+            pixscale = fltarr(5) ; working array
+            phi_offset = fltarr(5,nrow) ; working array
+
+            if keyword_set(usecterm) then begin 
+               color1 = [0, 1, 2, 2, 2]
+               color2 = [1, 2, 3, 3, 3]
+            
+               xbin = (sdss_runlist(runvec[ifile])).xbin
+               calibinfo = sdss_calib(runvec[ifile], colvec[ifile], $
+                fieldvec[ifile], thisdat.colc*xbin-0.5, rerun=rrunvec[ifile], $
+                select_tags=['NMGYPERCOUNT*','CLOUDCAM','CALIB_STATUS'], $
+                oldcalib=oldcalib, silent=silent)
+               modmag = 22.5-2.5*alog10(thisdat.counts_model* $
+                                        calibinfo.nmgypercount > .001)
+            endif 
+
+            ; Now do the other 4 filters...
+            for ifilt=0, 4 do begin
+               astrans = sdss_astrom(runvec[ifile], colvec[ifile], $
+                fieldvec[ifile], rerun=rrunvec[ifile], filter=ifilt)
+; ---------------------------------------------
+; Need to use the color terms!!!???
+; The color to use is u-g for u, 
+;                     g-r gor g,
+;                     r-i for r, i, z
+; added by D. Finkbeiner, 04/04/04
+
+               if keyword_set(usecterm) then begin 
+                  thiscolor = reform(modmag[color1[ifilt], *] - $
+                                     modmag[color2[ifilt], *])
+                  thiscolor = (thiscolor > 0) < 3 ; hardwire limits
+               endif
+
+               astrom_xyad, astrans, $
+                thisdat.colc[ifilt]-0.5, thisdat.rowc[ifilt]-0.5, $
+                airmass=airmass_filt, ra=ra, dec=dec, phi=phi, cterm=thiscolor
+               phi_offset[ifilt,*] = phi
+
+               ; Compute the airmass directly from the mean time-of-observation
+               ; in each filter.
+;               if (q_airmass) then $
+;                tdat[nobj:nobj+nrow-1].airmass[ifilt] = airmass_filt
+               if (q_airmass) then $
+                tdat[nobj:nobj+nrow-1].airmass[ifilt] = $
+                tai2airmass(ra, dec, tai=tai_time[ifilt,*])
+
+               if (q_offsetra) then $
+                tdat[nobj:nobj+nrow-1].offsetra[ifilt] = (ra - ra_ref) * 3600.
+               if (q_offsetdec) then $
+                tdat[nobj:nobj+nrow-1].offsetdec[ifilt] = (dec - dec_ref) * 3600.
+               if (q_pixscale OR q_psf_fwhm) then begin
+                  pixscale[ifilt] = astrom_pixscale(astrans) ; in arcsec
+               endif
+            endfor
+
+            ; Compute the rotation angles in degrees East of North.
+            if (q_phi_iso_deg) then $
+             tdat[nobj:nobj+nrow-1].phi_iso_deg = thisdat.iso_phi - phi_offset
+            if (q_phi_dev_deg) then $
+             tdat[nobj:nobj+nrow-1].phi_dev_deg = thisdat.phi_dev - phi_offset
+            if (q_phi_exp_deg) then $
+             tdat[nobj:nobj+nrow-1].phi_exp_deg = thisdat.phi_exp - phi_offset
+
+            ; Add PHI_OFFSET (in degrees)
+            if (q_phi_offset) then $
+             tdat[nobj:nobj+nrow-1].phi_offset = phi_offset
+
+            ; Add PIXSCALE (in arcsec/pix)
+            if (q_pixscale) then begin
+               tdat[nobj:nobj+nrow-1].pixscale = rebin(pixscale,5,nrow)
+            endif
+
+            ; Add PSF_FWHM (in arcsec)
+            if (q_psf_fwhm) then begin
+               tdat[nobj:nobj+nrow-1].psf_fwhm = rebin(pixscale,5,nrow) $
+                * 2. * sqrt(alog(2.) * (thisdat.m_rr_cc_psf > 0))
+            endif
+         endif
+
+         ; Add Galactic extinction values
+         if (keyword_set(no_extinct) EQ 0 AND nrow GT 0 $
+             AND ftype NE 'calibObj') then begin
+            if (ftype EQ 'tsObj' OR ftype EQ 'hoggObj') then begin
+               ra_ref = thisdat.ra
+               dec_ref = thisdat.dec
+            endif
+            euler, ra_ref, dec_ref, ll, bb, 1
+            red_fac = [5.155, 3.793, 2.751, 2.086, 1.479]
+            if (q_extinction) then $
+             tdat[nobj:nobj+nrow-1].extinction = $
+             red_fac # dust_getval(ll, bb, /interp, /noloop)
+         endif
+
+         ; Add calibrated counts
+         if (keyword_set(no_calib) EQ 0 AND ftype EQ 'fpObjc' $
+          AND nrow GT 0) then begin
+
+            ; Read photometric calibration file
+            thisrlist = sdss_runlist(runvec[ifile])
+            if (keyword_set(thisrlist)) then xbin = thisrlist.xbin $
+             else xbin = 1L
+            calibinfo = sdss_calib(runvec[ifile], colvec[ifile], $
+             fieldvec[ifile], thisdat.colc*xbin-0.5, rerun=rrunvec[ifile], $
+             select_tags=['NMGYPERCOUNT*','CLOUDCAM','CALIB_STATUS'], $
+             oldcalib=oldcalib, silent=silent)
+
+            if (q_nmgypercount) then $
+             tdat[nobj:nobj+nrow-1].nmgypercount = calibinfo.nmgypercount
+            if (q_nmgypercount_ivar) then $
+             tdat[nobj:nobj+nrow-1].nmgypercount_ivar = $
+              calibinfo.nmgypercount_ivar
+
+            ;----- aperture flux: Compute uncalibrated aperture fluxes here...
+            if (q_aperflux OR q_aperflux_ivar) then begin
+               aperflux = integrate_profile( $
+                thisdat.profmean, inerr=thisdat.proferr > 0, $
+                outivar=aperflux_ivar, apnum=apnum)
+            endif
+
+            for ifilt=0, 4 do begin
+;               if (q_cloudcam) then $
+;                tdat[nobj:nobj+nrow-1].cloudcam[ifilt] = $
+;                 calibinfo.cloudcam[ifilt]
+               if (q_calib_status) then $
+                tdat[nobj:nobj+nrow-1].calib_status[ifilt] = $
+                 calibinfo.calib_status[ifilt]
+
+               pcalib = calibinfo.nmgypercount[ifilt]
+               icalib2 = 1. / (calibinfo.nmgypercount[ifilt])^2
+
+               ;----- SKY flux
+               if (q_skyflux) then $
+                tdat[nobj:nobj+nrow-1].skyflux[ifilt] = $
+                thisdat.sky[ifilt] * pcalib / pixscale[ifilt]^2
+               if (q_skyflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].skyflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.skyerr[ifilt]) $
+                * pixscale[ifilt]^4
+
+               ;----- PanSTARRS PSF flux
+               if (q_pspsfflux) then begin 
+                  tdat[nobj:nobj+nrow-1].pspsfflux[ifilt] = $
+                     psphotom.pspsfcounts[ifilt] * pcalib
+               end
+               if (q_pspsfflux_ivar) then begin
+                  tdat[nobj:nobj+nrow-1].pspsfflux_ivar[ifilt] = $
+                     icalib2 * sdss_err2ivar(psphotom.pspsfcountserr[ifilt])
+               end
+
+               ;----- PSF flux
+               if (q_psfflux) then $
+                tdat[nobj:nobj+nrow-1].psfflux[ifilt] = $
+                thisdat.psfcounts[ifilt] * pcalib
+               if (q_psfflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].psfflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.psfcountserr[ifilt])
+
+               
+               ;----- PETRO flux
+               if (q_petroflux) then $
+                tdat[nobj:nobj+nrow-1].petroflux[ifilt] = $
+                thisdat.petrocounts[ifilt] * pcalib
+               if (q_petroflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].petroflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.petrocountserr[ifilt])
+
+               ;----- FIBER flux
+               if (q_fiberflux) then $
+                tdat[nobj:nobj+nrow-1].fiberflux[ifilt] = $
+                thisdat.fibercounts[ifilt] * pcalib
+               if (q_fiberflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].fiberflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.fibercountserr[ifilt])
+
+               ;----- FIBER2 flux (2 arcsec)
+               if (q_fiber2flux gt 0 AND $
+                   tag_exist(thisdat, 'fiber2counts') gt 0) then $
+                 tdat[nobj:nobj+nrow-1].fiber2flux[ifilt] = $
+                 thisdat.fiber2counts[ifilt] * pcalib
+               if (q_fiber2flux_ivar gt 0 AND $
+                   tag_exist(thisdat, 'fiber2countserr') gt 0) then $
+                 tdat[nobj:nobj+nrow-1].fiber2flux_ivar[ifilt] = $
+                 icalib2 * sdss_err2ivar(thisdat.fiber2countserr[ifilt])
+
+               ;----- MODEL flux
+               if (q_modelflux) then $
+                tdat[nobj:nobj+nrow-1].modelflux[ifilt] = $
+                thisdat.counts_model[ifilt] * pcalib
+               if (q_modelflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].modelflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.counts_modelerr[ifilt])
+
+               ;----- deV flux
+               if (q_devflux) then $
+                tdat[nobj:nobj+nrow-1].devflux[ifilt] = $
+                thisdat.counts_dev[ifilt] * pcalib
+               if (q_devflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].devflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.counts_deverr[ifilt])
+
+               ;----- exp flux
+               if (q_expflux) then $
+                tdat[nobj:nobj+nrow-1].expflux[ifilt] = $
+                thisdat.counts_exp[ifilt] * pcalib
+               if (q_expflux_ivar) then $
+                tdat[nobj:nobj+nrow-1].expflux_ivar[ifilt] = $
+                icalib2 * sdss_err2ivar(thisdat.counts_experr[ifilt])
+
+               ;----- aperture fluxes: Calibrate the fluxes here...
+               if (q_aperflux) then $
+                for iap=0, naper-1 do $
+                 tdat[nobj:nobj+nrow-1].aperflux[iap,ifilt] = $
+                  reform(pcalib * aperflux[iap,ifilt,*], nrow)
+               if (q_aperflux_ivar) then $
+                for iap=0, naper-1 do $
+                 tdat[nobj:nobj+nrow-1].aperflux_ivar[iap,ifilt] = $
+                  reform(icalib2 * aperflux_ivar[iap,ifilt,*], nrow)
+            endfor
+         endif
+
+         ; Add external catalog matches
+         if (keyword_set(catalog)) then begin
+            catdat = sdss_catmatch(ra_ref, dec_ref, catalog=catalog)
+            copy_struct_inx, catdat, tdat, index_to=nobj+lindgen(nrow)
+         endif 
+
+      endif 
+
+      nobj = nobj + nrow
+   endfor
+
+   if (keyword_set(outfile)) then begin
+      if (keyword_set(ascii)) then begin
+         if (keyword_set(tdat)) then struct_print, tdat, filename=outfile
+      endif else begin
+         mwrfits, tdat, outfile, /create
+      endelse
+   endif
+   
+   return, tdat
+end
+;------------------------------------------------------------------------------
+
+
 pro sdss_files__define
 
     ; note the values in the struct will not pass through, this

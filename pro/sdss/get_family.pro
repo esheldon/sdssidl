@@ -433,10 +433,6 @@ pro get_family, cat, pindex, parent, children, siblings, im, $
                 ytitle='Faint of input', $
                 maguse=maguse, hideradec=hideradec, $
                 _extra=extra,/silent  
-            ;!sdss->atlas_view, pstruct, index=parent, imtot=im, clr=clr, $
-            ;    ytitle='Faint of input', $
-            ;    maguse=maguse, hideradec=hideradec, $
-            ;    _extra=extra,/silent  
             
 
             for ich=0L, nsib_use-1 do begin 
@@ -451,10 +447,6 @@ pro get_family, cat, pindex, parent, children, siblings, im, $
                         ytitle=ytitle, $
                         maguse=maguse, hideradec=hideradec, $
                         _extra=extra,/silent  
-                    ;!sdss->atlas_view, pstruct, index=ii, imtot=im, clr=clr, $
-                    ;    ytitle=ytitle, $
-                    ;    maguse=maguse, hideradec=hideradec, $
-                    ;    _extra=extra,/silent  
  
                 endif
             endfor

@@ -75,7 +75,8 @@ pro eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=ri, nonlinear=nonl
       message,'Halting'
   ENDIF 
 
-    sdssidl_setup
-    !sdss->eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=ri, nonlinear=nonlinear, status=status
+    trans=obj_new('sdss_transform')
+    trans->eq2rowcol, trans, node, inc, field, ra, dec, row, col, ri=ri, nonlinear=nonlinear, status=status
+    obj_destroy, trans
 
 end 

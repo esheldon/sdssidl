@@ -62,7 +62,8 @@ pro rowcol2munu, trans, field, row, col, mu, nu, ri=ri, status=status
         message,'Halting'
     endif 
 
-    sdssidl_setup
-    !sdss->rowcol2munu, trans, field, row, col, mu, nu, ri=ri, status=status
+    trans=obj_new('sdss_transform')
+    trans->rowcol2munu, trans, field, row, col, mu, nu, ri=ri, status=status
+    obj_destroy, trans
 
 end

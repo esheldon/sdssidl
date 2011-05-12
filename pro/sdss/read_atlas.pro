@@ -133,8 +133,6 @@ pro read_atlas, p1, p2, p3, p4, p5, rerun=rerunin, $
                 $
                 silent=silent
 
-    sdssidl_setup
-
     ;; Deal with old syntax
     if n_params() eq 5 then begin
         ros=p1 & rerun=p2 & camcol=p3 & field=p4 & id=p5
@@ -145,7 +143,8 @@ pro read_atlas, p1, p2, p3, p4, p5, rerun=rerunin, $
         if n_elements(p1) ne 0 then ros = p1        
     endelse
 
-    comm = '!sdss->atlas_read, ros, camcol, field, id, rerun=rerun, '
+    sf = obj_new('sdss_files')
+    comm = 'sf->atlas_read, ros, camcol, field, id, rerun=rerun, '
     comm = comm + 'dir=dir, '
     comm = comm + 'index=index, '
 
@@ -167,6 +166,8 @@ pro read_atlas, p1, p2, p3, p4, p5, rerun=rerunin, $
                 
     comm = comm + 'silent=silent'
 
-    if not execute(comm) then message,'Could not run !sdss->atlas_read'
+    if not execute(comm) then message,'Could not run sdss_files->atlas_read'
+
+    obj_destroy, sf
     return
 END 

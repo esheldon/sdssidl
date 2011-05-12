@@ -56,7 +56,8 @@ PRO eq2gc, ra, dec, node, inc, mu, nu
         message,'Halting'
     endif 
 
-    sdssidl_setup
-    !sdss->eq2gc, ra, dec, node, inc, mu, nu
+    trans=obj_new('sdss_transform')
+    trans->eq2gc, ra, dec, node, inc, mu, nu
+    obj_destroy, trans
 
 END 

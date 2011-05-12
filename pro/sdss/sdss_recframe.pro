@@ -42,12 +42,11 @@ function sdss_recframe_getidlist, run, camcol, field, rerun=rerun, $
     struct = sdss_read(ftype,run, camcol, $
                        rerun=rerun, field=field, $
                        /nomodrow, $
-                       verbose=0, $
-                       status=tstatus)
-    if tstatus ne 0 then begin
+                       verbose=0)
+    if n_tags(struct) eq 0 then begin
         if not keyword_set(silent) then begin
             name=sdss_file(ftype,run, camcol, rerun=rerun, field=field)
-            message,string('Did not find fpobjc file: ',name),/inf
+            message,string(f='("Did not find fpobjc file: ",a)',name),/inf
         endif
         return,-1
     endif

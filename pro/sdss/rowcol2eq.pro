@@ -71,7 +71,8 @@ pro rowcol2eq, trans, node, inc, field, row, col, ra, dec, status=status
         message,'Halting'
     endif
 
-    sdssidl_setup
-    !sdss->rowcol2eq, trans, node, inc, field, row, col, ra, dec, status=status
+    trans=obj_new('sdss_transform')
+    trans->rowcol2eq, trans, node, inc, field, row, col, ra, dec, status=status
+    obj_destroy, trans
 
 end 

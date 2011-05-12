@@ -60,7 +60,8 @@ pro csurvey2eq, clambda, ceta, ra, dec
         message,'Halting'
     endif
 
-    sdssidl_setup
-    !sdss->csurvey2eq, clambda, ceta, ra, dec
+    trans=obj_new('sdss_transform')
+    trans->csurvey2eq, clambda, ceta, ra, dec
+    obj_destroy, trans
 
 end

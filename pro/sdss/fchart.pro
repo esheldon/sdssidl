@@ -382,7 +382,7 @@ PRO fchart, pstruct, index, radius, clr, fchart, dir=dir, $
           ;; Need field for astrans info
           field_current = pstruct[gi].field
 
-          !sdss->atlas_read, pstruct, index=gi, clr=clr, image=im, $
+          read_atlas, pstruct, index=gi, clr=clr, image=im, $
                col0=col0, row0=row0, dcol=dcol, drow=drow,/silent
  
           IF n_elements(im) EQ 0 THEN GOTO,jump
@@ -397,9 +397,9 @@ PRO fchart, pstruct, index, radius, clr, fchart, dir=dir, $
               ra = pstruct[gi].ra
               dec = pstruct[gi].dec
 
-              radec2rowcol, trans,  node,  inc,  field_current, ra, dec, $
+              eq2rowcol, trans,  node,  inc,  field_current, ra, dec, $
                 trow,  tcol
-              radec2rowcol, rtrans, rnode, rinc, field_current, ra, dec, $
+              eq2rowcol, rtrans, rnode, rinc, field_current, ra, dec, $
                 trrow, trcol
           
               adcol = tcol - trcol
