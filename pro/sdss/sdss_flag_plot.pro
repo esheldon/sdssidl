@@ -13,7 +13,8 @@
 ;   flags: a flag array.
 ;   flagtype: The flag type. Currently supported flags may be listed 
 ;      using the
-;         IDL> sf->print_flagtypes 
+;           IDL> sf=obj_new('sdss_flags')
+;           IDL> print, sf->flagtypes 
 ;      method, but is most likely at least
 ;         OBJECT1, OBJECT2, PRIMTARGET, SECTARGET, STATUS
 ;
@@ -37,8 +38,9 @@ pro sdss_flag_plot, flags, flagtype, xtitle=xtitle, ytitle=ytitle, _extra=_extra
         message,'Halting'
     endif
 
-    sdssidl_setup
-    !sdss->plotflags, flags, flagtype, xtitle=xtitle, ytitle=ytitle, _extra=_extra
+    sf=obj_new('sdss_flags')
+    sf->plotflags, flags, flagtype, xtitle=xtitle, ytitle=ytitle, _extra=_extra
+    obj_destroy, sf
 
 end
 

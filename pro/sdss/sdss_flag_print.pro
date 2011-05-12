@@ -34,8 +34,9 @@ pro sdss_flag_print, flags, flagtype
         message,'Halting'
     endif
 
-    sdssidl_setup
-    !sdss->printflags, flags, flagtype
+    sf=obj_new('sdss_flags')
+    sf->printflags, flags, flagtype
+    obj_destroy, sf
 
 end
 

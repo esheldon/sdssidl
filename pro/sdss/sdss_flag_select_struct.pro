@@ -60,7 +60,10 @@ function sdss_flag_select_struct, flagtype, default=default, status=status
     endif
 
 
-    sdssidl_setup
-    return, !sdss->select_struct(flagtype, default=default, status=status)
+    sf=obj_new('sdss_flags')
+    st=sf->select_struct(flagtype, default=default, status=status)
+    obj_destroy, sf
+
+    return, st
 
 end

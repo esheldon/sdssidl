@@ -68,9 +68,11 @@ function sdss_flag_select, flags, flagtype, select_struct, nkeep, orflags=orflag
       message,'Halting'
   endif 
 
-    sdssidl_setup
-    return,!sdss->flag_select(flags, flagtype, select_struct, nkeep, $
-                              orflags=orflags, input_index=input_index)
+    sf=obj_new('sdss_flags')
+    keep=sf->flag_select(flags, flagtype, select_struct, nkeep, $
+                         orflags=orflags, input_index=input_index)
+    obj_destroy, sf
+    return, keep
 
 end 
 

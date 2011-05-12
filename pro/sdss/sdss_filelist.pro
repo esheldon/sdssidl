@@ -16,7 +16,9 @@
 ;
 ; INPUTS:
 ;   filetype: file type.  For a list of types do
-;     print,!sdss->supported_filetypes()
+;       sdss=obj_new('sdss')
+;       print,sdss->supported_filetypes()
+;
 ;   run: The sdss run.
 ;   camcol: The camcol.  This is optional for some file types.
 ;

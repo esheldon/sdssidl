@@ -789,7 +789,8 @@ end
 ;
 ; INPUTS:
 ;   filetype: file type.  For a list of types do
-;     print,!sdss->supported_filetypes()
+;       sf=obj_new('sdss_files')
+;       print,sf->supported_filetypes()
 ;   run: The sdss run.
 ;   camcol: The camcol.  This is optional for some file types.
 ;
@@ -2345,14 +2346,16 @@ end
 ;   Look at the atlas images in each bandpass for first 10 objects in frame 35
 ;   of run 109
 ;
-; IDL> sf=obj_new('sdss_files')
-; IDL> run=745 & rerun=20 & camcol=3 & field = 123 & id = 27
-; IDL> sf->atlas_view, run, rerun, camcol, field, id
+;   Note for the following, you can also use the convenience function
+;   view_atlas
+;
+;       IDL> sf=obj_new('sdss_files')
+;       IDL> run=745 & rerun=20 & camcol=3 & field = 123 & id = 27
+;       IDL> sf->atlas_view, run, rerun, camcol, field, id
 ;
 ;   Use an input struct. Save the r-band image.
 ;
-; IDL> sdssidl_setup
-; IDL> !sdss->atlas_view, struct[27], clr=2, imr=red_image
+; IDL> sf->atlas_view, struct[27], clr=2, imr=red_image
 ; 
 ;
 ; REVISION HISTORY:
@@ -3006,7 +3009,7 @@ end
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;  st = !sdss->objmask_read(run, camcol, field, rerun=, idlist=, status=)
+;  st = sf->objmask_read(run, camcol, field, rerun=, idlist=, status=)
 ;
 ; INPUTS:
 ;  run,camcol,field: SDSS field info.
@@ -3233,7 +3236,8 @@ end
 ;
 ; INPUTS:
 ;   type: file type.  For a list of types do
-;     print,!sdss->supported_filetypes()
+;       sf=obj_new('sdss_files')
+;       print,sf->supported_filetypes()
 ;   run: The sdss run.
 ;   camcol: The camcol.  This is optional for some file types.
 ;
