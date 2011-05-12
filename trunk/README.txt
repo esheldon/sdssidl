@@ -16,10 +16,16 @@ code.
 
 
 INSTALLATION
+------------
 
-Untarring the file (e.g. sdssidl-2007-03-26.tar.gz) will create the directory
-sdssidl in the current working directory.  If all you want is the IDL code and
-not the C/C++ extensions, just add the sdssidl/pro directory to your IDL path.
+Untarring the file will create the directory in the current working directory.
+If all you want is the IDL code and not the C/C++ extensions, just set
+the environment variable
+
+    SDSSIDL_DIR
+
+to point to the sdssidl directory, and add the $SDSSIDL_DIR/pro to your IDL
+path
 
 If you want the C/C++ extensions: You must have IDL_DIR defined, which points
 to your idl distribution, e.g. /usr/local/rsi/idl_6.2.  Enter the directory and
@@ -32,12 +38,38 @@ Alternatively, if you have scons installed:
 
 	scons
 
+See the section below "Notes on C/C++ code" for more details
+
+
+Environment variables for SDSS data
+-----------------------------------
+
+You need to have various environment variables set up to read SDSS data.
+These point to directories on your file system. e.g.
+
+
+    PHOTO_REDUX
+    PHOTO_SWEEP
+    PHOTO_RESOLVE
+    PHOTO_CALIB
+    BOSS_PHOTOOBJ
+
+The most important of these are probably PHOTO_REDUX and PHOTO_SWEEP.  redux
+points to the location of base data directory, under which is the imaging
+and catalogs.  sweep points the the "photo sweep" directory, summary files
+for the imaging that are quite handy.
+
+For reading files, see the sdss_read function.
+
+Notes on C/C++ code
+-------------------
+
 The configure script will check the operating system and set some
 system-dependent CFLAGS and such.  Note, only the htmIndex and atlas
 distributions currently support platforms other than linux, although some of
-the others are simple enough to probably succeed.  If one fails, you can always
-comment it out of the src/Makefile.  If you figure out the flags for your
-system let us know.
+the others are simple enough to probably succeed.  If one fails, you can
+always comment it out of the src/Makefile.  If you figure out the flags for
+your system let us know.
 
 If code in the htm directory does not compile because of error near "template"
 in export.h, it is because you have an old version of export.h which has a
@@ -55,7 +87,8 @@ equal to this directory in your .cshrc or .bashrc file.  All users should do
 this.
 
 
-USING EUPS:
+USING EUPS
+----------
 
 You can "setup" sdssidl in the usual way.
 
@@ -91,7 +124,14 @@ example, the atlas reader is a DLM written in C).
 
 
 
+
+DEPRECATED Documentation
+
+
 CONFIGURATION FILE:
+
+NOTE: The SDSSIDL package no longer makes use of the config files, instead
+relying on environment variable.s
 
 The file SDSSIDL_CONFIG (see above) will contain the default paths and
 variables for sdss data on your machine. These config variables are read at run
