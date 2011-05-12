@@ -22,7 +22,7 @@
 ;     save considerable time.
 ;
 ; RESTRICTIONS:
-;  The sdss atlas images and either tsobj or fpobjc must be on disk and 
+;  The sdss atlas images and fpobjc files must be on disk and 
 ;  in the directories listed in the sdssidl config file.
 ; 
 ; EXAMPLE:
@@ -36,7 +36,7 @@ function sdss_recframe_getidlist, run, camcol, field, rerun=rerun, $
     struct=struct, silent=silent
 
     common sdss_recframe_common, ftype
-    if n_elements(ftype) eq 0 then ftype='tsobj'
+    if n_elements(ftype) eq 0 then ftype='fpobjc'
 
     ;; Try to read in the default filetype
     struct = sdss_read(ftype,run, camcol, $
@@ -45,20 +45,11 @@ function sdss_recframe_getidlist, run, camcol, field, rerun=rerun, $
                        verbose=0, $
                        status=tstatus)
     if tstatus ne 0 then begin
-        ;; We default to tsobj at first, so if it is already fpobjc then
-        ;; we couldn't find a usable file
-        if ftype eq 'tsobj' then begin
-            ftype='fpobjc'
-            ;; Recursive call
-            idlist = sdss_recframe_getidlist(run,camcol,field,rerun=rerun)
-            return, idlist
-        endif else begin
-            ftype='tsobj'
-            if not keyword_set(silent) then begin
-                message,'Did not find tsobj or fpobjc',/inf
-            endif
-            return,-1
-        endelse
+        if not keyword_set(silent) then begin
+            name=sdss_file(ftype,run, camcol, rerun=rerun, field=field)
+            message,string('Did not find fpobjc file: ',name),/inf
+        endif
+        return,-1
     endif
     
     w = where(struct.nchild EQ 0, nw)

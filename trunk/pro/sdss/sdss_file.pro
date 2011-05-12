@@ -20,12 +20,15 @@
 ;   camcol: The camcol.  This is optional for some file types.
 ;
 ; OPTIONAL INPUTS:
+;   fields: The fields to read. Defaults to a pattern with '*' for the 
+;       field number.  Can be sent either as the last argument or
+;       as keyword fields=
+; Keywords:
 ;   rerun: SDSS rerun.  If not sent, the run_status structure is searched
 ;       for the run and the latest rerun is returned.
 ;   bandpass: The bandpass in numerical of string form where
 ;       u,g,r,i,z -> 0,1,2,3,4
-;   fields: The fields to read. Defaults to a pattern with '*' for the 
-;       field number.
+;   frange: A 2-element range of fields, inclusive.
 ;   /nodir: Do not prepend the directory.
 ;   /stuffdb:  Filenames for db stuffing.
 ;
@@ -43,10 +46,11 @@
 ;
 ;-
 
-function sdss_file, type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, _extra=_extra
+function sdss_file, type, run, camcol, fnums, rerun=rerun, bandpass=bandpass, fields=fields, frange=frange, dir=dir, nodir=nodir, _extra=_extra
 
-    sdssidl_setup
-    file = !sdss->file(type, run, camcol, rerun=rerun, bandpass=bandpass, fields=fields, dir=dir, nodir=nodir, _extra=_extra)
+    s=obj_new('sdss_files')
+    file = s->file(type, run, camcol, fnums, rerun=rerun, bandpass=bandpass, fields=fields, frange=frange, dir=dir, nodir=nodir, _extra=_extra)
+    obj_destroy, s
     return, file
 
 end

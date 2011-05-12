@@ -571,7 +571,7 @@ end
 ;   camcol     - CCD column number [1..6]
 ;
 ; OPTIONAL INPUTS:
-;   fields      - Field number
+;   fields      - Field number.  Can also be specified as keyword fields=
 ; Keywords:
 ;   frange:    - A 2-element array represengin the range of fields. If fields is
 ;                not sent, this keyword is examined
@@ -612,13 +612,13 @@ pro sdss_files::_file_usage
     print,'                     filter=, bandpass=, exten=, indx=, /no_path, /nodir] )'
     message,'halting'
 end
-FUNCTION sdss_files::file, ftype1, runnum, camcol, fields, fieldskey=fieldskey, frange=frange, $
+FUNCTION sdss_files::file, ftype1, runnum, camcol, fnums, fields=fields, frange=frange, $
         rerun=rerun, $
         filter=filter, bandpass=bandpass,  $
         extension=exten, no_path=no_path, nodir=nodir, $
         _extra=_extra
 
-    if n_elements(fields) eq 0 and n_elements(fieldskey) ne 0 then fields=fieldskey
+    if n_elements(fnums) ne 0 then fields=fnums
 
     if n_elements(ftype1) eq 0 then self->_file_usage
     case strlowcase(ftype1) of
@@ -784,8 +784,8 @@ end
 ;   SDSS specifie.
 ;
 ; CALLING SEQUENCE:
-;   sdss_filelist(filetype, run, camcol [fields, rerun=, bandpass=, filter=,
-;                 fnums=, dir=, /silent)
+;   sdss_filelist(filetype, run, camcol [, fields, fields=, frange=, rerun=, bandpass=, filter=,
+;                 dir=, /silent)
 ;
 ; INPUTS:
 ;   filetype: file type.  For a list of types do
@@ -795,8 +795,9 @@ end
 ;
 ; OPTIONAL INPUTS:
 ;   fields: The fields to read. Defaults to a pattern with '*' for the 
-;       field number.
+;       field number. CAn also be sent as keyword fields=
 ; Keywords:
+;   frange: A 2-element range of fields, inclusive.
 ;   rerun: SDSS rerun.  Actually required for most files.
 ;   bandpass: The bandpass in numerical or string form where
 ;       u,g,r,i,z -> 0,1,2,3,4
@@ -815,11 +816,10 @@ end
 ;
 ;docend::sdss_files::filelist
 
-function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
+function sdss_files::filelist, filetype, run, camcol, fnums,  fields=fields, frange=frange, $
         rerun=rerun, $
         bandpass=bandpass, filter=filter, $
         extension=extension, $
-        fnums=fnums, $
         silent=silent, $
         _extra=_extra
 
@@ -837,7 +837,7 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
     if n_params() lt 2 then begin 
         on_error, 2
         print,'-Syntax: filedir=obj->filelist(filetype, run, camcol, '+$
-            '[fields, rerun=, bandpass=, filter=, extension=, fnums=, /silent])'
+            '[fields, rerun=, bandpass=, filter=, extension=, /silent])'
         print
         message,'Halting'
     endif 
@@ -845,16 +845,23 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
     if n_elements(bandpass) ne 0 then begin
         filter=bandpass
     endif
+
+    if n_elements(fnums) ne 0 then fields=fnums
+
     if n_elements(fields) eq 0 then begin
-        if n_elements(frange) ne 2 then begin
-            message,'frange must be a 2 element array'
-        endif
-        if frange[0] gt frange[1] then message,'FRANGE[0] must <= FRANGE[1]'
-        if frange[0] eq frange[1] then begin
-            fields=frange[1]
+        if n_elements(frange) eq 0 then begin
+            fields='*'
         endif else begin
-            nf = frange[1]-frange[0]+1
-            fields = frange[0] + lindgen(nf)
+            if n_elements(frange) ne 2 then begin
+                message,'frange must be a 2 element array'
+            endif
+            if frange[0] gt frange[1] then message,'FRANGE[0] must <= FRANGE[1]'
+            if frange[0] eq frange[1] then begin
+                fields=frange[1]
+            endif else begin
+                nf = frange[1]-frange[0]+1
+                fields = frange[0] + lindgen(nf)
+            endelse
         endelse
     endif
 
@@ -871,7 +878,7 @@ function sdss_files::filelist, filetype, run, camcol, fields,  frange=frange, $
         endif
 
 
-        file_pattern = self->file(filetype, run, camcol, fields, $
+        file_pattern = self->file(filetype, run, camcol, fields=fields, $
                                   rerun=rerun, filter=filter, exten=extension)
         ; add a glob on the end to allow for .gz files
         file_pattern = file_pattern+'*'
@@ -1343,7 +1350,7 @@ end
 ;  SDSS routine.
 ;
 ; CALLING SEQUENCE:
-;   st = sf->read(type, run [, camcol, fields, frange=, rerun=, 
+;   st = sf->read(type, run [, camcol, fields, fields=, frange=, rerun=, 
 ;                 filter=, bandpass=, 
 ;                 taglist=, wstring=, ex_struct=, 
 ;                 /pointers, verbose=)
@@ -1359,6 +1366,7 @@ end
 ;
 ; OPTIONAL INPUTS:
 ;   fields: Field number(s) or a glob '*'.
+;       can also be entered as a keyword fields=
 ;
 ; Keywords:
 ;   frange: A range of fields to read; can be used instead of the
@@ -1394,7 +1402,7 @@ end
 ;docend::sdss_files::read
 
 
-function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
+function sdss_files::read, filetype, run, camcol, fnums, fields=fields, frange=frange, $
         rerun=rerun, $
         bandpass=bandpass, filter=filter, $
         indir=indir, $
@@ -1415,7 +1423,7 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
     status=1
     if n_elements(filetype) eq 0 then begin 
         on_error, 2
-        print,'-Syntax: sdss->read(filetype, run, camcol, fields, rerun=, bandpass=, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent'
+        print,'-Syntax: sdss->read(filetype, run, camcol, fields, fields=, rerun=, bandpass=, indir=, dir=, taglist=, wstring=, /nomodow, ex_struct=, /pointers, /silent, verbose=, /silent'
         print
         print,'For filetype=asTrans, the extra keywords node=,inc= exist'
         print,'For atlas images see isf->atlas_read() or read_atlas()'
@@ -1429,6 +1437,8 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
     if n_elements(bandpass) ne 0 then filter=bandpass
 
     if n_elements(filetype_old) eq 0 then filetype_old = 'NONE'
+
+    if n_elements(fnums) ne 0 then fields=fnums
 
     ftype_low = strlowcase(filetype)
 
@@ -1464,13 +1474,13 @@ function sdss_files::read, filetype, run, camcol, fields, frange=frange, $
         ; this is the case where fields='*' and we need
         ; to figure out what files are available
         filelist = self->filelist( $
-            filetype, run, camcol, fields, frange=frange, $
+            filetype, run, camcol, fields=fields, frange=frange, $
             rerun=rerun, bandpass=bandpass, filter=filter, $
             extension=extension, $
-            fnums=fnums, indir=indir, dir=dir)
+            indir=indir, dir=dir)
     endif else begin
         filelist = self->file( $
-            filetype, run, camcol, fields, frange=frange, $
+            filetype, run, camcol, fields=fields, frange=frange, $
             rerun=rerun, bandpass=bandpass, filter=filter, $
             extension=extension)
     endelse

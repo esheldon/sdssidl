@@ -29,6 +29,7 @@
 ;
 ; OPTIONAL INPUTS:
 ;   fields: Field number(s) or a glob '*'.
+;       can also be entered as a keyword fields=
 ;
 ; Keywords:
 ;   frange: A range of fields to read; can be used instead of the
@@ -81,9 +82,12 @@
 ;
 ;
 
-function sdss_read, filetype, run, camcol, fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status
+function sdss_read, filetype, run, camcol, fnums, fields=fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, all=all, extension=extension, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status
 
-    sdssidl_setup
-    return, !sdss->read(filetype, run, camcol, fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status)
+    s = obj_new('sdss_files')
+    data = s->read(filetype, run, camcol, fnums, fields=fields, frange=frange, rerun=rerun, filter=filter, bandpass=bandpass, indir=indir, dir=dir, taglist=taglist, ex_struct=ex_struct, wstring=wstring, nomodrow=nomodrow, node=node, inc=inc, pointers=pointers, silent=silent, verbose=verbose, status=status)
+
+    obj_destroy, s
+    return, data
 
 end
