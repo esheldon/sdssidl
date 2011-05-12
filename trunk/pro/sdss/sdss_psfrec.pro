@@ -110,9 +110,4 @@ function sdss_psfrec, pstruct, row, col, counts=counts, trim=trim, coeffs=coeffs
 	endif
 	return,p
 
-
-    ;on_error, 2
-    ;sdssidl_setup
-    ;return, !sdss->psfrec(pstruct, row, col, counts=counts)
-
 end

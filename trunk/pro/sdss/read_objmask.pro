@@ -15,7 +15,7 @@
 ;  run,camcol,field: SDSS field info.
 ;
 ; OPTIONAL INPUTS:
-;  rerun: The sdss rerun. If not sent it is taken as the latest available.
+;  rerun: The sdss rerun. If not sent it is determined from the runlist.
 ;  idlist: List of sdss ids.  If not sent all are retrieved.
 ;
 ; OUTPUTS:

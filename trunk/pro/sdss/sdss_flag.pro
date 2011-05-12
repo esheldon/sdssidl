@@ -13,7 +13,9 @@
 ;
 ; INPUTS:
 ;  flag_type: The flag type. A list of supported types can be gotten from
-;     The !sdss->flagtypes() function.  E.g. OBJECT1, PRIMTARGET, etc.
+;           IDL> sf=obj_new('sdss_flags')
+;           IDL> print, sf->flagtypes 
+;    E.g. OBJECT1, PRIMTARGET, etc.
 ;  flag_name: The flag name, e.g. GALAXY, or PRIMARY
 ;
 ; OUTPUTS:
@@ -42,7 +44,9 @@ function sdss_flag, flag_type, flag_name
         message,'Halting'
     endif 
 
-    sdssidl_setup
-    return, !sdss->flag(flag_type, flag_name, status=status)
+    sf=obj_new('sdss_flags')
+    flags = sf->flag(flag_type, flag_name, status=status)
+    obj_destroy, sf
+    return, flags
 
 end 

@@ -41,7 +41,10 @@
 
 function sdss_flag_struct, flagtype, status=status    
 
-    sdssidl_setup
-    return, !sdss->flagstruct(flagtype, status=status)
+    sf=obj_new('sdss_flags')
+    st=sf->flagstruct(flagtype, status=status)
+    obj_destroy, sf
+
+    return, st
 
 end

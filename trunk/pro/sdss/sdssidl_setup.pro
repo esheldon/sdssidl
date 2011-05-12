@@ -1,11 +1,14 @@
 ;+
 ; NAME:
-;  SDSSIDL_SETUP
+;  SDSSIDL_SETUP (DEPRECATED)
 ;
 ; PURPOSE:
 ;  Set up SDSSIDL variables. The global variable !sdss is created.  This
 ;  is an instance of the sdss class.  This class inherits sdss_files, 
 ;  sdss_flags, and sdss_util classes.
+;
+;   This is deprecated because it is opaque and requires pre-setup by
+;   the user.
 ;
 ; CATEGORY:
 ;  SDSS specific routine.

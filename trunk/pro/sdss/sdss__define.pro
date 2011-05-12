@@ -5,26 +5,20 @@
 ; PURPOSE:
 ;   The main SDSS class file.  Inherits sdss_util, sdss_files, sdss_flags.
 ;   So far the whole point of this class is to inherit the others and 
-;   simplify the interface.  Most useful if an object is created at 
-;   IDL startup as a system variable, e.g. !sdss.  This is done by 
-;   sdssidl_setup which should be put in your startup file.  The startup
-;   file SDSSIDL_SETUP creates a system variable from an instance of this
-;   class !SDSS and all methods may be accessed from there without the
-;   user each time performing the kludgy IDL object declaration.  This also
-;   prevents the tedious by-hand memory cleanup of IDL objects.
+;   simplify the interface.
 ;
 ; CALLING SEQUENCE:
 ;   sd=obj_new('sdss')
 ;
 ;
 ; EXAMPLES:
-;  After running sdssidl_setup:
-;    IDL> struct = !sdss->read('tsobj', 756, 2, fields=[35,112])
+;    IDL> sdss=obj_new('sdss')
+;    IDL> struct = sdss->read('tsobj', 756, 2, fields=[35,112])
 ;
-;    IDL> if !sdss->run_exists(756) then ....
+;    IDL> if sdss->run_exists(756) then ....
 ;    
 ;    IDL> fst = {galaxy_red: 'y'}
-;    IDL> si = !sdss->flag_select(struct.primtarget, 'primtarget', fst)
+;    IDL> si = sdss->flag_select(struct.primtarget, 'primtarget', fst)
 ;   
 ; MODIFICATION HISTORY:
 ;  Created Mid 2005 Erin Sheldon, UChicago

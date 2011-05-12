@@ -46,10 +46,6 @@
 ;   IDL> fst = {galaxy_red: 'Y', galaxy: 'Y'}
 ;   IDL> si = sf->flag_select(st.primtarget, 'primtarget', fst, /orflags}
 ;
-;   NOTE: If sdssidl_setup is run, you can use these methods from the
-;     !sdss object.  e.g.
-;       IDL>  print, !sdss->flag('object1','bright')
-;
 ;
 ; MODIFICATION HISTORY:
 ;  Created: Mid-2005  Erin Sheldon Uchicago
