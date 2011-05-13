@@ -2655,6 +2655,18 @@ END
 ; PURPOSE: 
 ;    Create the comples titles
 
+function sdss_files::_maguse, struct
+    tags = tag_names(objStruct)
+
+    trymag = ['MODELMAG','CMODELMAG','MODELFLUX','CMODELFLUX']
+    for i=0L, n_elements(trymag)-1 do begin
+        wmag = where(tags eq 'MODELMAG', nw)
+        if nw ne 0 then return, wmag
+    endfor
+
+    return, -1
+
+end
 pro sdss_files::atlas_view_titles, objStruct, colors, imtot, $
                                title, subtitle, $
                                maguse=maguse, $
@@ -2663,8 +2675,7 @@ pro sdss_files::atlas_view_titles, objStruct, colors, imtot, $
                                silent=silent, $
                                _extra=_extra
 
-  tags = tag_names(objStruct)
-  wmag = sdss_maguse(objStruct, maguse=maguse, silent=silent)
+  wmag = self->_maguse(objstruct)
 
   IF (wmag NE -1) AND (NOT keyword_set(silent)) THEN BEGIN  
       print,'atlas_view: Using '+tags[wmag]
