@@ -170,7 +170,9 @@ PRO display_fchart, fchart, object, objx, objy, clr, $
 
   ytitle='Offset (arcminutes)'
 
-  wmag = sdss_maguse(object, maguse=maguse, silent=silent)
+  sf=obj_new('sdss_files')
+  wmag = sf->maguse(object, maguse=maguse)
+  obj_destroy, sf
 
   IF wmag NE -1 THEN BEGIN 
 
