@@ -278,7 +278,9 @@ PRO rgbfchart_titles, struct, ra, dec, title, xtitle, ytitle, $
 
   ytitle='Offset (arcminutes)'
 
-  wmag = sdss_maguse(struct, maguse=maguse, silent=silent)
+  sf=obj_new('sdss_files')
+  wmag = sf->maguse(struct, maguse=maguse)
+  obj_destroy, sf
 
   IF n_elements(inxtitle) EQ 0 AND wmag NE -1 THEN BEGIN 
 
