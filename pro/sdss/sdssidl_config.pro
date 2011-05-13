@@ -1,4 +1,8 @@
 ;+
+; NOTE:
+;   sdssidl does not rely on config files any more.  Please
+;   disregard any references to the config files and routines.
+;
 ; NAME:
 ;  SDSSIDL_CONFIG
 ;
