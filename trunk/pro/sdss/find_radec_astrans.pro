@@ -1,6 +1,9 @@
 
 ;+
 ;
+; THIS IS DEPRECATED:  Please use the sdss_astr2fields program
+; from the photoop IDL package.
+;
 ; NAME:
 ;       FIND_RADEC_ASTRANS
 ;       
