@@ -89,7 +89,6 @@ end
 pro cosmology::set_defaults
     self.c = 2.99792458e5         ; km/s
   
-    self.H0 = 100.0               ; h km/s/Mpc
     self.h = 1.0                  ; default hubble parameter
     self.flat = 1                 ; default is flat
     self.omega_m = 0.27           ; default omega_m
@@ -134,7 +133,7 @@ end
 function cosmology::DH, h=h
 
   IF n_elements(h) EQ 0 THEN h=self.h
-  return, self.c/self.H0/h
+  return, self.c/100./h
 
 end 
 
@@ -524,7 +523,6 @@ pro cosmology__define
   struct = { $
              cosmology, $
              c: 0.0,    $       ; speed of light
-             H0: 0.0,   $       ; Hubble constant h=1
              h: 0.0,    $       ; default hubble parameter
              flat: 0,      $    ; default flat
              omega_m: 0.0, $    ; default omega_m
