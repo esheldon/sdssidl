@@ -93,7 +93,7 @@ pro cosmology::set_defaults
     self.flat = 1                 ; default is flat
     self.omega_m = 0.27           ; default omega_m
     self.omega_l = 1.0-self.omega_m   ; default omega_l
-    self.omega_k = 0.0            ; default omega_m
+    self.omega_k = 0.0            ; default omega_k
     self.npts = 5                 ; default number of integration points
     self.vnpts = 100              ; default number of velement int. points
 end
@@ -529,8 +529,7 @@ pro cosmology__define
              omega_l: 0.0, $    ; default omega_l
              omega_k: 0.0, $    ; default omega_k
              npts: 0,   $       ; default number of integration points        
-             vnpts: 0,   $      ; default number of velement int. points
-             cgauleg: 0  $      ; is gauleg c function compiled? else use idl version.
+             vnpts: 0    $      ; default number of velement int. points
            }
 
 end 
