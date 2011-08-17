@@ -10,6 +10,9 @@
 ; CALLING SEQUENCE:
 ;   c=obj_new('cosmology')
 ;
+;   c=obj_new('cosmology',h=, omega_m=, omega_l=, omega_k=, flat=, 
+;              npts=, vnpts=)
+;
 ; METHODS:
 ;   DH(h=) 
 ;       Hubble distance
@@ -50,6 +53,10 @@
 ; MODIFICATION HISTORY:
 ;   Created some time in 2006, Erin Sheldon, NYU
 ;
+;   Added ability to change the default parameters during construction.
+;   Use exact value for speed of light.
+;           2011-08-17, Erin Sheldon, BNL
+;
 ;-
 ;  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
 ;
@@ -68,21 +75,55 @@
 ;
 ;
 
-function cosmology::init
+function cosmology::init, $
+        h=h, omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat, $
+        npts=npts, vnpts=vnpts
 
-  self.c = 2.99792458e5         ; km/s
+    self->set_defaults
+    self->set_pars, $
+        h=h, omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat, $
+        npts=npts, vnpts=vnpts
+    return, 1
+end
+
+pro cosmology::set_defaults
+    self.c = 2.99792458e5         ; km/s
   
-  self.H0 = 100.0               ; h km/s/Mpc
-  self.h = 1.0                  ; default hubble parameter
-  self.flat = 1                 ; default is flat
-  self.omega_m = 0.27           ; default omega_m
-  self.omega_l = 1.0-self.omega_m   ; default omega_l
-  self.omega_k = 0.0            ; default omega_m
-  self.npts = 5                 ; default number of integration points
-  self.vnpts = 100              ; default number of velement int. points
-  return, 1
+    self.H0 = 100.0               ; h km/s/Mpc
+    self.h = 1.0                  ; default hubble parameter
+    self.flat = 1                 ; default is flat
+    self.omega_m = 0.27           ; default omega_m
+    self.omega_l = 1.0-self.omega_m   ; default omega_l
+    self.omega_k = 0.0            ; default omega_m
+    self.npts = 5                 ; default number of integration points
+    self.vnpts = 100              ; default number of velement int. points
+end
+
+pro cosmology::set_pars, $
+        h=h, omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat, $
+        npts=npts, vnpts=vnpts
+
+    if n_elements(h) ne 0 then begin
+        self.h = h
+    endif
+
+    if n_elements(npts) ne 0 then begin
+        self.npts=npts
+    endif
+    if n_elements(vnpts) ne 0 then begin
+        self.vnpts=vnpts
+    endif
+    if n_elements(flat) ne 0 then begin
+        self.flat = flat
+    endif
+
+    t = self->_extract_omegas(omega_m, omega_l, omega_k, self.flat)
+    self.omega_m=t.omega_m
+    self.omega_l=t.omega_l
+    self.omega_k=t.omega_k
 
 end 
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General tools for calculating distances.  Only assumption is that
