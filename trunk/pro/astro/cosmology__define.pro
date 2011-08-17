@@ -70,7 +70,8 @@
 
 function cosmology::init
 
-  self.c = 2.9979e5             ; km/s
+  self.c = 2.99792458e5         ; km/s
+  
   self.H0 = 100.0               ; h km/s/Mpc
   self.h = 1.0                  ; default hubble parameter
   self.flat = 1                 ; default is flat
