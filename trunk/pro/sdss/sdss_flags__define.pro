@@ -1059,7 +1059,7 @@ pro sdss_flags::printflags, flags, flagtype
     endif
 
     flagnames = self->flagnames(flagtype, status=status)    
-    if status ne 0 then message,'Could not get flagnames for type: ',flagtype
+    if status ne 0 then message,'Could not get flagnames for type: '+flagtype
 
     nf=n_elements(flagnames)
     for i=0L, nf-1 do begin
