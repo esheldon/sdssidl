@@ -1,0 +1,12 @@
+# vim: set filetype=python :
+import os,sys
+
+Import('env')
+
+CPPPATH=env['CPPPATH'] + ['.']
+name="gauleg"
+dlm=name+".dlm"
+env.SharedLibrary(target="../DLM/"+name, source=name+".c",
+                  CPPPATH=CPPPATH,
+                  SHLIBPREFIX='')
+env.Command("../DLM/"+dlm,dlm,Copy("$TARGET","$SOURCE"))

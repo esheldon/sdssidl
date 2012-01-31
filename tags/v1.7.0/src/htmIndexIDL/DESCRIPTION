@@ -1,0 +1,2 @@
+title		htmIndexIDL
+description	C++ extension for performing hierarchical trianglar mesh indicex calculation, searches, and matches.  These are wrappers around the basic library of Peter Kunszt.

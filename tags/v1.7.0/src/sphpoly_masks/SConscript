@@ -1,0 +1,10 @@
+# vim: set filetype=python :
+import os,sys
+
+Import('env')
+CPPPATH=env['CPPPATH']+['.']
+name="sphPolyCompIDL"
+dlm=name+".dlm"
+env.SharedLibrary(target="../DLM/"+name, source=name+".c",
+                  SHLIBPREFIX='',CPPPATH=CPPPATH)
+env.Command("../DLM/"+dlm,dlm, Copy("$TARGET","$SOURCE"))

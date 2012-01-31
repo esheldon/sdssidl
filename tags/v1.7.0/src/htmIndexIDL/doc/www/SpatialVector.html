@@ -1,0 +1,272 @@
+<html><head><TITLE>SpatialVector</TITLE></head>
+ <body text="#111111" bgcolor="#FFFFFF" link="#333399" vlink="#663366" alink="#CC0000">
+
+<h3>&nbsp;&nbsp;
+<font color="#7700EE">HTM SpatialIndex Class Reference</font>
+</h3>
+<img SRC="rule.gif" >
+
+
+<H2><A HREF ="#DOC.DOCU" > <IMG BORDER=0 SRC=down.gif></A>  class  SpatialVector  </H2><BLOCKQUOTE>
+
+
+The SpatialVector is a 3D vector usually living on the surface of
+the sphere
+</BLOCKQUOTE>
+<hr>
+
+<DL>
+<TABLE BORDER>
+<DT><h3>Public Methods</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.11.2"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialVector</B> ()<br>
+<I> constructs (1,0,0), ra=0, dec=0.</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.3"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialVector</B> (float64 <!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.14">z</A>)<br>
+<I> Constructor from three coordinates, not necessarily normed to 1</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.4"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialVector</B> (float64 <!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)<br>
+<I> Constructor from ra/dec, this is always normed to 1</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.5"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>SpatialVector</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)<br>
+<I> Copy constructor</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.6"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>& </TD><TD><B>operator =</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)<br>
+<I> Assignment</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.7"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>set</B> (const float64 &<!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.14">z</A>)<br>
+<I> Set member function: set values - always normed to 1</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.8"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>set</B> (const float64 &<!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)<br>
+<I> Set member function: set values - always normed to 1</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.9"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>get</B> ( float64 &<!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.14">z</A>) const <br>
+<I> Get x,y,z</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.10"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>get</B> ( float64 &<!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)<br>
+<I> Get ra,dec - normalizes x,y,z</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.11"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>length</B> () const <br>
+<I> return length of vector</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.12"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>x</B> () const <br>
+<I> return x (only as rvalue)</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.13"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>y</B> () const <br>
+<I> return y</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.14"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>z</B> () const <br>
+<I> return z</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.15"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>ra</B> ()<br>
+<I> return ra - this norms the vector to 1 if not already done so</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.16"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>dec</B> ()<br>
+<I> return dec - this norms the vector to 1 if not already done so</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.17"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>normalize</B> ()<br>
+<I> Normalize vector length to 1</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.18"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>show</B> () const <br>
+<I> Printf it to stdout</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.19"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>read</B> (istream &)<br>
+<I> Read vector from a stream</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.20"> <IMG BORDER=0 SRC=icon1.gif></A> void </TD><TD><B>write</B> (ostream &) const <br>
+<I> Write vector to a stream</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.21"> <IMG BORDER=0 SRC=icon1.gif></A> int </TD><TD><B>operator ==</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const <br>
+<I> Comparison</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.22"> <IMG BORDER=0 SRC=icon1.gif></A> float64 </TD><TD><B>operator *</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const <br>
+<I> dot product</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.23"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator ^</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const <br>
+<I> cross product</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.24"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator +</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const <br>
+<I> addition</I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.25"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator -</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const <br>
+<I> subtraction</I>
+</TD></TR></TABLE><TABLE BORDER>
+<DT><h3>Public</h3><DD><TR><TD VALIGN=top><A HREF="#DOC.11.1"> <IMG BORDER=0 SRC=icon1.gif></A> </TD><TD><B>Scalar products with int and float </B> <br>
+<I></I>
+
+<TABLE BORDER>
+<TR><TD VALIGN=top><A HREF="#DOC.11.1.1"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>& </TD><TD><B>operator *= </B> (float64)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.1.2"> <IMG BORDER=0 SRC=icon1.gif></A> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>& </TD><TD><B>operator *=</B> (int)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.1.3"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator *</B> (float64, const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.1.4"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator *</B> (int, const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.1.5"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator *</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &, float64)<br>
+<I></I>
+</TD></TR><TR><TD VALIGN=top><A HREF="#DOC.11.1.6"> <IMG BORDER=0 SRC=icon1.gif></A> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> </TD><TD><B>operator *</B> (const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &, int)<br>
+<I></I>
+</TD></TR>
+</TABLE>
+</TD></TR></TABLE></DL>
+<A NAME="DOC.DOCU">
+<hr>
+ <h2> Documentation </h2>
+<BLOCKQUOTE>
+
+
+The SpatialVector is a 3D vector usually living on the surface of
+the sphere. The corresponding ra, dec can be obtained if the vector
+has unit length. That can be ensured with the normalize() function.
+
+
+</BLOCKQUOTE>
+<DL>
+
+<A NAME="SpatialVector">
+<A NAME ="DOC.11.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialVector()</B></TT>
+<DD> constructs (1,0,0), ra=0, dec=0.
+<DL></DL><P>
+<A NAME="SpatialVector">
+<A NAME ="DOC.11.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialVector(float64 <!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.14">z</A>)</B></TT>
+<DD> Constructor from three coordinates, not necessarily normed to 1
+<DL></DL><P>
+<A NAME="SpatialVector">
+<A NAME ="DOC.11.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialVector(float64 <!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, float64 <!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)</B></TT>
+<DD> Constructor from ra/dec, this is always normed to 1
+<DL></DL><P>
+<A NAME="SpatialVector">
+<A NAME ="DOC.11.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  SpatialVector(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)</B></TT>
+<DD> Copy constructor
+<DL></DL><P>
+<A NAME="operator =">
+<A NAME ="DOC.11.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>&  operator =(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)</B></TT>
+<DD> Assignment
+<DL></DL><P>
+<A NAME="set">
+<A NAME ="DOC.11.7">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  set(const float64 &<!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.14">z</A>)</B></TT>
+<DD> Set member function: set values - always normed to 1
+<DL></DL><P>
+<A NAME="set">
+<A NAME ="DOC.11.8">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  set(const float64 &<!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, const float64 &<!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)</B></TT>
+<DD> Set member function: set values - always normed to 1
+<DL></DL><P>
+<A NAME="get">
+<A NAME ="DOC.11.9">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  get( float64 &<!2><A HREF="SpatialVector.html#DOC.11.12">x</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.13">y</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.14">z</A>) const </B></TT>
+<DD> Get x,y,z
+<DL></DL><P>
+<A NAME="get">
+<A NAME ="DOC.11.10">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  get( float64 &<!2><A HREF="SpatialVector.html#DOC.11.15">ra</A>, float64 &<!2><A HREF="SpatialVector.html#DOC.11.16">dec</A>)</B></TT>
+<DD> Get ra,dec - normalizes x,y,z
+<DL></DL><P>
+<A NAME="length">
+<A NAME ="DOC.11.11">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  length() const </B></TT>
+<DD> return length of vector
+<DL></DL><P>
+<A NAME="x">
+<A NAME ="DOC.11.12">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  x() const </B></TT>
+<DD> return x (only as rvalue)
+<DL></DL><P>
+<A NAME="y">
+<A NAME ="DOC.11.13">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  y() const </B></TT>
+<DD> return y
+<DL></DL><P>
+<A NAME="z">
+<A NAME ="DOC.11.14">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  z() const </B></TT>
+<DD> return z
+<DL></DL><P>
+<A NAME="ra">
+<A NAME ="DOC.11.15">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  ra()</B></TT>
+<DD> return ra - this norms the vector to 1 if not already done so
+<DL></DL><P>
+<A NAME="dec">
+<A NAME ="DOC.11.16">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  dec()</B></TT>
+<DD> return dec - this norms the vector to 1 if not already done so
+<DL></DL><P>
+<A NAME="normalize">
+<A NAME ="DOC.11.17">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  normalize()</B></TT>
+<DD> Normalize vector length to 1
+<DL></DL><P>
+<A NAME="show">
+<A NAME ="DOC.11.18">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  show() const </B></TT>
+<DD> Printf it to stdout
+<DL></DL><P>
+<A NAME="read">
+<A NAME ="DOC.11.19">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  read(istream &)</B></TT>
+<DD> Read vector from a stream
+<DL></DL><P>
+<A NAME="write">
+<A NAME ="DOC.11.20">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> void  write(ostream &) const </B></TT>
+<DD> Write vector to a stream
+<DL></DL><P>
+<A NAME="operator ==">
+<A NAME ="DOC.11.21">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> int  operator ==(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const </B></TT>
+<DD> Comparison
+<DL></DL><P>
+<A NAME="operator *">
+<A NAME ="DOC.11.22">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> float64  operator *(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const </B></TT>
+<DD> dot product
+<DL></DL><P>
+<A NAME="operator ^">
+<A NAME ="DOC.11.23">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator ^(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const </B></TT>
+<DD> cross product
+<DL></DL><P>
+<A NAME="operator +">
+<A NAME ="DOC.11.24">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator +(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const </B></TT>
+<DD> addition
+<DL></DL><P>
+<A NAME="operator -">
+<A NAME ="DOC.11.25">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator -(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> & ) const </B></TT>
+<DD> subtraction
+<DL></DL><P>
+<A NAME="Scalar products with int and float ">
+<A NAME ="DOC.11.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B>  Scalar products with int and float </B></TT>
+<DL></DL><P><DL>
+
+<A NAME="operator *= ">
+<A NAME ="DOC.11.1.1">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>&  operator *= (float64)</B></TT>
+<DL></DL><P>
+<A NAME="operator *=">
+<A NAME ="DOC.11.1.2">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>&  operator *=(int)</B></TT>
+<DL></DL><P>
+<A NAME="operator *">
+<A NAME ="DOC.11.1.3">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator *(float64, const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)</B></TT>
+<DL></DL><P>
+<A NAME="operator *">
+<A NAME ="DOC.11.1.4">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator *(int, const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &)</B></TT>
+<DL></DL><P>
+<A NAME="operator *">
+<A NAME ="DOC.11.1.5">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator *(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &, float64)</B></TT>
+<DL></DL><P>
+<A NAME="operator *">
+<A NAME ="DOC.11.1.6">
+<DT><IMG BORDER=0 SRC=icon2.gif><TT><B> friend  <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A>  operator *(const <!2><A HREF="SpatialVector.html#DOC.11.3">SpatialVector</A> &, int)</B></TT>
+<DL></DL><P></DL>
+</DL>
+<hr>
+ <DL><DT><B>This class has no child classes.</B></DL>
+<DL></DL><P><I><A HREF="aindex.html"> alphabetic index</A></I>  <I><A HREF="HIER.html"> hierarchy of classes</A></I><P><hr>
+
+<img SRC="rule.gif" >
+<h6>
+&copy;
+<A HREF = "http://www.sdss.jhu.edu/ScienceArchive/copyright.html">
+Copyright
+</A>
+The Johns Hopkins University 1999, All Rights Reserved.<br>
+
+<a href="mailto:kunszt@pha.jhu.edu">Peter Z. Kunszt</a>,
+<br>
+</h6>
+
+</body>
+</html>
+
+<P Align=right><I>generated by <A HREF="http://www.zib.de/Visual/software/doc++/index.html">doc++</A></I>
+</BODY>
