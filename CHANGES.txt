@@ -2,6 +2,40 @@ NOTE:  The default for htm_match is maxmatch=1.  It used to be maxmatch=0,
 which means return all matches.  This backwards incompatiblity was not written
 ito the CHANGES.txt
 
+v1.7.0 (2012-01-31)
+---------------------------------------
+
+New files
+    pro/columns/columns.py
+        An IDL class file for working with columns databases.
+    pro/astro/mom2fwhm.pro
+    pro/astro/fwhm2mom.pro
+    pro/astro/shiftlon.pro Shift longitude by specified amount
+    pro/sdss/sdss_photoid.pro
+        Better "namespacing", replace deprecated photoid.pro
+    pro/struct/struct_addfields.pro
+        - replacement for addtags, prevents name conflicts, better
+          thought out
+    data/sdss_filetypes.par
+        Description of SDSS file locations.
+    gdl/*
+        GDL support procedures; add to path when using GDL.
+
+Changes
+    pro/cosmology
+        - Can now give cosmology pars on construction, much easier
+        - Use exact speed of light.
+    pro/struct/struct_addtags.pro
+        - can now take a struct to define additional tags
+    pro/sdss/photoid.pro
+        - using new exponents for superid, can still get
+          old ones with /old
+    pro/sdss/sdss_files__define.pro
+        - reading psf use ->file()
+    pro/files/which.pro
+        - fixed globbing
+General
+    Deprecating sdssidl_setup in favor of NYU/idlutils style.
 
 v1.6.1
 ---------------------------------------
