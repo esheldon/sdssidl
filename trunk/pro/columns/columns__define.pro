@@ -1,3 +1,44 @@
+;+
+; Class
+;   This is an IDL class file for working with a columns database.
+;
+;   The columns database is defined by its implementation in
+;   python
+;       http://code.google.com/p/pycolumns/
+;
+;   The columns database is just a directory with some files
+;   if type 'rec' inside.  It is designed for write once (or append) 
+;   and  read many, optimized for speed of reading.  It is not
+;   inherently relational, although relations may exist.
+;
+; Examples:
+;
+;   Say you have a columns database in 'maxbcg-input-dr8.cols'
+;       IDL> coldir='maxbcg-input-dr8.cols'
+;       IDL> c=obj_new('columns',coldir)
+;
+;   To see what data you have
+;       IDL> c->show
+;       IDL> info=c->colinfo()
+;
+;   To read some data
+;       IDL> data=c->read(colnames, rows=)
+;
+;   so to read *all rows* of ra,dec
+;
+;       IDL> data=c->read(['ra','dec'])
+;
+;   to read rows [25,33,1999]
+;
+;       IDL> data=c->read(['ra','dec'], rows=[25,33,1999])                                                                                                                    
+;
+;   Usually you will want to make some selections on the data based on
+;   certain columns and then read more columns
+;
+;       IDL> radec=c->read(['ra','dec'])
+;       IDL> w=where(ra > 80 and ra < 100 and dec > 0 and dec < 5)
+;       IDL> data=c->read(some_columns, rows=w)
+;-
 function columns::init, coldir
     if n_elements(coldir) eq 0 then begin
         on_error, 2
