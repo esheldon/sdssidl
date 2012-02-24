@@ -47,7 +47,7 @@ function _dtype2stringarr, dtype
 	totlen=strlen(dtype)
 
 	p1=strpos(dtype,'(')
-	if p1 ne 0 then message,'expected brace "(" at front of single dtype'
+	if p1 ne 0 then message,'expected brace "(" at front of single dtype, got "'+strmid(dtype,0,1)+'"'
 	p2 = strpos(dtype,')',/reverse_search)
 	if p2 ne (totlen-1) then $
 		message,'expected brace ")" at end of single dtype'
@@ -176,7 +176,7 @@ pro _pop_next_dtype, str, first, rest
 
     if p lt (totlen-1) then begin
         ; case of tuple (name,type,(a,b,..))
-        if strmid(str,p+1,p+2) eq ')' then begin
+        if strmid(str,p+1,1) eq ')' then begin
             p = p+1
         endif
     endif
