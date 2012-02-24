@@ -1,3 +1,45 @@
+function _csv2arr, s
+    ; the input is assumed to be either
+    ;   
+    ; or
+    ;   val1,val2,val3,...
+    ; if a third val looks like (something,..) then it is
+    ; assumed to be a tuple, and it is converted
+    ; into a form like [something,..], leaving off
+    ; empty parts like for (5,)
+    
+
+    p1 = strpos(s, ',')
+    if p1 eq -1 then message,'Expected at least two elements in dtype tuple'
+    name = strmid(s, 0, p1)
+
+    s2 = strmid(s, p1+1)
+    p2 = strpos(s2, ',')
+    if p2 eq -1 then begin
+        dtype = s2
+    endif else begin
+        dtype = strmid(s2, 0, p2)
+
+        dims = strmid(s2, p2+1)
+
+        ; this is either a number or a tuple
+        if strmid(dims, 0, 1) eq '(' then begin
+            dims = strmid(dims, 1, strlen(dims)-2)
+
+            ; this is to remove the (3,) type things
+            dims = '[' + strjoin( strsplit(dims, ',',/extract), ',' ) +']'
+        endif
+
+    endelse
+
+    sarr=[name,dtype]
+    if n_elements(dims) ne 0 then begin
+        sarr=[sarr,dims]
+    endif
+
+    return, sarr
+end
+
 function _dtype2stringarr, dtype
 	; convert a single dtype to a string array
 	; e.g. ('fieldname','type',len)
@@ -6,15 +48,15 @@ function _dtype2stringarr, dtype
 
 	p1=strpos(dtype,'(')
 	if p1 ne 0 then message,'expected brace "(" at front of single dtype'
-	p2 = strpos(dtype,')')
+	p2 = strpos(dtype,')',/reverse_search)
 	if p2 ne (totlen-1) then $
 		message,'expected brace ")" at end of single dtype'
 
 	tmp = strmid(dtype, 1, totlen-2)
 
-	tsplit = strsplit(tmp, ',', /extract)	
+    sarr = _csv2arr(tmp)
 
-	return, tsplit
+	return, sarr
 
 end
 
@@ -124,16 +166,21 @@ pro _pop_next_dtype, str, first, rest
 	; so we won't see a shape with braces
 
 
-	tmp=str
-
 	totlen = strlen(str)
 
 	; assuming only 1-d subarrays, this will find the end
 	; of the declaration
 
 	p=strpos(str, ')')
-
 	if p eq -1 then message,'Unexpectedly ran to end of dtype'
+
+    if p lt (totlen-1) then begin
+        ; case of tuple (name,type,(a,b,..))
+        if strmid(str,p+1,p+2) eq ')' then begin
+            p = p+1
+        endif
+    endif
+
 	first = strmid(str,0,p+1)
 	rest = strmid(str,p+1)
 	if strpos(rest,',') eq '0' then begin
