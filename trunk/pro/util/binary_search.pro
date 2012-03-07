@@ -20,6 +20,7 @@ pro binary_search,arr,x,index, round=round, edgedefault=edgedefault
 ;   Author: Dave Johnston.
 ;   Added round keyword  04/29/00  Erin Scott Sheldon  UofMich
 ;   Added edgedefault keyword 07-Mar-2001
+;   Changed all counters to longs 07-Mar-2012
 ; 
 ;-
 ;
@@ -57,13 +58,13 @@ pro binary_search,arr,x,index, round=round, edgedefault=edgedefault
               (x LT arr[0]): index=0L
               (x GT arr[n-1]): index=n-1
           ENDCASE
-      ENDIF ELSE index=-1
+      ENDIF ELSE index=-1L
 
       return
   ENDIF
 
-  down=-1
-  up=n
+  down=-1L
+  up=long(n)
 
   while up-down gt 1 do begin
       mid=down+(up-down)/2
