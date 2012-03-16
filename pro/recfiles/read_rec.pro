@@ -1,27 +1,22 @@
 
 ;+
 ; NAME:
-;  READ_IDLSTRUCT
+;  READ_REC
 ;
 ;
 ; PURPOSE:
-;  Read from the standardized file format ".st" into an array of structures.
-;  These file formats are written by the WRITE_IDLSTRUCT procedure.  See the
-;  documentation for that procedure for more info.
-;
-;
-; CATEGORY:
-;  File I/O
-;
+;  Read from the standardized file format ".rec" into an array of structures.
+;  These file formats are written by the WRITE_REC procedure or using
+;  the sfile.py module in esutil python (http://code.google.com/p/esutil/)
 ;
 ; CALLING SEQUENCE:
-;    struct = read_idlstruct(filename, columns=, rows=, numrows=, 
-;                           hdrstruct=, status=, /silent, error=)
+;    struct = read_rec(filename, columns=, rows=, numrows=, 
+;                      columns=,
+;                      hdrstruct=, status=, /silent, error=)
 ;
 ;
 ; INPUTS:
 ;  filename: Name of the file to be read.
-;
 ;
 ; OPTIONAL INPUTS:
 ;
@@ -49,30 +44,15 @@
 ;  error=error
 ;  status=status
 ;
-; PROCEDURES CALLED:
-;  READ_IDLHEADER
-;  (SWAP_ENDIAN)
-;  (IEEE_TO_HOST)
-;  (ASCII_READ)
-;  (BINARY_READ)
-;
 ; EXAMPLE:
-;  file = '~/blah.st'
-;  struct = read_idlstruct(file)
-;
-; MODIFICATION HISTORY:
-;  Created  02-Jul-2004 Erin Sheldon, UofChicago
-;  ES: Added columns keyword.  07-Mar-2004  
-;  ES: Added use of binary_read C function when available if columns 
-;      or rows are requested.  7-Nov-2005
-;  ES: Added use of ascii_read C function when available and if
-;      columns, rows requested.  28-April-2006
+;  file = '~/blah.rec'
+;  struct = read_rec(file)
 ;
 ;-
 ;
 ;
 ;
-;  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
+;  Copyright (C) 2012  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
 ;
 ;    This program is free software; you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
