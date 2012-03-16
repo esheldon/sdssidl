@@ -66,6 +66,7 @@
 ;      or rows are requested.  7-Nov-2005
 ;  ES: Added use of ascii_read C function when available and if
 ;      columns, rows requested.  28-April-2006
+;  Eli Rykoff (16-March-2012): Added _ri_mrd_struct which works without execute()
 ;
 ;-
 ;
@@ -88,6 +89,150 @@
 ;    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ;
 ;
+
+function _ri_mrd_struct, names, values, nrow, no_execute = no_execute,  $
+    structyp=structyp,  tempdir=tempdir, silent=silent, old_struct=old_struct
+
+compile_opt idl2
+
+; Keywords TEMPDIR, SILENT and OLD_STRUCT no longer do anything but are kept
+; for backward compatibility.
+
+
+;; noexecute = keyword_set(no_execute) or lmgr(/vm)
+ noexecute = 1
+
+ if noexecute then begin
+
+    ntags = n_elements(names)
+    for i=0,ntags-1 do begin
+;
+; create variable with the specified data type
+;
+	case strlowcase(values[i]) of 
+;
+; scalar values
+;
+	    '0b': v = 0B
+	    '0' : v = 0S
+            '0u': v = 0US
+	    '0l': v = 0L
+	    '0ll' : v = 0LL
+            '0ul' : v = 0UL
+            '0ull' : v = 0ULL
+	    '0.': v = 0.0
+            '0.0': v = 0.0
+            '0.0d': v = 0.0d0
+	    '0.0d0': v = 0.0d0
+ 	    '0.d0': v = 0.0d0
+             '" "': v = " "          ;Added July 2004
+	    'complex(0.,0.)': v = complex(0.,0.)
+	    'dcomplex(0.d0,0.d0)': v = dcomplex(0.d0,0.d0)
+;
+; strings and arrays
+;`
+	    else: begin	     
+	        value = strlowcase(values[i])
+		remchar,value,"'"
+		remchar,value,'"'   
+		if strlen(value) EQ 1 then v= value else begin 
+	        type = gettok(value,'(')
+		if type eq 'string' then $
+			junk = gettok(value,',')      ;remove "replicate(32b"
+		dimen_string = gettok(value,')')	
+		dimen = long(strsplit(dimen_string,',',/extract))
+		case type of
+                    'bytarr': v = make_array(dimen=dimen,/byte)
+		    'intarr': v = make_array(dimen=dimen,/int)
+                    'uintarr': v = make_array(dimen=dimen,/uint)
+		    'fltarr': v = make_array(dimen=dimen,/float)
+		    'lonarr': v = make_array(dimen=dimen,/long)
+                    'ulonarr': v = make_array(dimen=dimen,/ulong)
+		    'lon64arr': v = make_array(dimen=dimen,/l64)
+                    'ulon64arr' : v = make_array(dimen=dimen,/ul64)
+		    'dblarr': v = make_array(dimen=dimen,/double)
+		    'complexarr': v = make_array(dimen=dimen,/complex)
+		    'dcomplexarr': v = make_array(dimen=dimen,/dcomplex)
+                    'ptr_new': v = ptr_new()
+                    'string': begin
+                        ndimen = n_elements(dimen)-1
+                        if ndimen gt 0 then begin
+                            v = make_array(dimen=dimen[1:*],/string)
+                            v[*] = string(replicate(32B,dimen[0]))
+                        end else v = string(replicate(32B,dimen[0]))
+                    end
+                    'mkstr': v = string(replicate(32B,dimen))
+                    'strarr': begin
+                        ndimen = n_elements(dimen)-1
+                        if ndimen gt 0 then begin
+                            v = make_array(dimen=dimen[1:*],/string)
+                            v[*] = string(replicate(32B,dimen[0]))
+                        endif
+                    end
+                    else: message,'ERROR - Invalid field value: ' + values[i]		      
+                endcase
+            endelse 
+
+	    end
+	endcase     	
+	if i eq 0 then struct = create_struct(names[i],v) $
+		  else struct = create_struct(temporary(struct),names[i],v)
+    end; for i    
+
+endif else begin
+
+; Build up the structure use a combination of execute and
+; create_struct calls.  Basically we build as many rows as
+; will fit in an execute call and create that structure.  Then
+; we append that structure to whatever we've done before using
+; create_struct
+
+nel = N_elements(names)
+strng = "a={"
+
+comma = ' '
+for i=0,nel-1 do  begin
+    fval = values[i]
+    if (fval eq '0') then fval = '0s'
+  
+   ; Now for each element put in a name/value pair.
+    tstrng = strng + comma+names[i] + ':' + fval
+    
+    ; The nominal max length of the execute is 131
+    ; We need one chacacter for the "}"
+    if strlen(tstrng) gt 130 then begin
+        strng = strng + "}"
+        res = execute(strng)
+	if  res eq 0 then return, 0
+        struct = n_elements(struct) eq 0 ? a: $
+	         create_struct(temporary(struct), a)
+	strng = "a={" + names[i] + ":" + fval
+	
+    endif else strng = tstrng
+    comma = ","
+
+endfor
+	
+
+if strlen(strng) gt 3 then begin
+    strng = strng + "}"
+    res = execute(strng)
+     if  res eq 0 then return, 0
+     struct = n_elements(struct) eq 0 ? a : create_struct(temporary(struct), a)
+ endif
+ 
+endelse
+if keyword_set(structyp) then $
+     struct = create_struct(temporary(struct), name=structyp)
+
+
+if nrow le 1 then return, struct $
+             else return, replicate(struct, nrow)
+
+end
+
+
+
 
 PRO ri_swap_endian, struct
 
@@ -150,8 +295,8 @@ PRO ri_extract_columns, hdrStruct, columns, struct
       ;; Only need to extract if they are a subset of the original
       ;; columns
       IF n_elements(mstr) LT n_elements(hdrStruct.field_names) THEN BEGIN 
-          
-          tst = mrd_struct(hdrStruct.field_names[mstr], $
+
+          tst = _ri_mrd_struct(hdrStruct.field_names[mstr], $
                            hdrStruct.field_descriptions[mstr], $
                            n_elements(struct))
           struct_assign, struct, tst, /nozero
@@ -187,7 +332,7 @@ FUNCTION ri_ascii, hdrStruct, lun, nkeep, $
     status = 1
     COMMON read_idlstruct_block, c_bread_found, c_aread_found, isbig_endian
 
-    structdef = mrd_struct($
+    structdef = _ri_mrd_struct($
         hdrStruct.field_names, hdrStruct.field_descriptions, 1)
 
 
@@ -280,9 +425,9 @@ FUNCTION ri_binary, hdrStruct, lun, nkeep, $
   COMMON read_idlstruct_block, c_bread_found, c_aread_found, isbig_endian
 
 
-  structdef = mrd_struct(hdrStruct.field_names, $
-                         hdrStruct.field_descriptions, $
-                         1)
+  structdef = _ri_mrd_struct(hdrStruct.field_names, $
+                             hdrStruct.field_descriptions, $
+                             1)
 
   IF (n_elements(rows) NE 0 OR n_elements(columns) NE 0) AND $
     c_bread_found THEN BEGIN  
@@ -496,3 +641,4 @@ FUNCTION read_idlstruct, filename_in, $
   return,struct
 
 END 
+
