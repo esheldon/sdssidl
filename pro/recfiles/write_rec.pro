@@ -1,3 +1,47 @@
+;+
+; Name:
+;   write_rec
+;
+; Purpose:
+;   Write a structure to a "recfile", with a simple header describing
+;   the data in each row.  See the sfile.py module in esutil
+;   (http://code.google.com/p/esutil/) for more details.
+;   You can read these files with read_rec
+;
+; Calling Sequence
+;   write_rec, struct, filename, /clobber
+;
+; Inputs:
+;   struct: An IDL structure
+;   filename: The filename 
+; Optional Inputs
+;   /clobber: If set, overwrite an existing file.
+;
+; Limitations:
+;   Currently only the binary format is supported.  Appending
+;   is not yet supported.  Complex types and sub-structures
+;   not yet supported.
+;
+; Revision History
+;   2012-03-16 Created, Erin Sheldon, Brookhaven National Laboratory
+;-
+;  Copyright (C) 2012  Erin Sheldon, BNL.  erin dot sheldon at gmail dot com
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License
+;    along with this program; if not, write to the Free Software
+;    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
 pro _wr_write_data, lun, struct
       writeu, lun, struct
 end

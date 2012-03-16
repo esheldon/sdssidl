@@ -1,7 +1,7 @@
 
 ;+
 ; NAME:
-;  READ_REC
+;  read_rec
 ;
 ;
 ; PURPOSE:
