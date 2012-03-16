@@ -20,6 +20,7 @@
 ; Limitations:
 ;   Currently only the binary format is supported.  Appending
 ;   is not yet supported.  Complex types and sub-structures
+;   not yet supported.  Writing other data into the header
 ;   not yet supported.
 ;
 ; Revision History
