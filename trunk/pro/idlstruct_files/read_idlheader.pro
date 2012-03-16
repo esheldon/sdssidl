@@ -35,6 +35,7 @@
 ;
 ; MODIFICATION HISTORY:
 ;  Created  02-Jul-2004 Erin Sheldon, UofChicago
+;  Updated: 16-March-2012 Eli Rykoff -- removed execute() calls
 ;
 ;-
 ;
@@ -139,22 +140,85 @@ END
 
 FUNCTION rih_getvalue, description, format=format, error=error
 
-  error = 1
+  error = 0
 
   ;; Turn the value into an exectute string
   ;;print,description
-  command = 'tmp = '+description
+  ;;command = 'tmp = '+description
+
+  ;;print,command
+
+  value = strlowcase(description)
+  case strlowcase(description) of
+      '0b': tmp = 0B
+      '0': tmp = 0S
+      '0u': tmp = 0US
+      '0l': tmp = 0L
+      '0ll': tmp = 0LL
+      '0ul': tmp = 0UL
+      '0ull': tmp = 0ULL
+      '0.0': tmp = 0.0
+      '0.0d': tmp = 0.0d
+      'complex(0.0,0.0)' : tmp = complex(0.,0.)
+      'dcomplex(0.0d,0.0d)' : tmp = dcomplex(0.0d, 0.0d)
+      else: begin
+          value = strlowcase(description)
+          remchar,value,"'"
+          remchar,value,'"'
+          if strlen(value) eq 1 then tmp = value else begin
+              type = gettok(value,'(')
+              dimen_string = gettok(value,')')
+              dimen = long(strsplit(dimen_string,',',/extract))
+              case type of
+                  'bytarr': tmp = make_array(dimen=dimen,/byte)
+                  'intarr': tmp = make_array(dimen=dimen,/int)
+                  'uintarr': tmp = make_array(dimen=dimen,/uint)
+                  'fltarr': tmp = make_array(dimen=dimen,/float)
+                  'lonarr': tmp = make_array(dimen=dimen,/long)
+                  'ulonarr': tmp = make_array(dimen=dimen,/ulong)
+                  'lon64arr': tmp = make_array(dimen=dimen,/l64)
+                  'ulon64arr': tmp = make_array(dimen=dimen,/ul64)
+                  'dblarr': tmp = make_array(dimen=dimen,/double)
+                  'complexarr': tmp = make_array(dimen=dimen,/complex)
+                  'dcomplexarr': tmp = make_array(dimen=dimen,/dcomplex)
+                  'ptr_new': tmp = ptr_new()
+                  'mkstr': tmp = string(replicate(32B,dimen))
+                  'strarr': begin
+                      ndimen = n_elements(dimen)-1
+                      if ndimen gt 0 then begin
+                          tmp = make_array(dimen=dimen[1:*],/string)
+                          tmp[*] = string(replicate(32B,dimen[0]))
+                      endif
+                  end                  
+                  else: begin
+                      print,'Error - invalid field: '+description
+                      error = 1
+                  end
+                  
+              endcase
+          endelse
+
+      endelse
+  endcase
+
   
   ;; just execute the string
-  IF execute(command) THEN BEGIN 
-      error = 0
-      IF arg_present(format) THEN BEGIN 
+  ;;IF execute(command) THEN BEGIN 
+  ;;    error = 0
+  ;;    IF arg_present(format) THEN BEGIN 
+  ;;        format = rih_input_format(tmp)
+  ;;    ENDIF 
+  ;;    return,tmp
+  ;;ENDIF ELSE BEGIN 
+  ;;    return,-1
+  ;;ENDELSE
+  if (error eq 0) then begin
+      
+      if arg_present(format) then begin
           format = rih_input_format(tmp)
-      ENDIF 
+      endif
       return,tmp
-  ENDIF ELSE BEGIN 
-      return,-1
-  ENDELSE 
+  endif else return,-1
 
 END 
 
