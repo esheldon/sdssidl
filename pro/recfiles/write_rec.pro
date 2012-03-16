@@ -44,7 +44,7 @@
 
 
 pro _wr_write_data, lun, struct
-      writeu, lun, struct
+    writeu, lun, struct
 end
 
 pro _wr_write_rec_header, lun, struct
