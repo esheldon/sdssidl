@@ -188,7 +188,7 @@ def hdrdict2idlstruct(hdr_dict):
     return structdef
 
 if len(sys.argv) < 2:
-    sys.stdout.write("usage: python rec2idl.py recfile")
+    print "usage: python rec2idl.py recfile"
     sys.exit(45)
 
 
@@ -200,5 +200,5 @@ hdr=read_header(fname)
 
 stdef=hdrdict2idlstruct(hdr)
 
-sys.stdout.write(stdef+"\n")
+print stdef
 
