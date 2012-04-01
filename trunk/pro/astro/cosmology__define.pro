@@ -123,7 +123,6 @@ pro cosmology::set_pars, $
 
 end 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General tools for calculating distances.  Only assumption is that
 ;; lambda is a constant
@@ -189,7 +188,7 @@ function cosmology::_extract_omegas, omega_m, omega_l, omega_k, flat
 
     if st.omega_m lt 0.0 then message,'omega_m must be greater than 0'
     if st.omega_l lt 0.0 then message,'omega_l must be greater than 0'
-
+    
     return, st
 
 end
@@ -329,13 +328,13 @@ function cosmology::Dm, z1, z2, omega_m=omega_m, omega_l=omega_l, omega_k=omega_
     DH = self->DH(h=h)
     Dc = self->Dc(z1, z2, $
         omega_m=omega_m, omega_l=omega_l, omega_k=omega_k, flat=flat, h=h, npts=npts)
-
+    
     if o.omega_k eq 0 then begin 
         return, Dc
     endif else if o.omega_k gt 0 then begin 
-        return, DH*1./sqrt(o.omega_l)*sinh(sqrt(o.omega_k)*Dc/DH)
+        return, DH*1./sqrt(o.omega_k)*sinh(sqrt(o.omega_k)*Dc/DH)
     endif else begin 
-        return, DH*1./sqrt(o.omega_l)*sin(sqrt(o.omega_k)*Dc/DH)
+        return, DH*1./sqrt(abs(o.omega_k))*sin(sqrt(abs(o.omega_k))*Dc/DH)
     endelse 
 
 end 
