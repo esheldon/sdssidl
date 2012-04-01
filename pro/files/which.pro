@@ -58,6 +58,9 @@
 ;       the two methods.  Erin Sheldon, BNL
 ;   2010-12-15: Simplify: Just check every directory in !path for the filename.
 ;       Dropped VMS support.  ESS, BNL
+;
+;   2012-4-1: made it search the current working directory first.
+;        Matthew Becker, UChicago
 ;-
 
 pro _which_display_results, name, files, funcfound, profound, isglob=isglob, show=show
