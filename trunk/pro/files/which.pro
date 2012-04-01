@@ -143,7 +143,8 @@ function _which_find_file, name, dlm=dlm, isglob=isglob
         path_string = !dlm_path
         ext = '.dlm'
     endif else begin 
-        path_string = !path
+        cd,c=c
+        path_string = c+':'+!path
         ext = '.pro'
     endelse                 
     sep = ':'
