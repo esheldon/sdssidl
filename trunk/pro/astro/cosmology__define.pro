@@ -56,7 +56,9 @@
 ;   Added ability to change the default parameters during construction.
 ;   Use exact value for speed of light.
 ;           2011-08-17, Erin Sheldon, BNL
-;
+;   Fixed bug in Da for non-flat cosmologies
+;           2012-04-01, Matthew Becker, UChicago
+;  
 ;-
 ;  Copyright (C) 2005  Erin Sheldon, NYU.  erin dot sheldon at gmail dot com
 ;
