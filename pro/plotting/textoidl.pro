@@ -387,8 +387,9 @@ FUNCTION textoidl_table, POSTSCRIPT=ps, VECTOR=vec,  HELP=Help
 	[ '\leq', 		'l'   ,	 string(byte(163))  ],$
 	[ "\'", 		"'"   ,	 string(byte(162))  ],$
 	[ '\prime', 		"'"   ,	 string(byte(162))  ],$
-	[ '\circ', 		"%"   ,	 string(byte(176))  ]$
-	                  ]
+	[ '\circ', 		"%"   ,	 string(byte(176))  ],$
+        [ '\ell',          '!12l!X'   ,  '!12l!X'           ]$
+              ]
     LowercaseGreek(1,*) = $
       GreekFont(FontSelection) $
       + LowercaseGreek(FontSelection,*) $
