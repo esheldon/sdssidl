@@ -309,7 +309,7 @@ function binner_histogram, data, method, weights=weights, nperbin=nperbin, rever
                 if method eq 'weighted' or nweights ne 0 then whist[i] = total( weights[ind] )
                 tdata = data[ind]
                 xmean[i]   = mean(tdata)
-                xmedian[i] = median(tdata)
+                xmedian[i] = median([tdata])
 
                 if calcrange then begin
                     xlow[i] = min(tdata, max=tmax)
