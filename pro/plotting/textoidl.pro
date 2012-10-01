@@ -398,10 +398,13 @@ FUNCTION textoidl_table, POSTSCRIPT=ps, VECTOR=vec,  HELP=Help
       GreekFont(FontSelection) +$
       UppercaseGreek(FontSelection,*) $
       + PreviousFont(FontSelection)
-    Symbols(1,*) = $
-      SymbolFont(FontSelection) $
-      + Symbols(FontSelection,*) $
-      + PreviousFont(FontSelection)
+    q = where(Symbols[0,*] NE '\ell')
+    if q[0] NE -1 then begin
+       Symbols(1,q) = $
+          SymbolFont(FontSelection) $
+          + Symbols(FontSelection,q) $
+          + PreviousFont(FontSelection)
+    endif
     Roman(1,*) = $
       RomanFont(FontSelection) $
       + Roman(FontSelection,*) $
