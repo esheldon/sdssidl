@@ -27,15 +27,15 @@
 ;
 ;-
 
-function casid2photoid, casid, sky_version=sky_version, first_field=first_field
+function casid2photoid, cid, sky_version=sky_version, first_field=first_field
 
-    if n_elements(casid) eq 0 then begin
+    if n_elements(cid) eq 0 then begin
         print,'-Syntax: casid2photoid(casid, sky_version=, first_field=)'
         on_error, 2
         message,'Halting'
     endif
 
-    casid_extract, casid, run, rerun, camcol, field, id, sky_version=sky_version, first_field=first_field
+    casid_extract, cid, run, rerun, camcol, field, id, sky_version=sky_version, first_field=first_field
     return, photoid(run, rerun, camcol, field, id)
 
 end
