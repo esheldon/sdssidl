@@ -28,9 +28,9 @@
 ;
 ;-
 
-function casid2photoid, pid, sky_version=sky_version, first_field=first_field
+function photoid2casid, pid, sky_version=sky_version, first_field=first_field
 
-    if n_elements(casid) eq 0 then begin
+    if n_elements(pid) eq 0 then begin
         print,'-Syntax: photoid2casid(photoids, sky_version=, first_field=)'
         on_error, 2
         message,'Halting'
