@@ -1,5 +1,41 @@
+;+
+; NAME:
+;   casid
+;
+; PURPOSE:
+;   Create unique super id from run,rerun,camcol,field,id. Similar
+;   to sdss_photoid() but uses the CAS database convention, so
+;   is equivalent to "objID" in the database.
+;
+; CATEGORY:
+;   SDSS Specific routine.
+;
+;
+; CALLING SEQUENCE:
+;   superid = casid(run,rerun,camcol,field,id,first_field=0,sky_version=2)
+;
+; INPUTS:
+;   run,rerun,camcol,field,id (may be arrays)
+;       You can also just subsets if in order, e.g.
+;           run
+;           run,rerun,camcol
+;       zeros will be used for the others.
+;
+; Keywords:
+;   sky_version: default 2
+;   first_field: Always zero.
+;
+; OUTPUTS:
+;   A superid is returned
+;
+; MODIFICATION HISTORY:
+;   Based on code by Ryan Scranton.
+;   Updated to new default sky version in dr8: 2
+;
+;-
 function casid, run, rerun, camcol, field, obj_id, $
-    first_field=first_field, sky_version=sky_version, verbose=verbose
+    first_field=first_field, sky_version=sky_version, $
+    verbose=verbose
 
     on_error, 2
     if n_params() lt 5 then begin
@@ -21,9 +57,9 @@ function casid, run, rerun, camcol, field, obj_id, $
 
     if n_elements(sky_version) eq 0 then begin
         if keyword_set(verbose) then begin
-            print,'Assuming that sky_version is RUNS (15)'
+            print,'Assuming that sky_version is 2'
         endif
-        sky_version = intarr(n_elements(run)) + 15
+        sky_version = intarr(n_elements(run)) + 2
     endif
 
     if sky_version(0) eq -1 then sky_version = intarr(n_elements(run)) + 15
