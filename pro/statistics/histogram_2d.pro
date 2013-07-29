@@ -54,6 +54,7 @@ function histogram_2d,x,y,nxbins,nybins,xrange=xrange,yrange=yrange,silent=silen
 ;             30-Jul-2003
 ;       Returns bin ranges and bin middles as well as mean in each bin from
 ;       data.  July 2006 Erin Sheldon , NYU
+;       Returns correct bin values when xrange or yrange contain integer values.
 ;-
 ;
 ;
@@ -96,10 +97,10 @@ if n_elements(nybins) eq 0 then nybins=100
 ;the default size
 
 
-min1=xrange(0) < xrange(1)
-min2=yrange(0) < yrange(1)
-max1=xrange(0) > xrange(1)
-max2=yrange(0) > yrange(1)
+min1=1.*xrange(0) < xrange(1)
+min2=1.*yrange(0) < yrange(1)
+max1=1.*xrange(0) > xrange(1)
+max2=1.*yrange(0) > yrange(1)
 
 
 ;this is because xrange may be something like [12.0, 3.0]
