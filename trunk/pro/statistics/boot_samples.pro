@@ -48,7 +48,7 @@ function _boot_samples_inputparse, d1, d2, d3, d4, d5, d6, d7 ,d8
         istr=string(i,f='(i0)')
         comm = 'n=n_elements(d'+istr+')'
         if not execute(comm) then message,'Failed to count d'+istr
-        dinput[i] = n
+        dinput[i-1] = n
     endfor
     return, dinput
 end
