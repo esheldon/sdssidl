@@ -42,21 +42,21 @@ pro _boot_samples_format, nsamp, format, len
     tstr = string('Sample: ', 0, f=form)
     len = strlen(tstr)
 end
-function _boot_samples_inputparse, d1, d2, d3, d4, d5, d6, d7 ,d8
+function _boot_samples_inputparse, d0, d1, d2, d3, d4, d5, d6, d7
     dinput = intarr(8)
-    for i=1,8 do begin
+    for i=0,7 do begin
         istr=string(i,f='(i0)')
         comm = 'n=n_elements(d'+istr+')'
         if not execute(comm) then message,'Failed to count d'+istr
-        dinput[i-1] = n
+        dinput[i] = n
     endfor
     return, dinput
 end
 
-function boot_samples, nsamp, d1, d2, d3, d4, d5, d6, d7, d8, verbose=verbose
+function boot_samples, nsamp, d0, d1, d2, d3, d4, d5, d6, d7, verbose=verbose
     
     on_error, 2
-    dinput = _boot_samples_inputparse(d1,d2,d3,d4,d5,d6,d7,d8)
+    dinput = _boot_samples_inputparse(d0,d1,d2,d3,d4,d5,d6,d7)
     wthere=where(dinput ne 0, nvar)
     if nvar eq 0 or n_elements(nsamp) eq 0 then begin
         print,'-Syntax: bsamp = boot_samples(nsamp, v1,...v8, /verbose)'
