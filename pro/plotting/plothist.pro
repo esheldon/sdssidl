@@ -131,9 +131,6 @@ pro plothist, arr, xhistout, yhistout, weights=weights, $
     endelse
     xhist = bstruct.xcenter
 
-    if arg_present(xhistout) then xhistout=xhist
-    if arg_present(yhistout) then yhistout=yhist
-
     bsize = bstruct.xhigh[0]-bstruct.xlow[0]
 
     N_hist = N_elements( yhist )
@@ -150,6 +147,9 @@ pro plothist, arr, xhistout, yhistout, weights=weights, $
         yhist=yhist*mval
         if n_elements(histerr) ne 0 then histerr=histerr*mval
     endif
+
+    if arg_present(xhistout) then xhistout=xhist
+    if arg_present(yhistout) then yhistout=yhist
 
     ; If not doing a plot, exit here.
     if keyword_set(NoPlot) then return
